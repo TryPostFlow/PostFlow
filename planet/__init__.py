@@ -57,7 +57,7 @@ def configure_extensions(app):
 def configure_packages(app, packages):
     for package_name in packages:
         package_name = '%s.%s' % (app.import_name, package_name)
-        modules = find_modules(package_name)
+        modules = find_modules(package_name, include_packages=True)
         for module in modules:
             __import__(module)
 
