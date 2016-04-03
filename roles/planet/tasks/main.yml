@@ -1,0 +1,13 @@
+---
+
+- include: install.yml
+
+
+- include: config.yml
+  tags: [deploy]
+
+
+- name: Restart supervisor task
+  supervisorctl: name={{ riverrun_app_name }} state=restarted
+  when: server_mode == "production"
+  tags: [deploy]

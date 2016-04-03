@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+
+# reference from https://github.com/pythoncn/june/blob/master/etc/gunicorn.py
+
+import gevent.monkey
+gevent.monkey.patch_all()
+
+import multiprocessing
+
+
+bind = "{{planet_bind}}"
+workers = multiprocessing.cpu_count() * 2 + 1
+worker_class = 'gunicorn.workers.ggevent.GeventWorker'
+
+timeout = 30
+
+proc_name = '{{ planet_app_name }}'
+
+accesslog = '-'
+loglevel = 'warning'
+errorlog = '-'
+
+secure_scheme_headers = {
+    'X-FORWARDED-FOR': 'https',
+}

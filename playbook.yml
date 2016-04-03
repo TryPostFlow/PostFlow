@@ -1,0 +1,15 @@
+---
+- hosts: all
+  sudo: true
+
+  roles:
+    - Stouts.python
+    - Stouts.nginx
+    - Stouts.supervisor
+
+  vars:
+    python_ppa: false
+    python_versions: [2.7]
+    python_install: [virtualenv]
+    python_virtualenvs:
+      - path: /home/vagrant/venv

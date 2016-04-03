@@ -1,0 +1,14 @@
+[program:{{planet_app_name}}]
+user={{planet_user}}
+command = {{planet_virtualenv}}/bin/gunicorn -c config/gunicorn.py planet:app
+process_name=%(program_name)s
+directory = {{planet_base}}
+autostart=true
+autorestart=true
+redirect_stderr=true
+stdout_logfile=/var/log/supervisor/{{planet_server_name}}.log
+stdout_logfile_maxbytes=50MB
+stdout_logfile_backups=5
+stopwaitsecs = 60
+
+killasgroup=true

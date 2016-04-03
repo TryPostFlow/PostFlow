@@ -1,0 +1,21 @@
+---
+
+supervisor_enabled: yes                   # The role is enabled
+supervisor_version: "3.1.2"
+supervisor_bindir: "/usr/local/bin"
+supervisor_bin: "{{ supervisor_bindir }}/supervisord"
+supervisor_pid: /var/run/supervisord.pid
+supervisor_nofile: 65356                  # Set max opened files (set blank to default limits)
+supervisor_cfgdir: /etc/supervisor        # path to config directory
+supervisor_conf_file: "{{ supervisor_cfgdir }}/supervisord.conf"
+supervisor_logdir: /var/log/supervisor    # path to logs directory
+supervisor_incdir: "{{supervisor_cfgdir}}/conf.d" # path to include directory
+supervisor_tasks: []                      # List of supervisor programs
+                                          # Ex. supervisor_tasks:
+                                          #       - name: <name>
+                                          #         option: value
+                                          #         option: value
+                                          #         option: value
+supervisor_events: []                     # similar to tasks/programs but for eventlisteners like crashmail
+supervisor_groups: []                     # groups of tasks
+supervisor_superlance: no                 # Install superlance (http://superlance.readthedocs.org/
