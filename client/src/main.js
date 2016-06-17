@@ -2,13 +2,13 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Resource from 'vue-resource'
 
-import { format } from './filters'
 require('./css/yue.css')
 require('./css/site.css')
-import App from './components/app.vue'
-import Index from './components/index.vue'
-import Post from './components/post.vue'
-import Tag from './components/tag.vue'
+
+import { format } from './filters'
+import App from './app.vue'
+import views from './views'
+
 
 Vue.use(Router)
 Vue.use(Resource)
@@ -23,20 +23,7 @@ var router = new Router({
   saveScrollPosition: true
 })
 
-router.map({
-  '/': {
-    name: 'Index',
-    component: Index
-  },
-  '/posts/:post_id': {
-    name: 'post',
-    component: Post
-  },
-  '/tags/:tag_id': {
-    name: 'Tag',
-    component: Tag
-  }
-})
+router.map(views)
 
 router.redirect({
   '*': '/'

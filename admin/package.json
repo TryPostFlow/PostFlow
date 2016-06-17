@@ -5,7 +5,7 @@
   "author": "Shawn Xie",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server --inline --hot --quiet --port 7070",
+    "dev": "webpack-dev-server --inline --hot",
     "build": "NODE_ENV=production webpack --progress --hide-modules"
   },
   "devDependencies": {
@@ -43,9 +43,9 @@
     "marked": "^0.3.5",
     "select2": "^4.0.1",
     "toastr": "^2.1.2",
-    "vue": "^1.0.13",
-    "vue-resource": "^0.5.1",
-    "vue-router": "^0.7.7",
+    "vue": "^1.0.22",
+    "vue-resource": "^0.7.0",
+    "vue-router": "^0.7.13",
     "vue-strap": "^1.0.3"
   }
 }
