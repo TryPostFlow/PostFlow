@@ -30,43 +30,17 @@ export default {
     route: {
         data () {
             var resource = this.$resource(API.POST)
-            resource.query().then(function(response){
-                 if (response.data.length > 0) {
-                    this.$route.router.go(
-                        {
-                            name: 'PostView',
-                            params: { post_id: response.data[0].id }
-                        }
-                    )
-                }
-            })
-        }
-    },
-    created: function(){
-        var resource = this.$resource(API.POST)
-        resource.query().then(function(response){
-             if (response.data.length > 0) {
-                this.$route.router.replace(
-                    {
-                        name: 'PostView',
-                        params: { post_id: response.data[0].id }
+                resource.query().then(function(response){
+                     if (response.data.length > 0) {
+                        this.$route.router.go(
+                            {
+                                name: 'PostView',
+                                params: { post_id: response.data[0].id }
+                            }
+                        )
                     }
-                )
-            }
-        })
-    },
-    // compiled: function(){
-    //     var resource = this.$resource(API.POST)
-    //     resource.query().then(function(response){
-    //          if (response.data.length > 0) {
-    //             this.$route.router.replace(
-    //                 {
-    //                     name: 'PostView',
-    //                     params: { post_id: response.data[0].id }
-    //                 }
-    //             )
-    //         }
-    //     })
-    // }
+                })
+        }
+    }
 }
 </script>

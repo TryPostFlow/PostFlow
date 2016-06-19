@@ -22,25 +22,6 @@ if (localStorage.getItem('auth')) {
   Vue.http.headers.common['Authorization'] = 'Bearer ' + auth.access_token
 }
 
-// Vue.http.interceptors.push({
-//   response: function (response) {
-//     switch (response.status) {
-//       case 401:
-//         router.go({'name': 'SignIn'})
-//         break
-//       case 402:
-//         router.go({'name': 'SignIn'})
-//         break
-//       case 403:
-//         router.go({'name': 'SignIn'})
-//         break
-//       default:
-//         return response
-//     }
-//     return response
-//   }
-// })
-
 var router = new Router({
   linkActiveClass: 'active'
 })
@@ -49,6 +30,16 @@ router.map(views)
 
 router.redirect({
   '*': '/posts'
+})
+
+router.beforeEach(function (transition) {
+  if (transition.to.auth) {
+    var auth = localStorage.getItem('auth')?JSON.parse(localStorage.getItem('auth')):null
+    if (!auth) {
+        transition.redirect({name: 'SignIn'})
+    }
+  }
+  transition.next()
 })
 
 router.start(App, '#app')

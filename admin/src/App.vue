@@ -1,6 +1,6 @@
 <template>
   <div class="app" v-bind:class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}">
-    <div class="app-header navbar" v-if="isLogin">
+    <div class="app-header navbar">
         <div class="navbar-header bg-black">
           <a href="#/" class="navbar-brand text-lt">
             <i class="fa fa-globe"></i>
@@ -20,7 +20,7 @@
             </ul>
         </div>
     </div>
-    <div class="app-aside hidden-xs bg-black" v-if="isLogin">
+    <div class="app-aside hidden-xs bg-black">
         <div class="aside-wrap">
           <div class="navi-wrap">
             <nav class="navi clearfix">
@@ -74,7 +74,6 @@
             container: false
           }
         },
-        isLogin: false,
         account: {},
         auth: localStorage.getItem('auth')?JSON.parse(localStorage.getItem('auth')):null
       }
@@ -87,18 +86,22 @@
         }
     },
     created: function(){
-      if (this.auth) {
-        this.isLogin = true
-
-        var resource = this.$resource(API.ACCOUNT)
-        resource.get({id: 'me'}).then(function(response){
-             this.account = response.data
-        })
-      }
-      else{
-        this.isLogin = false
-         this.$route.router.go({name: 'SignIn'})
-      }
+      console.log('created')
+    },
+    beforeCompile: function(){
+      console.log('beforeCompile')
+    },
+    compiled: function(){
+      console.log('compiled')
+    },
+    ready: function(){
+      console.log('ready')
+    },
+    beforeDestroy: function(){
+      console.log('beforeDestroy')
+    },
+    destroy: function(){
+      console.log('destroy')
     }
   }
 </script>

@@ -8,26 +8,32 @@ import PostCreate from './PostCreate.vue'
 export default {
   '/signin': {
     name: 'SignIn',
-    component: SignIn
+    component: SignIn,
+    auth: false
   },
   '/signout': {
     name: 'SignOut',
-    component: SignOut
+    component: SignOut,
+    auth: false
   },
   '/posts': {
     name: 'PostList',
-    component: PostList
+    component: PostList,
+    auth: true
   },
   '/posts/:post_id': {
     name: 'PostView',
-    component: PostView
+    component: PostView,
+    auth: true
   },
   '/posts/:post_id/edit': {
     name: 'PostEdit',
-    component: PostEdit
+    component: PostEdit,
+    auth: true
   },
   '/posts/new': {
     name: 'PostCreate',
-    component: PostCreate
+    component: PostCreate,
+    auth: true
   }
 }
