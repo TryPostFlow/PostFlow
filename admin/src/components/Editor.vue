@@ -16,7 +16,8 @@
                 <div class="row-row">
                     <div class="cell scrollable hover">
                         <div class="cell-inner">
-                            <div class="wrapper yue" v-html="markdown | marked">
+                            <div class="wrapper yue rendered-markdown" v-html="html">
+                            <!-- <div class="wrapper yue rendered-markdown"> -->
                             </div>
                         </div>
                     </div>
@@ -27,6 +28,7 @@
 </template>
 <script>
     import marked from 'marked'
+    var $ = require('jquery')
 
     export default{
         props: {
@@ -36,9 +38,60 @@
                 default: ''
             }
         },
+        computed: {
+            html: function(){
+                var h = marked(this.markdown)
+                this.updateImagePlaceholders(h)
+                return h
+            }
+        },
         filters: {
             'marked': marked
         },
+        methods:{
+            updateImagePlaceholders: function(content) {
+                var imgPlaceholders = $(content).find('p').filter(function() {
+                    return (/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim).test($(this).text());
+                });
+
+                $(imgPlaceholders).each(function( index ) {
+                    console.log(index)
+                    // var elemindex = index,
+                    //     self = $(this),
+                    //     altText = self.text();
+
+                    // (function(){
+
+                    //     self.dropzone({ 
+                    //         url: "/article/imgupload",
+                    //         success: function( file, response ){                            
+                    //             var holderP = $(file.previewElement).closest("p"),
+
+                    //                 // Update the image path in markdown
+                    //                 imgHolderMardown = $(".CodeMirror-code").find('pre').filter(function() {
+                    //                     return (/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim).test(self.text()) && (self.find("span").length === 0);
+                    //                 }),
+
+                    //                 // Get markdown
+                    //                 editorOrigVal = editor.getValue(),
+                    //                 nth = 0,
+                    //                 newMarkdown = editorOrigVal.replace(/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(:\(([^\n\]]*)\))?$/gim, function (match, i, original){
+                    //                     nth++;
+                    //                     return (nth === (elemindex+1)) ? (match + "(" + response.path +")") : match;
+                    //                 });
+                    //                 editor.setValue( newMarkdown );
+
+                    //             // Set image instead of placeholder
+                    //             holderP.removeClass("dropzone").html('<img src="'+ response.path +'"/>');
+                    //         }
+                    //     }).addClass("dropzone");
+                    // }());
+                })
+            }
+        },
+        ready(){
+            // this.updatePreview()
+        }
     }
 </script>
 <style>

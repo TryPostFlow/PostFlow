@@ -10,6 +10,8 @@ from .extensions import db
 from .account.models import create_user, Permission
 from .permissions import Need
 
+import feedparser
+
 
 @app.cli.command()
 def createdb():
@@ -44,7 +46,21 @@ def create_super_user():
 @app.cli.command()
 def register_actions():
     for need in Need._needs:
-        db.session.add(
-            Permission(object_type=need.method, action_type=need.value))
+        permission = Permission.query.filter(
+            Permission.object_type == need.method,
+            Permission.action_type == need.value).first()
+        if not permission:
+            db.session.add(
+                Permission(
+                    object_type=need.method,
+                    action_type=need.value))
     db.session.commit()
     click.echo('over')
+
+
+@app.cli.command()
+def import_wordpress():
+    path = raw_input('path: ')
+    feed = feedparser.parse(path)
+    print feed.feed.title
+    print feed.entries[0].wp_post_id

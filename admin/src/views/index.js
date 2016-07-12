@@ -17,14 +17,19 @@ export default {
     auth: false
   },
   '/posts': {
-    name: 'PostList',
     component: PostList,
-    auth: true
-  },
-  '/posts/:post_id': {
-    name: 'PostView',
-    component: PostView,
-    auth: true
+    auth: true,
+    subRoutes: {
+      '/': {
+        name: 'PostList',
+        component: PostList
+      },
+       '/:post_id': {
+        name: 'PostView',
+        component: PostView,
+        // auth: true
+      },
+    }
   },
   '/posts/:post_id/edit': {
     name: 'PostEdit',

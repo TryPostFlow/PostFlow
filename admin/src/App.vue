@@ -1,6 +1,6 @@
 <template>
   <div class="app" v-bind:class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}">
-    <div class="app-header navbar">
+    <div class="app-header navbar" v-if="$route.auth">
         <div class="navbar-header bg-black">
           <a href="#/" class="navbar-brand text-lt">
             <i class="fa fa-globe"></i>
@@ -20,7 +20,7 @@
             </ul>
         </div>
     </div>
-    <div class="app-aside hidden-xs bg-black">
+    <div class="app-aside hidden-xs bg-black" v-if="$route.auth">
         <div class="aside-wrap">
           <div class="navi-wrap">
             <nav class="navi clearfix">
@@ -37,13 +37,13 @@
                     <span class="font-bold">Posts</span>
                   </a>
                 </li>
-<!--                 <li>
+                <li v-bind:class="$route.name == 'TagList' || $route.name == 'TagView' || $route.name == 'TagEdit'?'active':''">
                   <a href="#">
                     <i class="fa fa-tag"></i>
                     <span class="font-bold">Tags</span>
                   </a>
                 </li>
- -->              </ul>
+              </ul>
             </nav>
           </div>
         </div>

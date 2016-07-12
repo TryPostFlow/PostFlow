@@ -19,7 +19,16 @@ export default{
             default: false
         }
     },
+            route: {
+            data ({ to }) {
+              console.log('select route')
+            }
+      },
+    compiled(){
+      console.log('compile')
+    },
     ready(){
+      console.log('select ready')
         var self = this
         var select = $(this.$el)
 
@@ -83,8 +92,13 @@ export default{
             })
         }
     },
-    beforeDestory(){
+
+    beforeDestroy(){
+      console.log('select before destroy')
         $(this.$el).off().select2('destroy')
+    },
+    destroyed(){
+      console.log('select destroy')
     }
 }
 </script>
