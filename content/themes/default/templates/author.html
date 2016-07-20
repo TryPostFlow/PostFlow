@@ -1,0 +1,36 @@
+{% extends theme('layout.html') %}
+{% from theme('macros/_loop.html') import loop %}
+{% block title %}{{author.name}} - Page {{posts.page}} - {{g.site.title}}{% endblock %}
+{% block body_class %}author-template{%endblock%}
+{% block body %}
+<header class="main-header author-head {%if author.cover%}" style="background-image: url({{author.cover}}) {%elif g.site.cover%} style="background-image: url({{post.cover}}){%else%}no-cover{%endif%}">
+    <nav class="main-nav overlay clearfix">
+        {% if g.site.logo%}<a class="g.site-logo" href="{{g.site.domain}}"><img src="{{g.site.logo}}" alt="{{g.site.title}}" /></a>{% endif%}
+        {% if navigation%}
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        {% endif%}
+    </nav>
+</header>
+<section class="author-profile inner">
+    {% if author.avatar%}
+    <figure class="author-image">
+        <div class="img" style="background-image: url({{author.avatar}})"><span class="hidden">{{avatar.name}}'s Picture</span></div>
+    </figure>
+    {% endif %}
+    <h1 class="author-title">{{author.name}}</h1>
+    {% if author.bio %}
+        <h2 class="author-bio">{{author.bio}}</h2>
+    {% endif %}
+    <div class="author-meta">
+        {% if author.location%}<span class="author-location icon-location">{{author.location}}</span>{% endif %}
+        {% if author.website%}<span class="author-link icon-link"><a href="{{author.website}}">{{author.website}}</a></span>{% endif %}
+        <span class="author-stats"><i class="icon-stats"></i> {{ posts.total }} posts</span>
+    </div>
+</section>
+
+
+<main id="content" class="content" role="main">
+    {{loop(posts)}}
+</main>
+
+{% endblock %}

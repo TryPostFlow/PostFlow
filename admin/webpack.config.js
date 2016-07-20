@@ -1,18 +1,21 @@
-var vue = require('vue-loader')
+var path = require('path')
 var webpack = require('webpack')
 var ExtractTextPlugin = require('extract-text-webpack-plugin')
 
 module.exports = {
-  entry: './src/main.js',
+  entry: './src/index.js',
   output: {
-    path: './build',
-    publicPath: '/build/',
+    path: path.resolve(__dirname, './dist'),
+    publicPath: '/admin/',
     filename: 'build.js'
+  },
+  resolveLoader: {
+    root: path.join(__dirname, 'node_modules'),
   },
   module: {
     loaders: [
       { test: /\.js$/, exclude: /node_modules/, loader: 'babel'},
-      { test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css', 'postcss')},
+      { test: /\.css$/, loader: ExtractTextPlugin.extract('style', 'css')},
       { test: /\.vue$/, loader: 'vue' },
       {
         test: /\.(png|jpg|gif)$/,
@@ -48,43 +51,31 @@ module.exports = {
     plugins: ['transform-runtime']
   },
   vue: {
-    postcss: [
-      require('postcss-import')({
-        addDependencyTo: webpack
-      }),
-      require('postcss-url')({
-        url: 'rebase'
-      }),
-      require('postcss-mixins'),
-      require('postcss-simple-vars'),
-      require('postcss-cssnext')],
-    autoprefixer: false,
     loaders: {
       css: ExtractTextPlugin.extract('css')
     }
   },
-  postcss: function () {
-    return [
-      require('postcss-import')({
-        addDependencyTo: webpack,
-        onImport: function (files) {
-          files.forEach(this.addDependency)
-        }.bind(obj) // obj = the argument you should pass to `addDependencyTo()`
-      }),
-      require('postcss-url')({
-        url: 'rebase'
-      }),
-      require('postcss-mixins'),
-      require('postcss-simple-vars'),
-      require('postcss-cssnext')]
-  },
   plugins: [
     new ExtractTextPlugin('style.css')
-  ]
+  ],
+  devServer: {
+    historyApiFallback: {
+      index: '/dist/'
+    },
+    noInfo: true
+  },
+  devtool: '#eval-source-map'
 }
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.plugins = [
+  module.exports.output={
+    path: path.resolve(__dirname, '../planet/static/admin/dist'),
+    publicPath: '/admin/',
+    filename: 'build.js'
+  }
+  module.exports.devtool = 'source-map'
+  // http://vuejs.github.io/vue-loader/workflow/production.html
+  module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
@@ -96,7 +87,5 @@ if (process.env.NODE_ENV === 'production') {
       }
     }),
     new webpack.optimize.OccurenceOrderPlugin()
-  ]
-} else {
-  module.exports.devtool = '#source-map'
+  ])
 }

@@ -1,0 +1,15 @@
+{% extends theme('layout.html') %}
+{% block title %}{{error.code}}{% endblock %}
+{% block body %}
+<div class="gh-view">
+    <section class="error-content error-404 js-error-container">
+        <section class="error-details">
+             <img class="error-ghost" src="{{theme_static('img/404-ghost@2x.png')}}" srcset="{{theme_static('img/404-ghost.png')}} 1x, {{theme_static('img/404-ghost@2x.png')}} 2x" />
+             <section class="error-message">
+                 <h1 class="error-code">{{error.code}}</h1>
+                 <h2 class="error-description">{{error.message}}</h2>
+             </section>
+        </section>
+    </section>
+</div>
+{% endblock %}

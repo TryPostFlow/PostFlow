@@ -1,0 +1,109 @@
+{% extends theme('layout.html') %}
+{% block title %}{{post.title}}{% endblock %}
+{% block body_class %}post-template{%endblock%}
+{% block body %}
+<header class="main-header post-head {%if post.cover%}" style="background-image: url({{post.cover}}){%else%}no-cover{%endif%}">
+    <nav class="main-nav {%if post.cover %}overlay{%endif%} clearfix">
+        {% if g.site.logo%}<a class="g.site-logo" href="{{g.site.domain}}"><img src="{{g.site.logo}}" alt="{{g.site.title}}" /></a>{% endif%}
+        {% if g.site.navigation%}
+            <a class="menu-button icon-menu" href="#"><span class="word">Menu</span></a>
+        {% endif%}
+    </nav>
+</header>
+
+<main class="content" role="main">
+    <article class="post">
+        <header class="post-header">
+            <h1 class="post-title">{{post.title}}</h1>
+            <section class="post-meta">
+                <time class="post-date" datetime="{{post.created_at | format_datetime('%Y-%m-%d')}}">{{post.created_at | format_datetime('%d %B %Y')}}</time> on <a href="/tag/getting-started/">Getting Started</a>
+            </section>
+        </header>
+        <section class="post-content">
+            {{post.content | safe}}
+        </section>
+        <footer class="post-footer">
+
+            {%if post.author.avatar%}
+            <figure class="author-image">
+                <a class="img" href="{{post.author.url}}" style="background-image: url({{post.author.avatar}})"><span class="hidden">{{post.author.name}}'s Picture</span></a>
+            </figure>
+            {%endif%}
+
+            <section class="author">
+                <h4><a href="{{post.author.url}}">{{post.author.name}}</a></h4>
+
+                {%if post.author.bio%}
+                    <p>{{post.author.bio}}</p>
+                {%else%}
+                    <p>Read <a href="{{post.author.url}}">more posts</a> by this author.</p>
+                {%endif%}
+                <div class="author-meta">
+                    {%if post.author.location%}<span class="author-location icon-location">{{post.author.location}}</span>{%endif%}
+                    {%if post.author.website%}<span class="author-link icon-link"><a href="{{post.author.website}}">{{post.author.website}}</a></span>{%endif%}
+                </div>
+            </section>
+
+            <section class="share">
+                <h4>Share this post</h4>
+                <a class="icon-twitter" href="https://twitter.com/intent/tweet?text={{post.title}}&amp;url={{url_for('post_view.show', slug=post.slug, _external=True)}}"
+                    onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+                    <span class="hidden">Twitter</span>
+                </a>
+                <a class="icon-facebook" href="https://www.facebook.com/sharer/sharer.php?u={{url_for('post_view.show', slug=post.slug)}}"
+                    onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+                    <span class="hidden">Facebook</span>
+                </a>
+                <a class="icon-google-plus" href="https://plus.google.com/share?url={{url_for('post_view.show', slug=post.slug)}}"
+                   onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530');return false;">
+                    <span class="hidden">Google+</span>
+                </a>
+            </section>
+
+        </footer>
+        {% if g.site.disqus_id %}
+        <div id="disqus_thread"></div>
+        <script>
+            /**
+             *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+             *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+             */
+            /*
+            var disqus_config = function () {
+                this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+                this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+            };
+            */
+            (function() {  // DON'T EDIT BELOW THIS LINE
+                var d = document, s = d.createElement('script');
+                
+                s.src = '//{{g.site.disqus_id}}.disqus.com/embed.js';
+                
+                s.setAttribute('data-timestamp', +new Date());
+                (d.head || d.body).appendChild(s);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+        {% endif %}
+    </article>
+</main>
+
+<aside class="read-next">
+    {% if next_post %}
+    <a class="read-next-story {%if next_post.cover%}" style="background-image: url({{next_post.cover}}){%else%}no-cover{%endif%}" href="{{url_for('post_view.show', slug=next_post.slug)}}">
+        <section class="post">
+            <h2>{{next_post.title}}</h2>
+            <p>{{next_post.get_excerpt(50)}}&hellip;</p>
+        </section>
+    </a>
+    {% endif %}
+    {% if prev_post %}
+    <a class="read-next-story prev {%if prev_post.cover%}" style="background-image: url({{prev_post.cover}}){%else%}no-cover{%endif%}" href="{{url_for('post_view.show', slug=prev_post.slug)}}">
+        <section class="post">
+            <h2>{{prev_post.title}}</h2>
+            <p>{{prev_post.get_excerpt(50)}}&hellip;</p>
+        </section>
+    </a>
+    {% endif %}
+</aside>
+{% endblock %}

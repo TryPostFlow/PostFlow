@@ -1,0 +1,11 @@
+{%macro pagination(posts) %}
+<nav class="pagination" role="navigation">
+    {% if posts.has_prev %}
+        <a class="newer-posts" href="{{url_for('post_view.index') if posts.prev_num == 1 else url_for('post_view.index', page=posts.prev_num)}}"><span aria-hidden="true">&larr;</span> Newer Posts</a>
+    {% endif %}
+    <span class="page-number">Page {{posts.page}} of {{posts.pages}}</span>
+    {% if posts.has_next %}
+        <a class="older-posts" href="{{url_for('post_view.index', page=posts.next_num)}}">Older Posts <span aria-hidden="true">&rarr;</span></a>
+    {% endif %}
+</nav>
+{%endmacro%}
