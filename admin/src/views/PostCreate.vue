@@ -13,7 +13,7 @@
     </div>
 </div>
 <div class="app-content-full h-full" style="top: 117px; bottom:50px;">
-    <ui-editor :markdown.sync="post.markdown"></ui-editor>
+    <ui-editor :markdown.sync="post.markdown" :content.sync="post.content"></ui-editor>
 </div>
 
 </div>

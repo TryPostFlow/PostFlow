@@ -12,6 +12,8 @@ class TagSchema(BaseSchema):
     name = fields.String(required=True)
     slug = fields.String(allow_none=True)
     description = fields.String(allow_none=True)
+    updated_at = fields.DateTime(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
 
     @pre_load
     def slugify_name(self, in_data):

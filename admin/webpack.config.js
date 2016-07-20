@@ -6,7 +6,7 @@ module.exports = {
   entry: './src/index.js',
   output: {
     path: path.resolve(__dirname, './dist'),
-    publicPath: '/admin/',
+    publicPath: '/',
     filename: 'build.js'
   },
   resolveLoader: {
@@ -58,19 +58,19 @@ module.exports = {
   plugins: [
     new ExtractTextPlugin('style.css')
   ],
-  devServer: {
-    historyApiFallback: {
-      index: '/dist/'
-    },
-    noInfo: true
-  },
+  // devServer: {
+  //   historyApiFallback: {
+  //     index: '/dist/'
+  //   },
+  //   noInfo: true
+  // },
   devtool: '#eval-source-map'
 }
 
 if (process.env.NODE_ENV === 'production') {
   module.exports.output={
     path: path.resolve(__dirname, '../planet/static/admin/dist'),
-    publicPath: '/admin/',
+    publicPath: '/admin/dist/',
     filename: 'build.js'
   }
   module.exports.devtool = 'source-map'

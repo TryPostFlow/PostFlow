@@ -8,7 +8,7 @@ from datetime import datetime
 
 from .run import app
 from .extensions import db
-from .account.models import create_user, Permission
+from .account.models import create_user, Permission, Role
 from .permissions import Need
 from .setting.models import init_settings
 
@@ -41,23 +41,30 @@ def create_super_user():
     name = raw_input('name: ')
     email = raw_input('email: ')
     password = getpass.getpass('password: ')
+    role = Role.query.filter_by(slug='admin').first()
     create_user(name=name,
                 email=email,
-                password=password)
+                password=password,
+                role=role)
     click.echo('over')
 
 
 @app.cli.command()
 def register_actions():
+    admin = Role.query.filter_by(slug='admin').first()
+    if not admin:
+        admin = Role(name='Admin', slug='admin')
     for need in Need._needs:
         permission = Permission.query.filter(
             Permission.object_type == need.method,
             Permission.action_type == need.value).first()
         if not permission:
-            db.session.add(
-                Permission(
-                    object_type=need.method,
-                    action_type=need.value))
+            permission = Permission(
+                object_type=need.method,
+                action_type=need.value)
+            db.session.add(permission)
+        admin.permissions.append(permission)
+    db.session.add(admin)
     db.session.commit()
     click.echo('over')
 

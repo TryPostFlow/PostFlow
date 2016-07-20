@@ -43,7 +43,7 @@ export default{
         select.select2({
           tags: this.tags,
           ajax: {
-            url: 'http://127.0.0.1:5000/tags',
+            url: 'http://127.0.0.1:5000/api/tags',
             dataType: 'json',
             delay: 250,
             data: function (params) {

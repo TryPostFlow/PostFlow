@@ -17,7 +17,7 @@ Vue.use(Router)
 Vue.use(Resource)
 
 if (process.env.NODE_ENV === 'production') {
-  require('./ga')
+  // require('./ga')
   Vue.http.options.root = '/api'
 } else {
   window.ga = function () {}

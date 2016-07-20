@@ -9,7 +9,7 @@ from .schemas import TagSchema
 from .models import Tag
 
 
-@tag_api.route('', methods=['GET'])
+@tag_api.route('/', methods=['GET'])
 def list():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))

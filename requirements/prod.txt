@@ -1,4 +1,0 @@
--r base.txt
-gevent==1.1.0
-gunicorn==19.4.5
-raven==5.12

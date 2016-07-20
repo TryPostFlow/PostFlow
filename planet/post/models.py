@@ -54,7 +54,7 @@ class Post(db.Model):
     author_id = db.Column(db.Integer, index=True)
     title = db.Column(db.String(255))
     slug = db.Column(db.String(255))
-    markdown = db.Column(db.Text)
+    _markdown = db.Column('markdown', db.Text)
     content = db.Column(db.Text)
     excerpt = db.Column(db.Text)
     _status = db.Column('status', db.SmallInteger, default=STATUS_DRAFT)
@@ -83,6 +83,14 @@ class Post(db.Model):
     # @cached_property
     # def content(self):
     #     return mistune.markdown(self.markdown)
+    @hybrid_property
+    def markdown(self):
+        return self._markdown
+
+    @markdown.setter
+    def markdown(self, markdown):
+        self._markdown = markdown
+        self.content = mistune.markdown(self._markdown)
 
     def get_excerpt(self, length=100):
         # return re.sub(r'<.*?>', '', (self.excerpt or self.content))[:length]

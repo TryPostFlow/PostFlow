@@ -16,7 +16,7 @@
                 <div class="row-row">
                     <div class="cell scrollable hover">
                         <div class="cell-inner">
-                            <div class="wrapper yue rendered-markdown" v-html="html">
+                            <div class="wrapper yue rendered-markdown" v-html="content">
                             <!-- <div class="wrapper yue rendered-markdown"> -->
                             </div>
                         </div>
@@ -36,15 +36,20 @@
                 twoWay: true,
                 type: String,
                 default: ''
+            },
+            content: {
+                twoWay: true,
+                type: String,
+                default: ''
             }
         },
-        computed: {
-            html: function(){
-                var h = marked(this.markdown)
-                this.updateImagePlaceholders(h)
-                return h
-            }
-        },
+        // computed: {
+        //     content: function(){
+        //         var h = marked(this.markdown)
+        //         this.updateImagePlaceholders(h)
+        //         return h
+        //     }
+        // },
         filters: {
             'marked': marked
         },
@@ -91,6 +96,10 @@
         },
         ready(){
             // this.updatePreview()
+            this.$watch('markdown', function (val) {
+              this.content = marked(val)
+            })
+
         }
     }
 </script>
