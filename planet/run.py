@@ -7,7 +7,10 @@ packages = [
     'account',
     'auth',
     'post',
-    'tag'
+    'tag',
+    'setting',
+    'images',
+    'admin'
 ]
 
 app = create_app(packages=packages)

@@ -1,0 +1,28 @@
+{% from theme('macros/_pagination.html') import pagination %}
+{% macro loop(posts) %}
+
+<div class="extra-pagination inner">
+    {{pagination(posts)}}
+</div>
+
+{% for post in posts.items %}
+<article class="post {{post_class}}">
+    <header class="post-header">
+        <h2 class="post-title"><a href="{{url_for('post_view.show', slug=post.slug)}}">{{post.title}}</a></h2>
+    </header>
+    <section class="post-excerpt">
+        <p>{{post.get_excerpt(120)}} <a class="read-more" href="{{url_for('post_view.show', slug=post.slug)}}">&raquo;</a></p>
+    </section>
+    <footer class="post-meta">
+        {%if post.author.avatar%}<img class="author-thumb" src="post.author.avatar" alt="post.author.name" nopin="nopin" />{%endif%}
+        <a href="{{url_for('account_view.show', slug=post.author.slug)}}">{{post.author.name}}</a>
+        {% if post.tags %}
+        on {% for tag in post.tags %}<a href="{{url_for('tag_view.show', slug=tag.slug)}}">{{tag.name}}</a>{%if not loop.last%}, {%endif%}{% endfor %}
+        {% endif %}
+        <time class="post-date" datetime="{{post.created_at | format_datetime('%Y-%m-%d')}}">{{post.created_at | format_datetime('%d %B %Y')}}</time>
+    </footer>
+</article>
+{% endfor %}
+
+{{pagination(posts)}}
+{% endmacro %}

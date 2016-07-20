@@ -3,5 +3,5 @@
 
 from flask import Blueprint
 
-frontend = Blueprint('account_frontend', __name__)
-api = Blueprint('account_api', __name__, url_prefix='/accounts')
+account_view = Blueprint('account_view', __name__)
+account_api = Blueprint('account_api', __name__, url_prefix='/api/accounts')

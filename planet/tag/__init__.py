@@ -4,4 +4,5 @@
 from flask import Blueprint
 
 
-api = Blueprint('tag_api', __name__, url_prefix='/tags')
+tag_api = Blueprint('tag_api', __name__, url_prefix='/api/tags')
+tag_view = Blueprint('tag_view', __name__)

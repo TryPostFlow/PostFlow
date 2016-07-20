@@ -3,4 +3,4 @@
 
 from flask import Blueprint
 
-api = Blueprint('auth_api', __name__)
+auth_api = Blueprint('auth_api', __name__, url_prefix='/api/auth')

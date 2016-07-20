@@ -103,5 +103,5 @@ export default{
 }
 </script>
 <style>
-@import "select2/dist/css/select2.css";
+/*@import "select2/dist/css/select2.css";*/
 </style>

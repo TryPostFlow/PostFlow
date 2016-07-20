@@ -76,5 +76,5 @@
     }
 </script>
 <style>
-    @import "toastr";
+    /*@import "toastr";*/
 </style>

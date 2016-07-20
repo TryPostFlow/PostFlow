@@ -9,7 +9,7 @@ from ..account.models import User
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
-    client_id = db.Column(db.String(40), primary_key=True)
+    client_id = db.Column(db.String(40), index=True)
     client_secret = db.Column(db.String(55), unique=True, index=True,
                               nullable=False)
     _redirect_uris = db.Column(db.Text)

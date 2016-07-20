@@ -66,5 +66,5 @@
     }
 </script>
 <style>
-    @import "toastr";
+
 </style>

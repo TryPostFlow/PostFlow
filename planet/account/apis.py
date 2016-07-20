@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import jwt
-import calendar
-import datetime
+# import jwt
+# import calendar
+# import datetime
 from flask import request, current_app, g
 
-from . import api
+from . import account_api
 from .schemas import AccountSchema, LoginSchema
 from .models import get_user, get_all_users
 
@@ -36,18 +36,18 @@ from ..extensions import db
 #         {'token': token, 'exp': calendar.timegm(exp.timetuple())})
 
 
-@api.route('/me', methods=['GET'])
+@account_api.route('/me', methods=['GET'])
 def me():
     return render_schema(g.user, AccountSchema)
 
 
-@api.route('/<int:id>', methods=['GET'])
+@account_api.route('/<int:id>', methods=['GET'])
 def view(id):
     user = get_user(id)
     return render_schema(user, AccountSchema)
 
 
-@api.route('', methods=['GET'])
+@account_api.route('', methods=['GET'])
 def list():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
@@ -55,7 +55,7 @@ def list():
     return render_schema(users, AccountSchema)
 
 
-@api.route('', methods=['POST'])
+@account_api.route('', methods=['POST'])
 def create():
     payload = request.get_json()
     account_schema = AccountSchema(only=('name', 'email', 'password'))
@@ -67,7 +67,7 @@ def create():
     return render_schema(account_data, AccountSchema)
 
 
-@api.route('/<int:id>', methods=['PUT'])
+@account_api.route('/<int:id>', methods=['PUT'])
 def edit():
     payload = request.get_json()
     account_schema = AccountSchema(only=('name', 'email', 'password'))

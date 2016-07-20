@@ -3,4 +3,4 @@
 
 from flask import Blueprint
 
-api = Blueprint('media_api', __name__, url_prefix='/medias')
+api = Blueprint('media_api', __name__, url_prefix='/api/medias')

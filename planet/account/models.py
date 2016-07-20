@@ -9,6 +9,8 @@ from flask_principal import RoleNeed, UserNeed
 
 from ..extensions import db
 from ..permissions import Need
+from ..post.models import Post
+from ..setting.models import get_setting
 
 
 def auth_user(email, password):
@@ -21,8 +23,15 @@ def get_all_users(page, limit=20):
     return User.query.order_by(User.updated_at.desc()).paginate(page, limit)
 
 
-def get_user(id):
-    return User.query.get_or_404(id)
+def get_user(id_or_slug):
+    return User.query.filter(
+        db.or_(User.id == id_or_slug, User.slug == id_or_slug)).first()
+
+
+def get_posts_by_user(id, page, limit=None):
+    limit = limit if limit else int(get_setting('postsPerPage').value)
+    posts = Post.query.filter(Post.author_id == id).paginate(page, limit)
+    return posts
 
 
 def create_user(name, email, password):

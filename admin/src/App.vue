@@ -55,6 +55,7 @@
   </div>
 </template>
 <script>
+
   import {API} from './api.js'
   export default{
     data() {
@@ -106,19 +107,4 @@
   }
 </script>
 <style>
-@import "bootstrap";
-@import "font-awesome";
-@import "./css/variables.css";
-@import "./css/mixins.css";
-@import "./css/reset.css";
-@import "./css/layout.css";
-@import "./css/layout.boxed.css";
-@import "./css/nav.css";
-@import "./css/nav.offscreen.css";
-@import "./css/nav.dock.css";
-@import "./css/arrow.css";
-@import "./css/buttons.css";
-@import "./css/colors.css";
-@import "./css/utilities.css";
-@import "./css/yue.css";
 </style>

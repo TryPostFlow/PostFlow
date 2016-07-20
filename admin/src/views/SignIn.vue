@@ -39,8 +39,8 @@
           app: this.$parent.app,
           user: {
             grant_type: 'password',
-            client_id: 'Bd8AX46FcnzNYuou1ZS1bCDCkKULTTHdbznRnY5n',
-            client_secret: 'gOyGCiKuAJLLTymWRZm9VzwAy1k9pLGUZAG9xNrtqrKLydFlu9'
+            client_id: 'J1SuWr9nNV618NgJ4kZPM4DvYVY68AjtxDRsokZI',
+            client_secret: 'bM17VfEkCAmmcMTm81g0VExTsPPDSVzTDbCZZKoEDQZdZqTm05'
           },
           authError: null
         }

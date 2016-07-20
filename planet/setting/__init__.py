@@ -3,4 +3,4 @@
 
 from flask import Blueprint
 
-setting = Blueprint('setting', __name__, url_prefix='/settings')
+setting = Blueprint('setting', __name__, url_prefix='/api/settings')

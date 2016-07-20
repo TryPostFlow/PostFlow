@@ -6,7 +6,7 @@ from werkzeug.security import gen_salt
 from flask import jsonify, g, request
 from ..extensions import oauth, db
 
-from . import api
+from . import auth_api
 from .models import Token, Client, Grant
 from ..account.models import User
 
@@ -72,34 +72,34 @@ def get_user(username, password, *args, **kwargs):
     return None
 
 
-@api.route('/token', methods=['GET', 'POST'])
+@auth_api.route('/token', methods=['GET', 'POST'])
 @oauth.token_handler
 def token():
     return None
 
 
-@api.route('/revoke', methods=['POST'])
+@auth_api.route('/revoke', methods=['POST'])
 @oauth.revoke_handler
 def revoke_token():
     return {}
 
 
-@api.route('/errors')
+@auth_api.route('/errors')
 def errors():
     error = request.args.get('error', None)
     return jsonify(error=error)
 
 
-@api.route('/client', methods=['POST'])
+@auth_api.route('/client', methods=['POST'])
 def client():
     client = Client(
         client_id=gen_salt(40),
         client_secret=gen_salt(50),
         _redirect_uris=' '.join([
-            'http://localhost:8000/authorized',
-            'http://127.0.0.1:8000/authorized',
-            'http://127.0.1:8000/authorized',
-            'http://127.1:8000/authorized',
+            'http://localhost:8000/api/authorized',
+            'http://127.0.0.1:8000/api/authorized',
+            'http://127.0.1:8000/api/authorized',
+            'http://127.1:8000/api/authorized',
             ])
     )
     db.session.add(client)

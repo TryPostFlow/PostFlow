@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from flask import request
-from . import api
+from . import tag_api
 from ..extensions import db
 from ..schema import render_schema
 from .schemas import TagSchema
 from .models import Tag
 
 
-@api.route('', methods=['GET'])
+@tag_api.route('', methods=['GET'])
 def list():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
