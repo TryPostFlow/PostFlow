@@ -1,10 +1,19 @@
 <template>
 <div class="col">
-    <div class="wrapper b-b clear">
-        <h2 class="font-thin m-n pull-left">{{post.title}}</h2>
-        <a v-link="{ name: 'PostEdit', params: { post_id: post.id }}" class="btn btn-default btn-sm pull-right">Edit</a>
+    <div class="vbox">
+        <div class="row-row">
+            <div class="cell">
+                <div class="cell-inner">
+                    <div class="wrapper b-b clear">
+                        <h2 class="font-thin m-n pull-left">{{post.title}}</h2>
+                        <a v-link="{ name: 'PostEdit', params: { post_id: post.id }}" class="btn btn-default btn-sm pull-right">Edit</a>
+                    </div>
+                    <div class="wrapper">{{{post.content}}}</div>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div class="wrapper">{{{post.content}}}</div>
 </div>
 </template>
 <script>

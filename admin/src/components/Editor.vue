@@ -27,8 +27,10 @@
     </div>
 </template>
 <script>
+    import {API} from '../api.js'
     import marked from 'marked'
-    var $ = require('jquery')
+    import $ from 'jQuery'
+    var Dropzone = require("dropzone");
 
     export default{
         props: {
@@ -43,61 +45,71 @@
                 default: ''
             }
         },
-        // computed: {
-        //     content: function(){
-        //         var h = marked(this.markdown)
-        //         this.updateImagePlaceholders(h)
-        //         return h
-        //     }
-        // },
+        computed: {
+            content: function(){
+                return marked(this.markdown)
+            }
+        },
         filters: {
             'marked': marked
         },
         methods:{
-            updateImagePlaceholders: function(content) {
-                var imgPlaceholders = $(content).find('p').filter(function() {
-                    return (/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim).test($(this).text());
-                });
+            updateImagePlaceholders: function() {
+                    var self= this;
+                    var plist = Array.prototype.slice.call(document.querySelectorAll('.rendered-markdown p'));
+                    var imgPlaceholders = plist.filter(function(element) {
+                        // console.log(element)
+                        if ($(element).find('img').length > 0) {
+                            return $($(element).find('img')[0]).attr('src') == '';
+                        };
+                    });
+                    // console.log('length: '+imgPlaceholders.length)
+                    Dropzone.autoDiscover = false;
 
-                $(imgPlaceholders).each(function( index ) {
-                    console.log(index)
-                    // var elemindex = index,
-                    //     self = $(this),
-                    //     altText = self.text();
+                    imgPlaceholders.forEach(
+                        function(element, index){
+                            // console.log('element'+element)
+                            // console.log('index'+index)
+                            var elemindex = index
+                            // self = $(this),
+                            // altText = self.text();
 
-                    // (function(){
+                            element.setAttribute("class", "dropzone");
+                            $($(element).find('img')[0]).remove()
+                            var dropzone = new Dropzone(element, {
+                                url: self.$http.options.root+'/'+API.IMAGE_UPLOAD,
+                                paramName: 'image',
+                                success: function(file, response){
+                                    var holderP = $(file.previewElement).closest("p")
 
-                    //     self.dropzone({ 
-                    //         url: "/article/imgupload",
-                    //         success: function( file, response ){                            
-                    //             var holderP = $(file.previewElement).closest("p"),
+                                    // Get markdown
+                                    var nth = 0;
+                                    var newMarkdown = self.markdown.replace(/(!\[.*?\]\()(\))/g, function (whole, a, b){
+                                        nth++;
+                                        // console.log('nth: '+nth)
+                                        // console.log('elemindex: ' + elemindex)
+                                        //  console.log(nth === (elemindex+1))
+                                        // console.log('whole: '+ whole)
+                                        // console.log('a: '+ a)
+                                        // console.log('b: '+ b)
+                                        return (nth === (elemindex+1)) ? (a + response.path +')') : a+b;
+                                    });
+                                    self.markdown = newMarkdown
+                                    // console.log(self.markdown)
 
-                    //                 // Update the image path in markdown
-                    //                 imgHolderMardown = $(".CodeMirror-code").find('pre').filter(function() {
-                    //                     return (/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim).test(self.text()) && (self.find("span").length === 0);
-                    //                 }),
-
-                    //                 // Get markdown
-                    //                 editorOrigVal = editor.getValue(),
-                    //                 nth = 0,
-                    //                 newMarkdown = editorOrigVal.replace(/^(?:\{<(.*?)>\})?!(?:\[([^\n\]]*)\])(:\(([^\n\]]*)\))?$/gim, function (match, i, original){
-                    //                     nth++;
-                    //                     return (nth === (elemindex+1)) ? (match + "(" + response.path +")") : match;
-                    //                 });
-                    //                 editor.setValue( newMarkdown );
-
-                    //             // Set image instead of placeholder
-                    //             holderP.removeClass("dropzone").html('<img src="'+ response.path +'"/>');
-                    //         }
-                    //     }).addClass("dropzone");
-                    // }());
-                })
-            }
+                                    // Set image instead of placeholder
+                                    holderP.removeClass("dropzone").html('<img src="'+ response.path +'"/>');
+                                }
+                            });
+                        }
+                    );
+                }
         },
         ready(){
-            // this.updatePreview()
-            this.$watch('markdown', function (val) {
-              this.content = marked(val)
+            this.updateImagePlaceholders()
+
+            this.$watch('content', function(val){
+                this.updateImagePlaceholders()
             })
 
         }

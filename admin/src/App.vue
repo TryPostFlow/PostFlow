@@ -38,7 +38,7 @@
                   </a>
                 </li>
                 <li v-bind:class="$route.name == 'TagList' || $route.name == 'TagView' || $route.name == 'TagEdit'?'active':''">
-                  <a href="#">
+                  <a v-link="{name: 'TagList'}">
                     <i class="fa fa-tag"></i>
                     <span class="font-bold">Tags</span>
                   </a>

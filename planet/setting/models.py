@@ -33,6 +33,10 @@ def get_setting(key):
         db.or_(Setting.key == key, Setting.id == key)).first()
 
 
+def get_all_settings():
+    return Setting.query.all()
+
+
 class Setting(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(150), nullable=False)

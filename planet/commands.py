@@ -99,5 +99,6 @@ def import_wordpress():
 
 @app.cli.command()
 def init():
+    register_actions()
     init_settings()
     click.echo('over')

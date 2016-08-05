@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from . import post_view
-from .models import get_all_posts, get_post, get_next_post, get_prev_post
+from .models import (
+    get_all_posts, get_post, get_next_post, get_prev_post, add_post_views)
 
 from ..helpers.template import render_template
 
@@ -18,5 +19,6 @@ def show(slug):
     post = get_post(slug)
     next_post = get_next_post(post.id)
     prev_post = get_prev_post(post.id)
+    add_post_views(post.id)
     return render_template(
         'post.html', post=post, next_post=next_post, prev_post=prev_post)

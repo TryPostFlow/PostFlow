@@ -4,6 +4,9 @@ import PostList from './PostList.vue'
 import PostView from './PostView.vue'
 import PostEdit from './PostEdit.vue'
 import PostCreate from './PostCreate.vue'
+import TagList from './TagList.vue'
+import TagCreate from './TagCreate.vue'
+import TagEdit from './TagEdit.vue'
 
 export default {
   '/signin': {
@@ -40,5 +43,25 @@ export default {
     name: 'PostCreate',
     component: PostCreate,
     auth: true
-  }
+  },
+  '/tags': {
+    component: TagList,
+    auth: true,
+    subRoutes: {
+      '/': {
+        name: 'TagList',
+        component: TagList
+      },
+      '/new': {
+        name: 'TagCreate',
+        component: TagCreate
+      },
+       '/:tag_id': {
+        name: 'TagEdit',
+        component: TagEdit,
+        // auth: true
+      }
+    }
+  },
+
 }

@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # import re
+import itertools
 import mistune
 
 from jinja2.utils import Markup
@@ -11,6 +12,7 @@ from werkzeug import cached_property
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from ..extensions import db
+from ..helpers.text import slugify
 from ..setting.models import get_setting
 
 
@@ -30,6 +32,15 @@ def get_next_post(id):
 
 def get_prev_post(id):
     return Post.query.order_by(Post.id.desc()).filter(Post.id < id).first()
+
+
+def add_post_views(id, views=1):
+    post = Post.query.get(id)
+    if not post:
+        return
+    post.views = post.views + views
+    db.session.add(post)
+    db.session.commit()
 
 
 post_tag = db.Table(
@@ -53,10 +64,11 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     author_id = db.Column(db.Integer, index=True)
     title = db.Column(db.String(255))
-    slug = db.Column(db.String(255))
+    _slug = db.Column('slug', db.String(255), unique=True)
     _markdown = db.Column('markdown', db.Text)
     content = db.Column(db.Text)
     excerpt = db.Column(db.Text)
+    views = db.Column(db.Integer, default=0)
     _status = db.Column('status', db.SmallInteger, default=STATUS_DRAFT)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
@@ -99,3 +111,19 @@ class Post(db.Model):
     @property
     def status(self):
         return self.STATUSES.get(self._status)
+
+    @hybrid_property
+    def slug(self):
+        return self._slug
+
+    @slug.setter
+    def slug(self, slug):
+        slugify_slug = slugify(slug) if slug else slugify(self.title)
+
+        self._slug = slugify_slug
+
+        for x in itertools.count(1):
+            if not db.session.query(
+                    db.exists().where(Post.slug == self._slug)).scalar():
+                break
+            self._slug = "{}-{}".format(slugify_slug, x)

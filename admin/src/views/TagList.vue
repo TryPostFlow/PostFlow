@@ -2,19 +2,16 @@
 <div class="app-content h-full">
     <div class="app-content-body app-content-full h-full">
         <div class="hbox hbox-auto-xs hbox-auto-sm">
-            <div class="col w-xl bg-light dk b-r bg-auto">
+            <div class="col bg-light dk b-r bg-auto">
                 <div class="vbox">
                     <div class="row-row">
                         <div class="cell scrollable hover" @scroll="loadmore">
                             <div class="cell-inner">
-                                 <ul class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
-                                    <li v-for="post_item in posts" track-by="id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.post_id == post_item.id?'b-l-info':''">
-                                        <div>
-                                            <a class="text-md" v-link="{ name: 'PostView', params: { post_id: post_item.id }}">{{post_item.title}}</a>
-                                        </div>
-                                        <div class="text-ellipsis m-t-xs"><span class="label bg-light m-l-sm" v-for="tag in post_item.tags">{{tag.name}}</span></div>
-                                    </li>
-                                </ul>
+                                 <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
+                                    <a v-for="tag_item in tags" track-by="id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.tag_id == tag_item.id?'b-l-info':''" v-link="{ name: 'TagEdit', params: { tag_id: tag_item.slug }}">
+                                        {{tag_item.name}} {{'tag-'+tag_item.id}}<span class="label label-default">{{tag_item.slug}}</span>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -30,27 +27,26 @@
 <script>
     import {API} from '../api.js'
     let $ = require('jQuery')
-
     export default{
-        name: 'PostList',
+        name: 'TagList',
         data () {
             return {
-                post: {},
-                posts: [],
+                tag: {},
+                tags: [],
                 p: 1
             }
         },
         route: {
             data ({ to }) {
-                var resource = this.$resource(API.POST)
+                var resource = this.$resource(API.TAG)
                 resource.query({p: this.p}).then(function(response){
-                    this.posts = response.data
-                    if (this.$route.name == 'PostList') {
-                        if (this.posts.length > 0) {
+                    this.tags = this.tags.length?this.tags:response.data
+                    if (this.$route.name == 'TagList') {
+                        if (this.tags.length > 0) {
                             this.$route.router.go(
                                 {
-                                    name: 'PostView',
-                                    params: { post_id: this.posts[0].id }
+                                    name: 'TagEdit',
+                                    params: { tag_id: this.tags[0].slug }
                                 }
                             )
                         }
@@ -66,11 +62,10 @@
                       // load your content
                     console.log('bottom')
                     lock = true;
-                   let resource = this.$resource(API.POST)
+                   let resource = this.$resource(API.TAG)
                    this.p += 1
                     resource.query({p: this.p}).then(function(response){
-                        let posts = response.data
-                        this.posts = this.posts.concat(posts)
+                        this.tags = this.tags.concat(response.data)
                         lock = false
                     })
                 }

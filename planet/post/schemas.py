@@ -13,14 +13,17 @@ class PostSchema(BaseSchema):
     id = fields.Integer()
     title = fields.String(required=True)
     slug = fields.String()
-    user = fields.Nested(AccountSchema, exclude=('password', ))
+    author = fields.Nested(AccountSchema, exclude=('password', ))
     markdown = fields.String()
     content = fields.String()
     tags = fields.Nested(TagSchema, many=True, partial=True)
+    status = fields.String()
+    views = fields.Integer()
 
     @pre_load
     def slugify_name(self, in_data):
-        in_data['slug'] = slugify(in_data['title'])
+        in_data['slug'] = slugify(in_data['slug'])\
+            if 'slug' in in_data.keys() else slugify(in_data['title'])
 
     @post_load
     def make_object(self, data):

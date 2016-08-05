@@ -2,6 +2,7 @@ import 'font-awesome/css/font-awesome.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import './css/app.css'
 import './css/yue.css'
+import './css/dropzone.css'
 
 import 'select2/dist/css/select2.css'
 import 'toastr/build/toastr.css'

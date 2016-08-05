@@ -38,7 +38,7 @@ def create():
     post_data, errors = post_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
-    post_data.user = g.user
+    post_data.author = g.user
     db.session.add(post_data)
     db.session.commit()
     return render_schema(post_data, PostSchema)

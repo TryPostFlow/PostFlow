@@ -7,7 +7,7 @@ clean-pyc:
 	@find . -name '*~' -exec rm -f {} +
 	@find . -name '__pycache__' -exec rm -fr {} +
 
-ifeq (serve,$(firstword $(MAKECMDGOALS)))
+ifeq (server,$(firstword $(MAKECMDGOALS)))
   # use the rest as arguments for "serve"
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
   # ...and turn them into do-nothing targets
@@ -17,7 +17,7 @@ endif
 export FLASK_ENV=dev
 export FLASK_APP=planet/commands.py
 export FLASK_DEBUG=1
-serve: 
+server: 
 	flask $(RUN_ARGS)
 
 admin-serve:
@@ -27,4 +27,4 @@ admin-build:
 	@npm run build --prefix admin
 
 dev:
-	@$(MAKE) serve admin-serve -j 2
+	@$(MAKE) server admin-serve -j 2

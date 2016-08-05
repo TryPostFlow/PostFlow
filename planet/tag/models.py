@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import itertools
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from ..extensions import db
@@ -35,13 +36,15 @@ class Tag(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     _name = db.Column('name', db.String(150))
-    slug = db.Column(db.String(150))
+    _slug = db.Column('slug', db.String(150), unique=True)
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
         db.DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
+
+    __mapper_args__ = {'order_by': id.desc()}
 
     @hybrid_property
     def name(self):
@@ -52,3 +55,19 @@ class Tag(db.Model):
         self._name = name
         if self.slug is None:
             self.slug = slugify(name)
+
+    @hybrid_property
+    def slug(self):
+        return self._slug
+
+    @slug.setter
+    def slug(self, slug):
+        slugify_slug = slugify(slug) if slug else slugify(self.title)
+
+        self._slug = slugify_slug
+
+        for x in itertools.count(1):
+            if not db.session.query(
+                    db.exists().where(Tag.slug == self._slug)).scalar():
+                break
+            self._slug = "{}-{}".format(slugify_slug, x)
