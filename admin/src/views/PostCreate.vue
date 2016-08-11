@@ -2,15 +2,13 @@
     <div class="app-content">
       <div class="app-content-body">
 
-<div class="wrapper-sm b-b">
-    <div class="row">
-        <div class="col-lg-11">
+<div class="wrapper-sm b-b clearfix">
+        <div class="pull-left">
             <input class="form-control input-lg no-radius no-border no-bg text-lg" type="text" v-model="post.title" placeholder="Post title">
         </div>
-        <div class="col-lg-1">
-             <a @click="save" class="btn btn-primary">Save</a>
+        <div class="pull-right">
+        <ui-dropdown-button :items='buttons' @action="save"></ui-dropdown-button>
         </div>
-    </div>
 </div>
 <div class="app-content-full h-full" style="top: 117px; bottom:50px;">
     <ui-editor :markdown.sync="post.markdown" :content.sync="post.content"></ui-editor>
@@ -37,6 +35,10 @@
     import toastr from 'toastr'
     import editor from '../components/Editor.vue'
     import select from '../components/Select.vue'
+    import DropdownButton from '../components/DropdownButton.vue'
+    import jQuery from 'jquery'
+    window.jQuery = jQuery
+    require('bootstrap/js/dropdown.js')
 
     export default{
         name: 'PostsCreate',
@@ -45,23 +47,35 @@
                 post: {
                     markdown: '',
                     tags: []
-                }
+                },
+                buttons: [
+                    {
+                        dataTarget: 'draft',
+                        text: 'Save Draft'
+                    },
+                    {
+                        dataTarget: 'published',
+                        text: 'Publish Now'
+                    }
+                ]
             }
         },
         methods: {
-            save: function () {
-                    var resource = this.$resource(API.POST)
-                    resource.save(this.post).then(function(response){
-                        this.post = {markdown: '', tags:[]}
-                        toastr.options.positionClass = 'toast-bottom-right';
-                        toastr.success('Save successfully.', {timeOut: 3000})
-                        this.$route.router.go({name:'PostEdit', params:{post_id: response.data.id}})
-                    })
+            save: function (status) {
+                this.post.status = status
+                var resource = this.$resource(API.POST)
+                resource.save(this.post).then(function(response){
+                    this.post = {markdown: '', tags:[]}
+                    toastr.options.positionClass = 'toast-bottom-right';
+                    toastr.success('Save successfully.', {timeOut: 3000})
+                    this.$route.router.go({name:'PostEdit', params:{post_id: response.data.id}})
+                })
             }
         },
         components: {
             'ui-select': select,
-            'ui-editor': editor
+            'ui-editor': editor,
+            'ui-dropdown-button': DropdownButton
         }
     }
 </script>

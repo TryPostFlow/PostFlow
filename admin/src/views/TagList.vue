@@ -9,7 +9,7 @@
                             <div class="cell-inner">
                                  <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
                                     <a v-for="tag_item in tags" track-by="id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.tag_id == tag_item.id?'b-l-info':''" v-link="{ name: 'TagEdit', params: { tag_id: tag_item.slug }}">
-                                        {{tag_item.name}} {{'tag-'+tag_item.id}}<span class="label label-default">{{tag_item.slug}}</span>
+                                        {{tag_item.name}} <span class="label label-default">{{tag_item.slug}}</span>
                                     </a>
                                 </div>
                             </div>

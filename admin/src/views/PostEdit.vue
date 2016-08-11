@@ -2,14 +2,12 @@
     <div class="app-content">
       <div class="app-content-body">
 
-<div class="wrapper-sm b-b">
-    <div class="row">
-        <div class="col-lg-11">
-            <input class="form-control input-lg no-radius no-border no-bg text-lg" type="text" v-model="post.title">
-        </div>
-        <div class="col-lg-1">
-             <a @click="update" class="btn btn-primary">Save</a>
-        </div>
+<div class="wrapper-sm b-b clearfix">
+    <div class="pull-left">
+        <input class="form-control input-lg no-radius no-border no-bg text-lg" type="text" v-model="post.title">
+    </div>
+    <div class="pull-right">
+         <ui-dropdown-button :items='buttons' @action="update"></ui-dropdown-button>
     </div>
 </div>
 <div class="app-content-full h-full" style="top: 117px; bottom:50px;">
@@ -37,6 +35,7 @@
     import toastr from 'toastr'
     import editor from '../components/Editor.vue'
     import select from '../components/Select.vue'
+    import DropdownButton from '../components/DropdownButton.vue'
 
     export default{
         name: 'PostsEdit',
@@ -45,7 +44,51 @@
                 post: {
                     markdown: '',
                     tags: []
+                },
+                buttons: [
+                    {
+                        dataTarget: 'published',
+                        text: 'Update Post'
+                    },
+                    {
+                        dataTarget: 'draft',
+                        text: 'Unpublish'
+                    },
+                    {
+                        dataTarget: 'delete',
+                        text: 'Delete Post'
+                    }
+                ]
+            }
+        },
+        computed: {
+            buttons: function(){
+                if (this.post.status == 'draft') {
+                    return [
+                        {
+                            dataTarget: 'draft',
+                            text: 'Save Draft'
+                        },
+                        {
+                            dataTarget: 'published',
+                            text: 'Publish Now'
+                        }
+                    ]
                 }
+                return [
+                    {
+                        dataTarget: 'published',
+                        text: 'Update Post'
+                    },
+                    {
+                        dataTarget: 'draft',
+                        text: 'Unpublish'
+                    },
+                    {
+                        dataTarget: 'delete',
+                        text: 'Delete Post'
+                    }
+                ]
             }
         },
         route: {
@@ -57,21 +100,23 @@
             }
         },
         methods: {
-            update: function () {
-                    var resource = this.$resource(API.POST)
-                    resource.update(
-                        {id: this.$route.params.post_id},
-                        this.post)
-                    .then(function(response){
-                        this.post = response.data
-                        toastr.options.positionClass = 'toast-bottom-right';
-                        toastr.success('Save successfully.', {timeOut: 3000})
-                    })
+            update: function (status) {
+                this.post.status = status
+                var resource = this.$resource(API.POST)
+                resource.update(
+                    {id: this.$route.params.post_id},
+                    this.post)
+                .then(function(response){
+                    this.post = response.data
+                    toastr.options.positionClass = 'toast-bottom-right';
+                    toastr.success('Save successfully.', {timeOut: 3000})
+                })
             }
         },
         components: {
             'ui-select': select,
-            'ui-editor': editor
+            'ui-editor': editor,
+            'ui-dropdown-button': DropdownButton
         }
     }
 </script>

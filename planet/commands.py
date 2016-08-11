@@ -75,7 +75,6 @@ def import_wordpress():
     path = 'wordpress.2016-07-07.xml'
     feed = feedparser.parse(path)
     for entry in feed.entries:
-        # print entry.keys()
         post = Post()
         post.title = entry.title
         # print entry.content
@@ -87,7 +86,8 @@ def import_wordpress():
             post.tags.append(tag)
 
         published = datetime.strptime(entry.wp_post_date, '%Y-%m-%d %H:%M:%S')
-        post.author_id = 1
+        post.created_by = 1
+        post.updated_by = 1
         print published.strftime('%Y/%m/'+entry.wp_post_id)
         post.slug = published.strftime('%Y/%m/'+entry.wp_post_id)
         post.created_at = published

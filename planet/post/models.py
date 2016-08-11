@@ -16,9 +16,12 @@ from ..helpers.text import slugify
 from ..setting.models import get_setting
 
 
-def get_all_posts(page, limit=None):
+def get_all_posts(status=None, page=1, limit=None):
     limit = limit if limit else int(get_setting('postsPerPage').value)
-    return Post.query.order_by(Post.updated_at.desc()).paginate(page, limit)
+    query = Post.query
+    if status:
+        query = query.filter(Post.status == status)
+    return query.order_by(Post.updated_at.desc()).paginate(page, limit)
 
 
 def get_post(id_or_slug):
@@ -51,30 +54,25 @@ post_tag = db.Table(
 
 class Post(db.Model):
 
-    STATUS_DRAFT = 0
-    STATUS_PUBLIC = 1
-    STATUS_REMOVED = 2
-
-    STATUSES = {
-        STATUS_DRAFT: 'draft',
-        STATUS_PUBLIC: 'public',
-        STATUS_REMOVED: 'closed'
-    }
+    STATUS_DRAFT = 'draft'
+    STATUS_PUBLIC = 'published'
+    STATUS_REMOVED = 'removed'
 
     id = db.Column(db.Integer, primary_key=True)
-    author_id = db.Column(db.Integer, index=True)
     title = db.Column(db.String(255))
     _slug = db.Column('slug', db.String(255), unique=True)
     _markdown = db.Column('markdown', db.Text)
     content = db.Column(db.Text)
     excerpt = db.Column(db.Text)
     views = db.Column(db.Integer, default=0)
-    _status = db.Column('status', db.SmallInteger, default=STATUS_DRAFT)
+    status = db.Column(db.String(150), default=STATUS_DRAFT)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_by = db.Column(db.Integer, index=True)
     updated_at = db.Column(
         db.DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
+    updated_by = db.Column(db.Integer, index=True)
 
     __mapper_args__ = {'order_by': id.desc()}
 
@@ -88,13 +86,10 @@ class Post(db.Model):
 
     author = db.relationship(
         'User',
-        primaryjoin='Post.author_id == User.id',
-        foreign_keys='Post.author_id',
+        primaryjoin='Post.created_by == User.id',
+        foreign_keys='Post.created_by',
         backref='posts')
 
-    # @cached_property
-    # def content(self):
-    #     return mistune.markdown(self.markdown)
     @hybrid_property
     def markdown(self):
         return self._markdown
@@ -108,10 +103,6 @@ class Post(db.Model):
         # return re.sub(r'<.*?>', '', (self.excerpt or self.content))[:length]
         return Markup(self.excerpt or self.content).striptags()[:length]
 
-    @property
-    def status(self):
-        return self.STATUSES.get(self._status)
-
     @hybrid_property
     def slug(self):
         return self._slug
@@ -119,11 +110,12 @@ class Post(db.Model):
     @slug.setter
     def slug(self, slug):
         slugify_slug = slugify(slug) if slug else slugify(self.title)
-
+        if not self._slug:
+            self._slug = slugify_slug
+            for x in itertools.count(1):
+                if not db.session.query(
+                        db.exists().where(Post.slug == self._slug)).scalar():
+                    break
+                self._slug = "{}-{}".format(slugify_slug, x)
+            return
         self._slug = slugify_slug
-
-        for x in itertools.count(1):
-            if not db.session.query(
-                    db.exists().where(Post.slug == self._slug)).scalar():
-                break
-            self._slug = "{}-{}".format(slugify_slug, x)

@@ -17,7 +17,7 @@ from .permissions import (post_create_perm,
 def index():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
-    posts = get_all_posts(page, limit)
+    posts = get_all_posts(page=page, limit=limit)
     return render_schema(posts, PostSchema)
 
 
@@ -39,6 +39,7 @@ def create():
     if errors:
         return render_error(20001, errors, 422)
     post_data.author = g.user
+    post_data.updated_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
     return render_schema(post_data, PostSchema)
@@ -48,14 +49,14 @@ def create():
 @auth.require(401)
 @post_update_perm.require(403)
 def update(id):
-    payload = request.get_json()
-    if not payload:
+    playload = request.get_json()
+    if not playload:
         return render_error(20001, 'No input data provided')
-    post = get_post(id)
-    post_schema = PostSchema(exclude=('created_at', 'updated_at'))
-    post, errors = post_schema.load(payload)
+    post_schema = PostSchema(exclude=('created_at', 'updated_at', 'author'))
+    post, errors = post_schema.load(playload)
     if errors:
         return render_error(20001, errors, 422)
+    post.updated_by = g.user.id
     db.session.add(post)
     db.session.commit()
     return render_schema(post, PostSchema)
