@@ -21,7 +21,7 @@ def get_all_posts(status=None, page=1, limit=None):
     query = Post.query
     if status:
         query = query.filter(Post.status == status)
-    return query.order_by(Post.updated_at.desc()).paginate(page, limit)
+    return query.paginate(page, limit)
 
 
 def get_post(id_or_slug):
