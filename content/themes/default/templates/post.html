@@ -107,3 +107,10 @@
     {% endif %}
 </aside>
 {% endblock %}
+{% block afterscript %}
+<script>
+    (function() {
+      $.post(window.location.pathname+'/views');
+    })();
+  </script>
+  {% endblock %}
