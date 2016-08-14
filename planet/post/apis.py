@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
 from flask import request, g
 
 from . import api
@@ -40,6 +41,9 @@ def create():
         return render_error(20001, errors, 422)
     post_data.author = g.user
     post_data.updated_by = g.user.id
+    if post_data.status == 'published':
+        post_data.published_at = datetime.utcnow
+        post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
     return render_schema(post_data, PostSchema)
@@ -49,17 +53,21 @@ def create():
 @auth.require(401)
 @post_update_perm.require(403)
 def update(id):
+    post = get_post(id)
     playload = request.get_json()
     if not playload:
         return render_error(20001, 'No input data provided')
     post_schema = PostSchema(exclude=('created_at', 'updated_at', 'author'))
-    post, errors = post_schema.load(playload)
+    post_data, errors = post_schema.load(playload)
     if errors:
         return render_error(20001, errors, 422)
-    post.updated_by = g.user.id
-    db.session.add(post)
+    post_data.updated_by = g.user.id
+    if post.status != 'published' and post_data.status == 'published':
+        post_data.published_at = datetime.utcnow
+        post_data.published_by = g.user.id
+    db.session.add(post_data)
     db.session.commit()
-    return render_schema(post, PostSchema)
+    return render_schema(post_data, PostSchema)
 
 
 @api.route('/<id>', methods=['DELETE'])

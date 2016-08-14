@@ -73,6 +73,8 @@ class Post(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
     updated_by = db.Column(db.Integer, index=True)
+    published_at = db.Column(db.DateTime)
+    published_by = db.Column(db.Integer, index=True)
 
     __mapper_args__ = {'order_by': id.desc()}
 

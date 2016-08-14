@@ -36,7 +36,10 @@
     </script>
 
     <meta name="generator" content="Planet 0.1">
-    <link rel="alternate" type="application/rss+xml" title="{{g.site.title}}" href="{{g.site.domain}}/rss/">
+    <link href="{{ url_for('post_view.feed') }}"
+      rel="alternate"
+      title="{{g.site.title}}" 
+      type="application/atom+xml">
     <link rel="stylesheet" href="{{theme_static('css/screen.css')}}">
   </head>
   <body class="{% block body_class %}{%endblock%} nav-closed">
@@ -50,7 +53,7 @@
                 <li class="nav-{{item['slug']}}{%if item.current%} nav-current{% endif%}" role="presentation"><a href="{{item['url']}}">{{item['label']}}</a></li>
             {%endfor%}
         </ul>
-        <a class="subscribe-button icon-feed" href="{{g.site.domain}}rss/">Subscribe</a>
+        <a class="subscribe-button icon-feed" href="{{url_for('post_view.feed')}}">Subscribe</a>
     </div>
     <span class="nav-cover"></span>
 
