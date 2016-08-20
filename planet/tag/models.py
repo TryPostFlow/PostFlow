@@ -52,9 +52,9 @@ class Tag(db.Model):
 
     @name.setter
     def name(self, name):
-        self._name = name
+        self._name = name.strip()
         if self.slug is None:
-            self.slug = slugify(name)
+            self.slug = slugify(name)[:255]
 
     @hybrid_property
     def slug(self):
@@ -63,11 +63,13 @@ class Tag(db.Model):
     @slug.setter
     def slug(self, slug):
         slugify_slug = slugify(slug) if slug else slugify(self.title)
+        if not self._slug:
+            self._slug = slugify_slug
 
+            for x in itertools.count(1):
+                if not db.session.query(
+                        db.exists().where(Tag.slug == self._slug)).scalar():
+                    break
+                self._slug = "{}-{}".format(slugify_slug, x)
+            return
         self._slug = slugify_slug
-
-        for x in itertools.count(1):
-            if not db.session.query(
-                    db.exists().where(Tag.slug == self._slug)).scalar():
-                break
-            self._slug = "{}-{}".format(slugify_slug, x)

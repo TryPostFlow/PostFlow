@@ -59,7 +59,7 @@ class Post(db.Model):
     STATUS_REMOVED = 'removed'
 
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(255))
+    _title = db.Column('title', db.String(255))
     _slug = db.Column('slug', db.String(255), unique=True)
     _markdown = db.Column('markdown', db.Text)
     content = db.Column(db.Text)
@@ -104,6 +104,16 @@ class Post(db.Model):
     def get_excerpt(self, length=100):
         # return re.sub(r'<.*?>', '', (self.excerpt or self.content))[:length]
         return Markup(self.excerpt or self.content).striptags()[:length]
+
+    @hybrid_property
+    def title(self):
+        return self._title
+
+    @title.setter
+    def title(self, title):
+        self._title = title.strip()
+        if self.slug is None:
+            self.slug = slugify(title)[:255]
 
     @hybrid_property
     def slug(self):

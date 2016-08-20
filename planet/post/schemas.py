@@ -20,10 +20,10 @@ class PostSchema(BaseSchema):
     status = fields.String()
     views = fields.Integer()
 
-    @pre_load
-    def slugify_name(self, in_data):
-        in_data['slug'] = slugify(in_data['slug'])\
-            if 'slug' in in_data.keys() else slugify(in_data['title'])
+    # @pre_load
+    # def slugify_name(self, in_data):
+    #     in_data['slug'] = slugify(in_data['slug'])\
+    #         if 'slug' in in_data.keys() else slugify(in_data['title'])
 
     @post_load
     def make_object(self, data):
