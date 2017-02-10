@@ -5,7 +5,7 @@
                 <div class="row-row">
                     <div class="cell scrollable hover">
                         <div class="cell-inner">
-                            <textarea id="markdown-editor" class="form-control no-radius no-border no-bg wrapper-lg text-md markdown-editor" style="height:100%;" v-model="markdown"></textarea>
+                            <textarea id="markdown-editor" class="form-control no-radius no-border no-bg wrapper-lg text-md markdown-editor" style="height:100%;" v-model="value.markdown"></textarea>
                         </div>
                     </div>
                 </div>
@@ -17,7 +17,6 @@
                     <div class="cell scrollable hover">
                         <div class="cell-inner">
                             <div class="wrapper yue rendered-markdown" v-html="content">
-                            <!-- <div class="wrapper yue rendered-markdown"> -->
                             </div>
                         </div>
                     </div>
@@ -27,27 +26,28 @@
     </div>
 </template>
 <script>
-    import {API} from '../api.js'
     import marked from 'marked'
     import $ from 'jQuery'
     var Dropzone = require("dropzone");
+    import '../css/yue.css'
+    import '../css/dropzone.css'
 
     export default{
+        name: 'Editor',
         props: {
-            markdown: {
-                twoWay: true,
-                type: String,
-                default: ''
-            },
-            content: {
-                twoWay: true,
-                type: String,
-                default: ''
+            value: {
+                type: Object,
+                default:function(){
+                    return {
+                        markdown: '',
+                        content: ''
+                    }
+                }
             }
         },
         computed: {
             content: function(){
-                return marked(this.markdown)
+                return this.value.markdown?marked(this.value.markdown):this.value.content
             }
         },
         filters: {
@@ -76,15 +76,16 @@
 
                             element.setAttribute("class", "dropzone");
                             $($(element).find('img')[0]).remove()
+                            var url = process.env.NODE_ENV === 'production'?'/api/images/upload':'http://127.0.0.1:5000/api/images/upload'
                             var dropzone = new Dropzone(element, {
-                                url: self.$http.options.root+'/'+API.IMAGE_UPLOAD,
+                                url: url,
                                 paramName: 'image',
                                 success: function(file, response){
                                     var holderP = $(file.previewElement).closest("p")
 
                                     // Get markdown
                                     var nth = 0;
-                                    var newMarkdown = self.markdown.replace(/(!\[.*?\]\()(\))/g, function (whole, a, b){
+                                    var newMarkdown = self.value.markdown.replace(/(!\[.*?\]\()(\))/g, function (whole, a, b){
                                         nth++;
                                         // console.log('nth: '+nth)
                                         // console.log('elemindex: ' + elemindex)
@@ -94,7 +95,7 @@
                                         // console.log('b: '+ b)
                                         return (nth === (elemindex+1)) ? (a + response.path +')') : a+b;
                                     });
-                                    self.markdown = newMarkdown
+                                    self.value.markdown = newMarkdown
                                     // console.log(self.markdown)
 
                                     // Set image instead of placeholder
@@ -105,11 +106,13 @@
                     );
                 }
         },
-        ready(){
+        mounted(){
             this.updateImagePlaceholders()
 
             this.$watch('content', function(val){
                 this.updateImagePlaceholders()
+                this.value.content = this.content
+                this.$emit('input', this.value)
             })
 
         }

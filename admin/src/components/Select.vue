@@ -1,36 +1,37 @@
 <template>
-    <select multiple="{{multiple}}" style="width: 100%"></select>
+    <select :multiple="multiple" style="width: 100%"></select>
 </template>
 <script>
+import "select2/dist/css/select2.css"
 var $ = require('jquery')
 var select2 = require('select2')
 
 export default{
+    name: 'Select',
     props: {
         multiple: {
             type: String,
             default: false
         },
-        selected: {
-            twoWay: true
+        value: {
+            type: Array,
+            default: function(){
+              return []
+            }
         },
         tags: {
             type: Boolean,
             default: false
         }
     },
-            route: {
-            data ({ to }) {
-              console.log('select route')
-            }
-      },
-    compiled(){
-      console.log('compile')
+    data(){
+      return{
+        select:$(this.$el)
+      }
     },
-    ready(){
-      console.log('select ready')
+    mounted(){
         var self = this
-        var select = $(this.$el)
+        self.select = $(this.$el)
 
         function formatRepo (repo) {
           return repo.name
@@ -40,7 +41,7 @@ export default{
           return repo.name
         }
 
-        select.select2({
+        self.select.select2({
           tags: this.tags,
           ajax: {
             url: 'http://127.0.0.1:5000/api/tags',
@@ -54,7 +55,6 @@ export default{
             },
             processResults: function (data, params) {
               params.page = params.page || 1
-
               return {
                 results: data
               }
@@ -68,37 +68,32 @@ export default{
           templateSelection: formatRepoSelection
         }).on('change', function () {
           var data = []
-          $.each(select.select2('data'), function (key, value) {
+          $.each(self.select.select2('data'), function (key, value) {
             data.push({
               id: parseInt(value.id)? parseInt(value.id): null,
               name: value.text || value.name,
             text: value.text || value.name})
           })
-          self.selected = data
+          // self.selected = data
+          self.$emit('input', data)
         })
     },
     watch: {
-        'selected': function(val, oldVal){
-            var select = $(this.$el)
-            select.html('')
-            $.each(val, function (key, value) {
-              var $option = $('<option selected>Loading...</option>')
-              $option.text(value.name).val(value.id)
-              $option.removeData()
-              select.append($option)
-            })
-            select.select2({
-              tags: []
-            })
-        }
-    },
-
-    beforeDestroy(){
-      console.log('select before destroy')
-        $(this.$el).off().select2('destroy')
+      value(val){
+        // select.html('')
+        var self = this
+        $.each(val, function (key, value) {
+          var $option = $('<option selected>Loading...</option>')
+          $option.text(value.name).val(value.id)
+          $option.removeData()
+          self.append($option)
+          // select.trigger('change')
+        })
+        self.trigger('change.select2')
+      }
     },
     destroyed(){
-      console.log('select destroy')
+      $(this.$el).off().select2('destroy')
     }
 }
 </script>

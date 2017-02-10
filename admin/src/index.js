@@ -1,54 +1,55 @@
 import 'font-awesome/css/font-awesome.css'
 import 'bootstrap/dist/css/bootstrap.css'
 import './css/app.css'
-import './css/yue.css'
-import './css/dropzone.css'
-
-import 'select2/dist/css/select2.css'
-import 'toastr/build/toastr.css'
 
 import Vue from 'vue'
+
 import Router from 'vue-router'
-import Resource from 'vue-resource'
+import { sync } from 'vuex-router-sync'
 
 import App from './App.vue'
 import views from './views'
+import store from './store'
 
 Vue.use(Router)
-Vue.use(Resource)
+Vue.use(ElementUI)
 
-if (process.env.NODE_ENV === 'production') {
-  // require('./ga')
-  Vue.http.options.root = '/api'
-} else {
-  window.ga = function () {}
-  Vue.config.debug = true
-  Vue.http.options.root = 'http://127.0.0.1:5000/api'
-}
-
-if (localStorage.getItem('auth')) {
-  var auth = JSON.parse(localStorage.getItem('auth'))
-  Vue.http.headers.common['Authorization'] = 'Bearer ' + auth.access_token
-}
-
-var router = new Router({
-  linkActiveClass: 'active'
+const router = new Router({
+  // mode: 'history',
+  // scrollBehavior: () => ({ y: 0 }),
+  // scrollBehavior: function(to, from, savedPosition) {
+  //     if (to.hash) {
+  //         return {selector: to.hash}
+  //     } else {
+  //         return { x: 0, y: 0 }
+  //     }
+  // },
+  routes: views
 })
 
-router.map(views)
+sync(store, router)
 
-router.redirect({
-  '*': '/posts'
-})
-
-router.beforeEach(function (transition) {
-  if (transition.to.auth) {
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.auth)) {
     var auth = localStorage.getItem('auth')? JSON.parse(localStorage.getItem('auth')): null
     if (!auth) {
-      transition.redirect({name: 'SignIn'})
+      next({
+        path: '/signin',
+        query: {redirect: to.fullpath}
+      })
+    }else{
+      next()
     }
+  }else{
+    next()
   }
-  transition.next()
 })
 
-router.start(App, '#app')
+const app = new Vue(
+  Vue.util.extend({
+    router,
+    store
+  }, App) // Object spread copying everything from App.vue
+)
+require('es6-promise').polyfill()
+app.$mount('#app')

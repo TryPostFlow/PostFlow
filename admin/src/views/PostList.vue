@@ -8,9 +8,9 @@
                         <div class="cell scrollable hover" @scroll="loadmore">
                             <div class="cell-inner">
                                  <ul class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
-                                    <li v-for="post_item in posts" track-by="id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.post_id == post_item.id?'b-l-info':''">
+                                    <li v-for="post_item in posts" :key="post_item.id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.post_id == post_item.id?'b-l-info':''">
                                         <div>
-                                            <a class="text-md" v-link="{ name: 'PostView', params: { post_id: post_item.id }}">{{post_item.title}}</a>
+                                            <router-link class="text-md" :to="{ name: 'PostView', params: { post_id: post_item.id }}">{{post_item.title}}</router-link>
                                         </div>
                                         <div class="text-ellipsis m-t-xs"><span class="label bg-light m-l-sm" v-for="tag in post_item.tags">{{tag.name}}</span></div>
                                     </li>
@@ -26,57 +26,53 @@
     </div>
 </div>
 </template>
-
 <script>
-    import {API} from '../api.js'
-    let $ = require('jQuery')
-
-    export default{
-        name: 'PostList',
-        data () {
-            return {
-                post: {},
-                posts: [],
-                p: 1
-            }
+const $ = require('jQuery')
+function fetchPosts(store, page){
+    let params = {
+        p: page?page:1
+    }
+    return store.dispatch('post/FETCH_ITEMS', {path: 'posts', params:params})
+}
+export default{
+    name: 'PostList',
+    computed: {
+        posts(){
+            return this.$store.getters['post/GET_ITEMS']().data
         },
-        route: {
-            data ({ to }) {
-                var resource = this.$resource(API.POST)
-                resource.query({p: this.p}).then(function(response){
-                    this.posts = response.data
-                    if (this.$route.name == 'PostList') {
-                        if (this.posts.length > 0) {
-                            this.$route.router.go(
-                                {
-                                    name: 'PostView',
-                                    params: { post_id: this.posts[0].id }
-                                }
-                            )
-                        }
-                    };
-                })
-            }
-        },
-        methods:{
-            loadmore: function(e){
-                let lock = false;
-                if($(e.target).scrollTop() - $('.app-header').height() +1 == $('.scrollable .list-group').height() - $(window).height() && !lock)
-                {
-                      // load your content
-                    console.log('bottom')
-                    lock = true;
-                   let resource = this.$resource(API.POST)
-                   this.p += 1
-                    resource.query({p: this.p}).then(function(response){
-                        let posts = response.data
-                        this.posts = this.posts.concat(posts)
-                        lock = false
-                    })
-                }
+        page(){return this.$store.getters['post/GET_ITEMS']().page}
+    },
+    methods:{
+        loadmore: function(e){
+            let lock = false;
+            if($(e.target).scrollTop() - $('.app-header').height() +1 == $('.scrollable .list-group').height() - $(window).height() && !lock)
+            {
+                  // load your content
+                console.log('bottom')
+                lock = true;
+                fetchPosts(this.$store, this.page+1).then(()=>{lock=false})
             }
         }
+    },
+    watch:{
+        '$route':function(){
+            if (this.$route.name == 'PostList'){
+                fetchPosts(this.$store).then(()=>{
+                    if(this.posts.length > 0){
+                        this.$router.push({name: 'PostView', params: { post_id: this.posts[0].id }})
+                    }
+                })
+            }
+        }
+    },
+    beforeMount(){
+        fetchPosts(this.$store).then(()=>{
+             if (this.$route.name == 'PostList' && this.posts.length > 0){
+                this.$router.push({name: 'PostView', params: { post_id: this.posts[0].id }})
+            }
+        })
     }
+}
 </script>
 <style>
     .list-group-item:first-child{

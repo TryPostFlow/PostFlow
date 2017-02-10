@@ -5,7 +5,7 @@
             <div class="cell">
                 <div class="cell-inner">
                     <div class="wrapper b-b">
-                        <a v-link="{ name: 'TagCreate'}" class="btn btn-sm btn-default">New TAG</a>
+                        <router-link :to="{ name: 'TagCreate'}" class="btn btn-sm btn-default">New TAG</router-link>
                     </div>
                     <div class="wrapper b-b clear">
                         <div class="font-bold m-b">Tag Settings</div>
@@ -24,7 +24,7 @@
                             </div>
                             <div class="form-group">
                                 <button type="submit" class="btn btn-sm btn-success pull-left" @click="save"><i class="fa fa-save"></i> SAVE TAG</button>
-                                <button type="submit" class="btn btn-sm btn-link text-danger pull-right"><i class="fa fa-trash"></i> DELETE TAG</button>
+                                <button type="submit" class="btn btn-sm btn-link text-danger pull-right" @click="remove"><i class="fa fa-trash"></i> DELETE TAG</button>
                             </div>
                         </form>
                     </div>
@@ -36,32 +36,58 @@
 </div>
 </template>
 <script>
-import {API} from '../api.js'
+import toastr from 'toastr'
+import 'toastr/build/toastr.css'
+
+function fetchTag(store){
+    return store.dispatch(
+        'tag/FETCH_ITEM',
+        {
+            path: `tags/${store.state.route.params.post_id}`,
+            params: {
+                id: store.state.route.params.tag_id
+            }
+        })
+}
 
 export default{
     name: 'TagEdit',
-    data () {
-        return {
-            tag: {},
-            tags: []
-        }
-    },
-    route: {
-        data ({ to }) {
-            var resource = this.$resource(API.TAG)
-            resource.get({id: to.params.tag_id}).then((response) => {
-                this.tag = response.data
-            })
+    computed:{
+        tag(){
+            return this.$store.getters['tag/GET_ITEM'](this.$store.state.route.params.tag_id) || {}
         }
     },
     methods: {
         save: function(){
-            let resource = this.$resource(API.TAG)
-            resource.update({id: this.tag.id},this.tag).then(
-                (response) => {
-                this.tag = response.data
-            })
+            this.$store.dispatch(
+                'tag/UPDATE_ITEM',
+                {
+                    path: `tags/${this.$store.state.route.params.tag_id}`,
+                    params: this.tag
+                })
+                .then(()=>{
+                    toastr.options.positionClass = 'toast-bottom-right';
+                    toastr.success('Save successfully.', {timeOut: 3000})
+                })
+        },
+        remove(){
+            this.$store.dispatch(
+                'tag/DELETE_ITEM',
+                {
+                    path: `tags/${this.$store.state.route.params.tag_id}`,
+                    params:{
+                        key: this.$store.state.route.params.tag_id
+                    }
+                })
+                .then(()=>{
+                    toastr.options.positionClass = 'toast-bottom-right';
+                    toastr.success('Delete successfully.', {timeOut: 3000})
+                     this.$router.push({name:'TagList'})
+                })
         }
+    },
+    beforeMount(){
+        fetchTag(this.$store)
     }
 }
 </script>
