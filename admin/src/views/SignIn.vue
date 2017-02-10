@@ -1,25 +1,35 @@
 <template>
-<el-row type="flex" class="row" justify="center">
-  <el-col :span="6">
+<div class="container w-xxl w-auto-xs">
   <a href class="navbar-brand block m-t">{{app.name}}</a>
   <div class="m-b-lg">
-    <el-form :model="user">
+    <div class="wrapper text-center">
+      <strong>Sign in to get in touch</strong>
+    </div>
+    <form name="form" class="form-validation">
       <div class="text-danger wrapper text-center" v-show="authError">
           {{authError}}
       </div>
-      <!-- <div class="list-group list-group-sm"> -->
-        <el-form-item>
-          <el-input v-model="user.username" placeholder="Email" required></el-input>
-        </el-form-item>
-        <el-form-item>
-           <el-input type="password" placeholder="Password" v-model="user.password" required></el-input>
-        </el-form-item>
-      <!-- </div> -->
-      <el-button type="primary" @click="signin()" class="btn-block" size="large">Log in</el-button>
-    </el-form>
+      <div class="list-group list-group-sm">
+        <div class="list-group-item">
+          <input type="email" placeholder="Email" class="form-control no-border" v-model="user.username" required>
+        </div>
+        <div class="list-group-item">
+           <input type="password" placeholder="Password" class="form-control no-border" v-model="user.password" required>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-lg btn-primary btn-block" @click="signin()" ng-disabled='form.$invalid'>Log in</button>
+      <div class="text-center m-t m-b"><a ui-sref="access.forgotpwd">Forgot password?</a></div>
+      <div class="line line-dashed"></div>
+      <p class="text-center"><small>Do not have an account?</small></p>
+      <a ui-sref="access.signup" class="btn btn-lg btn-default btn-block">Create an account</a>
+    </form>
   </div>
-  </el-col>
-</el-row>
+  <div class="text-center">
+    <p>
+      <small class="text-muted">Web app framework base on VueJS<br>&copy; 2017</small>
+    </p>
+  </div>
+</div>
 </template>
 <script>
 import axios from '../store/constants/api'
@@ -38,6 +48,7 @@ export default{
   },
   methods: {
     signin(){
+      var vm = this
       axios.post(
         'auth/token',
         qs.stringify(this.user),
@@ -46,12 +57,11 @@ export default{
         })
       .then(function (response) {
         localStorage.setItem('auth', JSON.stringify(response.data))
-        this.$router.push({name: 'PostList'})
+        vm.$router.push({name: 'PostList'})
       })
-      // .catch(function(error){
-      //   this.authError = error
-      // })
-      
+      .catch(function(error){
+        this.authError = error
+      })
     }
   }
   // beforeMount(){
