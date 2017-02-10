@@ -12,7 +12,6 @@ import views from './views'
 import store from './store'
 
 Vue.use(Router)
-Vue.use(ElementUI)
 
 const router = new Router({
   // mode: 'history',
