@@ -6,7 +6,7 @@
         name: 'SignOut',
         created: function(){
             localStorage.removeItem('auth')
-            this.$route.router.push({name: 'SignIn'})
+            this.$router.push({name: 'SignIn'})
         }
     }
 </script>
