@@ -1,6 +1,6 @@
 <template>
   <div class="app" v-bind:class="{'app-header-fixed':app.settings.headerFixed, 'app-aside-fixed':app.settings.asideFixed, 'app-aside-folded':app.settings.asideFolded, 'app-aside-dock':app.settings.asideDock, 'container':app.settings.container}">
-    <div class="app-header navbar" v-if="$route.auth">
+    <div class="app-header navbar" v-if="$route.meta.auth">
         <div class="navbar-header bg-black">
           <a href="#/" class="navbar-brand text-lt">
             <i class="fa fa-globe"></i>
@@ -15,33 +15,33 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
               <li>
-                    <a v-link="{name: 'SignOut'}">Sign Out</a>
+                    <router-link :to="{name: 'SignOut'}">Sign Out</a>
                   </li>
             </ul>
         </div>
     </div>
-    <div class="app-aside hidden-xs bg-black" v-if="$route.auth">
+    <div class="app-aside hidden-xs bg-black" v-if="$route.meta.auth">
         <div class="aside-wrap">
           <div class="navi-wrap">
             <nav class="navi clearfix">
               <ul class="nav">
                 <li v-bind:class="$route.name == 'PostCreate'?'active':''">
-                  <a v-link="{ name: 'PostCreate'}">
+                  <router-link :to="{ name: 'PostCreate'}">
                     <i class="fa fa-pencil-square-o"></i>
                     <span class="font-bold">New Post</span>
-                  </a>
+                  </router-link>
                 </li>
                 <li v-bind:class="$route.name == 'PostList' || $route.name == 'PostView' || $route.name == 'PostEdit'?'active':''">
-                  <a v-link="{ name: 'PostList'}">
+                  <router-link :to="{ name: 'PostList'}">
                     <i class="fa fa-list"></i>
                     <span class="font-bold">Posts</span>
-                  </a>
+                  </router-link>
                 </li>
                 <li v-bind:class="$route.name == 'TagList' || $route.name == 'TagView' || $route.name == 'TagEdit'?'active':''">
-                  <a v-link="{name: 'TagList'}">
+                  <router-link :to="{ name: 'TagList'}">
                     <i class="fa fa-tag"></i>
                     <span class="font-bold">Tags</span>
-                  </a>
+                  </router-link>
                 </li>
               </ul>
             </nav>
@@ -85,24 +85,6 @@
             this.isLogin = false
             this.$route.router.go({name: 'SignIn'})
         }
-    },
-    created: function(){
-      console.log('created')
-    },
-    beforeCompile: function(){
-      console.log('beforeCompile')
-    },
-    compiled: function(){
-      console.log('compiled')
-    },
-    ready: function(){
-      console.log('ready')
-    },
-    beforeDestroy: function(){
-      console.log('beforeDestroy')
-    },
-    destroy: function(){
-      console.log('destroy')
     }
   }
 </script>

@@ -30,7 +30,8 @@
 </div>
 </template>
 <script>
-import {API} from '../api.js'
+import toastr from 'toastr'
+import 'toastr/build/toastr.css'
 
 export default{
     name: 'TagCreate',
@@ -41,11 +42,17 @@ export default{
     },
     methods: {
         save: function(){
-            let resource = this.$resource(API.TAG)
-            resource.save(this.tag).then((response)=>{
-                this.tag = response.data
-                this.$parent.tags.unshift(this.tag)
-                this.$route.router.go({name:'TagEdit', params:{tag_id: response.data.slug}})
+            this.$store.dispatch(
+                'tag/CREATE_ITEM',
+                {
+                    path: `tags`,
+                    params: this.tag
+                }
+            )
+            .then((response)=>{
+                toastr.options.positionClass = 'toast-bottom-right';
+                toastr.success('Save successfully.', {timeOut: 3000})
+                this.$router.push({name:'TagEdit', params:{tag_id: response.data.id}})
             })
         }
     }

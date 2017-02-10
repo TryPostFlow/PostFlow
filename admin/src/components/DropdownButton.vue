@@ -30,10 +30,10 @@
         },
         methods: {
             action: function(data_target){
-                this.$dispatch('action', data_target)
+                this.$emit('action', data_target)
             }
         },
-        ready(){
+        mounted(){
             var self = this
             jQuery('.dropdown .btn:first-child').click(function(){self.action(jQuery(this).attr('data-target'))})
             jQuery('.dropdown-menu').on('click', 'li a', function(event){

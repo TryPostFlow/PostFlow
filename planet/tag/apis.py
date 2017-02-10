@@ -57,3 +57,18 @@ def update(id):
     db.session.add(tag)
     db.session.commit()
     return render_schema(tag, TagSchema)
+
+
+@tag_api.route('/<id>', methods=['DELETE'])
+@auth.require(401)
+def destory(id):
+    tag = get_tag(id)
+    db.session.delete(tag)
+    db.session.commit()
+
+    message = {
+        'code': 10000,
+        'message': 'success'
+    }
+
+    return render_schema(message)

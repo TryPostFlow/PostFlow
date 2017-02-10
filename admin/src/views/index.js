@@ -8,60 +8,93 @@ import TagList from './TagList.vue'
 import TagCreate from './TagCreate.vue'
 import TagEdit from './TagEdit.vue'
 
-export default {
-  '/signin': {
+export default [
+  {
+    path: '/signin',
     name: 'SignIn',
     component: SignIn,
-    auth: false
+    meta: {
+      auth: false
+    }
   },
-  '/signout': {
+  {
+    path: '/signout',
     name: 'SignOut',
     component: SignOut,
-    auth: false
-  },
-  '/posts': {
-    component: PostList,
-    auth: true,
-    subRoutes: {
-      '/': {
-        name: 'PostList',
-        component: PostList
-      },
-       '/:post_id': {
-        name: 'PostView',
-        component: PostView,
-        // auth: true
-      },
+    meta: {
+      auth: false
     }
   },
-  '/posts/:post_id/edit': {
-    name: 'PostEdit',
-    component: PostEdit,
-    auth: true
-  },
-  '/posts/new': {
+  {
+    path: '/posts/new',
     name: 'PostCreate',
     component: PostCreate,
-    auth: true
-  },
-  '/tags': {
-    component: TagList,
-    auth: true,
-    subRoutes: {
-      '/': {
-        name: 'TagList',
-        component: TagList
-      },
-      '/new': {
-        name: 'TagCreate',
-        component: TagCreate
-      },
-       '/:tag_id': {
-        name: 'TagEdit',
-        component: TagEdit,
-        // auth: true
-      }
+    meta: {
+      auth: true
     }
   },
-
-}
+  {
+    path: '/posts',
+    component: PostList,
+    children: [
+      {
+        path: '',
+        name: 'PostList',
+        // component: PostList,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path: ':post_id',
+        name: 'PostView',
+        component: PostView,
+        meta: {
+          auth: true
+        }
+      }
+    ]
+  },
+  {
+    path: '/posts/:post_id/edit',
+    name: 'PostEdit',
+    component: PostEdit,
+    meta: {
+      auth: true
+    }
+  },
+  {
+    path: '/tags',
+    component: TagList,
+    children: [
+      {
+        path: '',
+        name: 'TagList',
+        component: TagList,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path: 'new',
+        name: 'TagCreate',
+        component: TagCreate,
+        meta: {
+          auth: true
+        }
+      },
+      {
+        path:  ':tag_id',
+        name: 'TagEdit',
+        component: TagEdit,
+        meta: {
+          auth: true
+        }
+      }
+    ]
+  },
+  {
+    path: '*',
+    redirect: '/'
+  }
+]
