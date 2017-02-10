@@ -5,7 +5,7 @@
     <div class="wrapper text-center">
       <strong>Sign in to get in touch</strong>
     </div>
-    <form name="form" class="form-validation">
+    <form name="form" class="form-validation" @submit.prevent="signin">
       <div class="text-danger wrapper text-center" v-show="authError">
           {{authError}}
       </div>
@@ -17,11 +17,11 @@
            <input type="password" placeholder="Password" class="form-control no-border" v-model="user.password" required>
         </div>
       </div>
-      <button type="submit" class="btn btn-lg btn-primary btn-block" @click="signin()" ng-disabled='form.$invalid'>Log in</button>
-      <div class="text-center m-t m-b"><a ui-sref="access.forgotpwd">Forgot password?</a></div>
+      <button type="submit" class="btn btn-lg btn-primary btn-block" @click.stop.prevent="signin">Log in</button>
+      <div class="text-center m-t m-b"><a href="javascript:void(0)">Forgot password?</a></div>
       <div class="line line-dashed"></div>
       <p class="text-center"><small>Do not have an account?</small></p>
-      <a ui-sref="access.signup" class="btn btn-lg btn-default btn-block">Create an account</a>
+      <a href="javascript:void(0)" class="btn btn-lg btn-default btn-block">Create an account</a>
     </form>
   </div>
   <div class="text-center">
@@ -57,10 +57,22 @@ export default{
         })
       .then(function (response) {
         localStorage.setItem('auth', JSON.stringify(response.data))
+        // axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
         vm.$router.push({name: 'PostList'})
       })
       .catch(function(error){
-        this.authError = error
+        if (error.response) {
+          // The request was made, but the server responded with a status code
+          // that falls out of the range of 2xx
+          vm.authError = error.response.data.error_description
+          console.log(error.response.data);
+          console.log(error.response.status);
+          console.log(error.response.headers);
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          console.log('Error', error.message);
+        }
+        console.log(error.config);
       })
     }
   }
