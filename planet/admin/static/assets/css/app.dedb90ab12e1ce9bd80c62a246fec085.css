@@ -6,8 +6,8 @@
  * -------------------------- */
 @font-face {
   font-family: 'FontAwesome';
-  src: url(/static/fonts/fontawesome-webfont.674f50d.eot);
-  src: url(/static/fonts/fontawesome-webfont.674f50d.eot?#iefix&v=4.7.0) format('embedded-opentype'), url(/static/fonts/fontawesome-webfont.af7ae50.woff2) format('woff2'), url(/static/fonts/fontawesome-webfont.fee66e7.woff) format('woff'), url(/static/fonts/fontawesome-webfont.b06871f.ttf) format('truetype'), url(/static/img/fontawesome-webfont.912ec66.svg#fontawesomeregular) format('svg');
+  src: url(/assets/fonts/fontawesome-webfont.674f50d.eot);
+  src: url(/assets/fonts/fontawesome-webfont.674f50d.eot?#iefix&v=4.7.0) format('embedded-opentype'), url(/assets/fonts/fontawesome-webfont.af7ae50.woff2) format('woff2'), url(/assets/fonts/fontawesome-webfont.fee66e7.woff) format('woff'), url(/assets/fonts/fontawesome-webfont.b06871f.ttf) format('truetype'), url(/assets/img/fontawesome-webfont.912ec66.svg#fontawesomeregular) format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -2600,8 +2600,8 @@ th {
 @font-face {
   font-family: 'Glyphicons Halflings';
 
-  src: url(/static/fonts/glyphicons-halflings-regular.f4769f9.eot);
-  src: url(/static/fonts/glyphicons-halflings-regular.f4769f9.eot?#iefix) format('embedded-opentype'), url(/static/fonts/glyphicons-halflings-regular.448c34a.woff2) format('woff2'), url(/static/fonts/glyphicons-halflings-regular.fa27723.woff) format('woff'), url(/static/fonts/glyphicons-halflings-regular.e18bbf6.ttf) format('truetype'), url(/static/img/glyphicons-halflings-regular.8988968.svg#glyphicons_halflingsregular) format('svg');
+  src: url(/assets/fonts/glyphicons-halflings-regular.f4769f9.eot);
+  src: url(/assets/fonts/glyphicons-halflings-regular.f4769f9.eot?#iefix) format('embedded-opentype'), url(/assets/fonts/glyphicons-halflings-regular.448c34a.woff2) format('woff2'), url(/assets/fonts/glyphicons-halflings-regular.fa27723.woff) format('woff'), url(/assets/fonts/glyphicons-halflings-regular.e18bbf6.ttf) format('truetype'), url(/assets/img/glyphicons-halflings-regular.8988968.svg#glyphicons_halflingsregular) format('svg');
 }
 .glyphicon {
   position: relative;
@@ -15629,4 +15629,4 @@ button.toast-close-button {
 .select2-container--classic.select2-container--open .select2-dropdown {
   border-color: #5897fb; }
 
-/*# sourceMappingURL=app.9cbd9090484f6eb6f28998ca7c0a239b.css.map*/
+/*# sourceMappingURL=app.dedb90ab12e1ce9bd80c62a246fec085.css.map*/
