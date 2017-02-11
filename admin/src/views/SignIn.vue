@@ -57,13 +57,10 @@ export default{
         })
       .then(function (response) {
         localStorage.setItem('auth', JSON.stringify(response.data))
-        // axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
         vm.$router.push({name: 'PostList'})
       })
       .catch(function(error){
         if (error.response) {
-          // The request was made, but the server responded with a status code
-          // that falls out of the range of 2xx
           vm.authError = error.response.data.error_description
           console.log(error.response.data);
           console.log(error.response.status);
