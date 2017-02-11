@@ -4,7 +4,7 @@
 from datetime import datetime
 from flask import request, g
 
-from . import api
+from . import post_api
 from ..extensions import db
 from ..schema import render_schema, render_error
 from .schemas import PostSchema
@@ -14,7 +14,7 @@ from .permissions import (post_create_perm,
                           post_update_perm, post_destory_perm)
 
 
-@api.route('', methods=['GET'])
+@post_api.route('', methods=['GET'])
 def index():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
@@ -22,13 +22,13 @@ def index():
     return render_schema(posts, PostSchema)
 
 
-@api.route('/<id_or_slug>', methods=['GET'])
+@post_api.route('/<id_or_slug>', methods=['GET'])
 def show(id_or_slug):
     post = get_post(id_or_slug)
     return render_schema(post, PostSchema)
 
 
-@api.route('', methods=['POST'])
+@post_api.route('', methods=['POST'])
 @auth.require(401)
 @post_create_perm.require(403)
 def create():
@@ -49,7 +49,7 @@ def create():
     return render_schema(post_data, PostSchema)
 
 
-@api.route('/<id>', methods=['PUT'])
+@post_api.route('/<id>', methods=['PUT'])
 @auth.require(401)
 @post_update_perm.require(403)
 def update(id):
@@ -70,7 +70,7 @@ def update(id):
     return render_schema(post_data, PostSchema)
 
 
-@api.route('/<id>', methods=['DELETE'])
+@post_api.route('/<id>', methods=['DELETE'])
 @auth.require(401)
 @post_destory_perm.require(403)
 def destory(id):
