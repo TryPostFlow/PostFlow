@@ -3,4 +3,4 @@
 
 from flask import Blueprint
 
-admin_view = Blueprint('admin_view', __name__)
+admin_view = Blueprint('admin_view', __name__, template_folder='static', static_url_path='')
