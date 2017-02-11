@@ -10,11 +10,14 @@ from ..schema import render_schema, render_error
 from .schemas import PostSchema
 from .models import get_all_posts, get_post
 from ..permissions import auth
-from .permissions import (post_create_perm,
-                          post_update_perm, post_destory_perm)
+from .permissions import (
+    post_list_perm, post_show_perm, post_create_perm,
+    post_update_perm, post_destory_perm)
 
 
 @post_api.route('', methods=['GET'])
+@auth.require(401)
+@post_list_perm.require(403)
 def index():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
@@ -23,6 +26,8 @@ def index():
 
 
 @post_api.route('/<id_or_slug>', methods=['GET'])
+@auth.require(401)
+@post_show_perm.require(403)
 def show(id_or_slug):
     post = get_post(id_or_slug)
     return render_schema(post, PostSchema)

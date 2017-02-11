@@ -5,12 +5,17 @@ from flask import request
 from . import tag_api
 from ..extensions import db
 from ..schema import render_schema, render_error
-from ..permissions import auth
 from .schemas import TagSchema
 from .models import Tag, get_tag
+from ..permissions import auth
+from .permissions import (
+    tag_list_perm, tag_show_perm, tag_create_perm,
+    tag_update_perm, tag_destory_perm)
 
 
 @tag_api.route('', methods=['GET'])
+@auth.require(401)
+@tag_list_perm.require(403)
 def list():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
@@ -23,6 +28,8 @@ def list():
 
 
 @tag_api.route('/<id_or_slug>', methods=['GET'])
+@auth.require(401)
+@tag_show_perm.require(403)
 def show(id_or_slug):
     tag = get_tag(id_or_slug)
     return render_schema(tag, TagSchema)
@@ -30,6 +37,7 @@ def show(id_or_slug):
 
 @tag_api.route('', methods=['POST'])
 @auth.require(401)
+@tag_create_perm.require(403)
 def create():
     payload = request.get_json()
     if not payload:
@@ -45,6 +53,7 @@ def create():
 
 @tag_api.route('/<id>', methods=['PUT'])
 @auth.require(401)
+@tag_update_perm.require(403)
 def update(id):
     payload = request.get_json()
     if not payload:
@@ -61,6 +70,7 @@ def update(id):
 
 @tag_api.route('/<id>', methods=['DELETE'])
 @auth.require(401)
+@tag_destory_perm.require(403)
 def destory(id):
     tag = get_tag(id)
     db.session.delete(tag)
