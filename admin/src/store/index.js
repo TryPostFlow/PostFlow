@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import createLogger from 'vuex/dist/logger'
-import { Post, Tag, Account } from './modules'
+import { Post, Tag, Account, Setting } from './modules'
 
 Vue.use(Vuex)
 
@@ -10,7 +10,8 @@ const store = new Vuex.Store({
   modules: {
     Account,
     Post,
-    Tag
+    Tag,
+    Setting
   }
 })
 

@@ -43,14 +43,25 @@ function actions(types){
                 });
             })
         },
-        [types.UPDATE_ITEM] ({commit, state}, {path, params, index}){
+        [types.UPDATE_ITEM] ({commit, state}, {path, params, request, index}){
             // path: `posts/${param['id']}`
             return axios.put(path, params)
                 .then(function (response) {
-                    commit(types.SET_ITEM, {
-                        index: index?index:'id',
-                        data: response.data
-                    })
+                    if(response.data instanceof Array){
+                        commit(types.SET_ITEMS, {
+                            request: request?request:'default',
+                            index: index?index:'id',
+                            data: response.data,
+                            total:'x-total' in response.headers?parseInt(response.headers['x-total']):0,
+                            page: 'x-page' in response.headers?parseInt(response.headers['x-page']):0,
+                            page_size: 'limit' in params?params['limit']:20
+                        })
+                    }else{
+                        commit(types.SET_ITEM, {
+                            index: index?index:'id',
+                            data: response.data
+                        })
+                    }
                 })
         },
         [types.DELETE_ITEM]({commit, state}, {path, params}){

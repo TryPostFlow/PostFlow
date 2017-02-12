@@ -5,6 +5,7 @@ function create_types(type){
         FETCH_ITEM: `${type}/FETCH_ITEM`,
         CREATE_ITEM: `${type}/CREATE_ITEM`,
         UPDATE_ITEM: `${type}/UPDATE_ITEM`,
+        UPDATE_ITEM: `${type}/UPDATE_ITEM`,
         SET_ITEMS: `${type}/SET_ITEMS`,
         SET_ITEM: `${type}/SET_ITEM`,
         PUSH_ITEM: `${type}/PUSH_ITEM`,

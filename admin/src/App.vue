@@ -43,6 +43,16 @@
                     <span class="font-bold">Tags</span>
                   </router-link>
                 </li>
+                <li class="line dk"></li>
+                <li class="hidden-folded padder m-t m-b-sm text-muted text-xs">
+                  <span>Settings</span>
+                </li>
+                <li :class="{'active':$route.name == 'Settings'}">
+                  <router-link :to="{ name: 'Settings'}">
+                    <i class="fa fa-cog"></i>
+                    <span class="font-bold">General</span>
+                  </router-link>
+                </li>
               </ul>
             </nav>
           </div>
