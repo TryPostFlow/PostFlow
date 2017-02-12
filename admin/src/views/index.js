@@ -7,6 +7,7 @@ import PostCreate from './PostCreate.vue'
 import TagList from './TagList.vue'
 import TagCreate from './TagCreate.vue'
 import TagEdit from './TagEdit.vue'
+import Settings from './Settings.vue'
 
 export default [
   {
@@ -92,6 +93,14 @@ export default [
         }
       }
     ]
+  },
+  {
+    path: '/settings',
+    name: 'Settings',
+    component: Settings,
+    meta: {
+      auth: true
+    }
   },
   {
     path: '*',
