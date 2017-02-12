@@ -10,6 +10,7 @@
                                  <div class="list-group list-group-lg no-radius m-b-none m-t-n-xxs">
                                     <router-link v-for="tag_item in tags" :key="tag_item.id" class="list-group-item clearfix b-l-3x" v-bind:class="$route.params.tag_id == tag_item.id?'b-l-info':''" :to="{ name: 'TagEdit', params: { tag_id: tag_item.id }}">
                                         {{tag_item.name}} <span class="label label-default">{{tag_item.slug}}</span>
+                                        <span class="badge">{{tag_item.num_posts}}</span>
                                     </router-link>
                                 </div>
                             </div>
@@ -44,12 +45,16 @@
         },
         beforeMount(){
             fetchTags(this.$store).then(()=>{
-                this.$router.push({name: 'TagEdit', params: { tag_id: this.tags[0].id }})
+                if(this.$route.name == 'TagList' && this.tags.length > 0){
+                    this.$router.push({name: 'TagEdit', params: { tag_id: this.tags[0].id }})
+                }
             })
         },
         watch:{
             '$route': function(){
-                fetchTags(this.$store)
+                if (this.$route.name == 'TagList'){
+                    fetchTags(this.$store)
+                }
             }
         },
         methods:{

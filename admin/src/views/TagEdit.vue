@@ -43,7 +43,7 @@ function fetchTag(store){
     return store.dispatch(
         'tag/FETCH_ITEM',
         {
-            path: `tags/${store.state.route.params.post_id}`,
+            path: `tags/${store.state.route.params.tag_id}`,
             params: {
                 id: store.state.route.params.tag_id
             }
