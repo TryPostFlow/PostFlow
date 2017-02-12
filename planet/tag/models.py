@@ -73,3 +73,7 @@ class Tag(db.Model):
                 self._slug = "{}-{}".format(slugify_slug, x)
             return
         self._slug = slugify_slug
+
+    @property
+    def num_posts(self):
+        return len(self.posts)

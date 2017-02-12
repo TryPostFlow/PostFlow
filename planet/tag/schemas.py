@@ -12,6 +12,7 @@ class TagSchema(BaseSchema):
     name = fields.String(required=True)
     slug = fields.String(allow_none=True)
     description = fields.String(allow_none=True)
+    num_posts = fields.Integer(allow_none=True)
     updated_at = fields.DateTime(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
 
