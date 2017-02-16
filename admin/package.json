@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "webpack-dev-server --config build/webpack.dev.conf.js -d --inline --hot",
-    "build": "webpack --config build/webpack.prod.conf.js --progress --hide-modules"
+    "build": "rm -rf dist && webpack --config build/webpack.prod.conf.js --progress --hide-modules"
   },
   "devDependencies": {
     "autoprefixer": "^6.7.0",
