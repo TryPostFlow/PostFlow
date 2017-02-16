@@ -1,8 +1,0 @@
-- src: https://github.com/Stouts/Stouts.python
-  path: roles/
-
-- src: https://github.com/Stouts/Stouts.nginx
-  path: roles/
-
-- src: https://github.com/fengluo/Stouts.supervisor
-  path: roles/

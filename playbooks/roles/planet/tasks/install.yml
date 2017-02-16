@@ -1,7 +1,0 @@
----
-
-- name: install system packages
-  apt: pkg={{ item }} state=installed
-  with_items:
-    - build-essential
-    - libssl-dev

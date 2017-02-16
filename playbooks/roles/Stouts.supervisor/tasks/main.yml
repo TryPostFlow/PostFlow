@@ -1,5 +1,0 @@
----
-
-- include: supervisor.yml
-  when: supervisor_enabled
-  tags: [supervisor]
