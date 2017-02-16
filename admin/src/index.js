@@ -14,8 +14,8 @@ import store from './store'
 Vue.use(Router)
 
 const router = new Router({
-  // mode: 'history',
-  // scrollBehavior: () => ({ y: 0 }),
+  mode: 'history',
+  scrollBehavior: () => ({ y: 0 }),
   routes: views
 })
 
