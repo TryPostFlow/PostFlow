@@ -12,8 +12,8 @@ import views from './views'
 import store from './store'
 
 Vue.use(Router)
-
 const router = new Router({
+  base: base,
   mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: views
@@ -26,7 +26,7 @@ router.beforeEach((to, from, next) => {
     var auth = localStorage.getItem('auth')? JSON.parse(localStorage.getItem('auth')): null
     if (!auth) {
       next({
-        path: '/signin',
+        name: 'SignIn',
         query: {redirect: to.fullpath}
       })
     }else{

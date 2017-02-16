@@ -104,6 +104,6 @@ export default [
   },
   {
     path: '*',
-    redirect: '/signin'
+    redirect: {name: 'SignIn'}
   }
 ]
