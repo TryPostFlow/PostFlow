@@ -24,7 +24,7 @@ admin-serve:
 	@npm run dev --prefix admin
 
 admin-build:
-	@npm run build --prefix admin
+	@npm run build --prefix admin && rm -rf planet/admin/static/* && cp -r admin/dist/* planet/admin/static
 
 dev:
 	@$(MAKE) server admin-serve -j 2
