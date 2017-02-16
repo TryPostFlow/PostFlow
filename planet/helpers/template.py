@@ -2,15 +2,16 @@
 
 import dateutil
 from flask import current_app, g
-from flask_themes import render_theme_template
+from flask_themes2 import get_theme, render_theme_template
 
 
-def get_theme():
-    return g.site.activeTheme or current_app.config['THEME']
+def get_current_theme():
+    theme = g.site.activeTheme or current_app.config['THEME']
+    return get_theme(theme)
 
 
 def render_template(template, **context):
-    return render_theme_template(get_theme(), template, **context)
+    return render_theme_template(get_current_theme(), template, **context)
 
 
 def format_datetime(value, format='%Y-%m-%dT%H:%M:%SZ'):

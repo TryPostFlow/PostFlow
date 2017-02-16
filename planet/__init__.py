@@ -8,7 +8,7 @@ from collections import namedtuple
 from werkzeug.utils import import_string, find_modules
 from flask import Flask, request, Blueprint, g, Response, abort
 from flask_principal import identity_loaded, Identity
-from flask_themes import setup_themes
+from flask_themes2 import Themes, load_themes_from
 
 from .account.models import User
 from .auth.models import Token
@@ -49,7 +49,7 @@ def create_app(config=None, packages=None):
 
 
 def configure_extensions(app):
-    setup_themes(app, theme_url_prefix='/content/themes')
+    Themes(app, app_identifier='planet', theme_url_prefix='/content/themes')
     for extension_name in extensions.__all__:
         getattr(extensions, extension_name).init_app(app)
 
