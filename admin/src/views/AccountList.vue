@@ -3,12 +3,11 @@
     <div class="app-content-body">
         <div class="bg-light lter b-b wrapper-md clearfix">
             <h1 class="m-n font-thin h3 pull-left">Accounts</h1>
-            <a href="javascript:void(0)" class="btn btn-primary pull-right">Add</a>
         </div>
         <div class="wrapper-md">
             <div class="panel no-border">
                 <div class="list-group list-group-lg list-group-sp">
-                    <a class="list-group-item clearfix" v-for="account in accounts">
+                    <router-link class="list-group-item clearfix" :to="{name:'AccountEdit', params:{account_id:account.id}}" v-for="account in accounts">
                         <span class="pull-left thumb-sm avatar m-r">
                             <img :src="account.avatar">
                         </span>
@@ -18,7 +17,7 @@
                             <small class="text-muted clear text-ellipsis">{{account.email}}</small>
                         </span>
                         <span class="pull-right label bg-primary inline m-t-sm">Admin</span>
-                    </a>
+                    </router-link>
                 </div>
             </div>
         </div>
