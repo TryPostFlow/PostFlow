@@ -34,6 +34,7 @@ class AccountSchema(BaseSchema):
     name = fields.String()
     email = fields.Email()
     password = fields.String()
+    avatar = fields.String()
 
     @post_load
     def make_object(self, data):
