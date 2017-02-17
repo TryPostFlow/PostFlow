@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import hashlib
 from datetime import datetime
 from werkzeug import cached_property, security
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -107,8 +108,7 @@ class User(db.Model):
         self._password = security.generate_password_hash(password)
 
     def check_password(self, password):
-        return password == self._password
-        # return security.check_password_hash(self._password, password)
+        return security.check_password_hash(self._password, password)
 
     @cached_property
     def permissions(self):
@@ -127,6 +127,11 @@ class User(db.Model):
             for perm in self.permissions])
 
         return needs
+
+    @cached_property
+    def avatar(self):
+        gravatar_url = "https://www.gravatar.com/avatar/"
+        return gravatar_url + hashlib.md5(self.email.lower()).hexdigest()
 
 
 class Role(db.Model):
