@@ -8,6 +8,7 @@ import TagList from './TagList.vue'
 import TagCreate from './TagCreate.vue'
 import TagEdit from './TagEdit.vue'
 import Settings from './Settings.vue'
+import AccountList from './AccountList.vue'
 
 export default [
   {
@@ -99,6 +100,14 @@ export default [
     name: 'Settings',
     component: Settings,
     meta: {
+      auth: true
+    }
+  },
+  {
+    path: '/accounts',
+    name: 'AccountList',
+    component: AccountList,
+    meta:{
       auth: true
     }
   },
