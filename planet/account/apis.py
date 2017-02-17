@@ -4,50 +4,37 @@
 # import jwt
 # import calendar
 # import datetime
-from flask import request, current_app, g
+from flask import request, g
 
 from . import account_api
-from .schemas import AccountSchema, LoginSchema
+from .schemas import AccountSchema, PasswordSchema
 from .models import get_user, get_all_users
+from ..permissions import auth
+from .permissions import (
+    account_list_perm, account_show_perm, account_create_perm,
+    account_update_perm, account_destory_perm)
 
 from ..schema import render_schema, render_error
 from ..extensions import db
 
 
-# @api.route('/token', methods=['POST'])
-# def token():
-#     login_schema = LoginSchema(only=('email', 'password'))
-#     account_data, errors = login_schema.load(request.get_json())
-#     if errors:
-#         return render_error(20001, errors, 422)
-
-#     exp = datetime.datetime.utcnow() + datetime.timedelta(seconds=86400)
-#     payload = {
-#         'id': account_data.id,
-#         'name': account_data.name,
-#         'email': account_data.email,
-#         'exp': exp
-#     }
-#     token = jwt.encode(
-#         payload,
-#         current_app.config['SECRET_KEY'],
-#         algorithm='HS256')
-#     return render_schema(
-#         {'token': token, 'exp': calendar.timegm(exp.timetuple())})
-
-
 @account_api.route('/me', methods=['GET'])
+@auth.require(401)
 def me():
     return render_schema(g.user, AccountSchema)
 
 
 @account_api.route('/<int:id>', methods=['GET'])
+@auth.require(401)
+@account_show_perm.require(403)
 def view(id):
     user = get_user(id)
     return render_schema(user, AccountSchema)
 
 
 @account_api.route('', methods=['GET'])
+@auth.require(401)
+@account_list_perm.require(403)
 def list():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
@@ -56,6 +43,8 @@ def list():
 
 
 @account_api.route('', methods=['POST'])
+@auth.require(401)
+@account_create_perm.require(403)
 def create():
     payload = request.get_json()
     account_schema = AccountSchema(only=('name', 'email', 'password'))
@@ -67,13 +56,35 @@ def create():
     return render_schema(account_data, AccountSchema)
 
 
-@account_api.route('/<int:id>', methods=['PUT'])
-def edit():
+@account_api.route('/<int:id>/password', methods=['PUT'])
+@auth.require(401)
+@account_update_perm.require(403)
+def update_password(id):
     payload = request.get_json()
-    account_schema = AccountSchema(only=('name', 'email', 'password'))
-    account_data, errors = account_schema.load(payload).data
+    password_schema = PasswordSchema()
+    password_data, errors = password_schema.load(payload)
+    if errors:
+        return render_error(20001, errors, 422)
+    user = get_user(id)
+    user.password = password_data['new_password']
+    db.session.add(user)
+    db.session.commit()
+    message = {
+        'code': 10000,
+        'message': 'success'
+    }
+    return render_schema(message)
+
+
+@account_api.route('/<int:id>', methods=['PUT'])
+@auth.require(401)
+@account_update_perm.require(403)
+def update(id):
+    payload = request.get_json()
+    account_schema = AccountSchema(only=('id', 'name', 'email', 'password'))
+    account_data, errors = account_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
     db.session.add(account_data)
     db.session.commit()
-    return render_schema(account_data, account_schema)
+    return render_schema(account_data, AccountSchema)

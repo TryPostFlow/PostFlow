@@ -108,8 +108,7 @@ class User(db.Model):
         self._password = security.generate_password_hash(password)
 
     def check_password(self, password):
-        return password == self._password
-        # return security.check_password_hash(self._password, password)
+        return security.check_password_hash(self._password, password)
 
     @cached_property
     def permissions(self):
