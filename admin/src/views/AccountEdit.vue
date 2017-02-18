@@ -23,6 +23,7 @@
                 <div class="form-group">
                   <div class="col-lg-offset-2 col-lg-10">
                     <button type="submit" class="btn btn-primary text-u-c" @click.stop.prevent="save">Save</button>
+                    <button type="submit" class="btn btn-link text-danger text-u-c" @click.stop.prevent="remove"><i class="fa fa-trash"></i> Delete Account</button>
                   </div>
                 </div>
             </form>
@@ -140,6 +141,20 @@
                 }
                 console.log(error.config);
               })
+            },
+            remove(){
+                this.$store.dispatch(
+                'account/DELETE_ITEM',
+                {
+                    path: `accounts/${this.$store.state.route.params.account_id}`,
+                    params:{
+                        key: this.$store.state.route.params.account_id
+                    }
+                }).then(()=>{
+                    toastr.options.positionClass = 'toast-bottom-right';
+                    toastr.success('Delete successfully.', {timeOut: 3000})
+                    this.$router.push({name:'AccountList'})
+                })
             }
         }
     }
