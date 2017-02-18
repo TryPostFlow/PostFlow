@@ -1,7 +1,7 @@
 <template>
     <div class="modal-wrap" v-show="isActive">
         <div class="modal-backdrop fade in"></div>
-        <div tabindex="-1" role="dialog" class="modal fade in" @click="backdropClose">
+        <div tabindex="-1" role="dialog" class="modal fade in" @click.self="backdropClose">
             <div class="modal-dialog" :class="{'modal-sm': size == 'sm', 'modal-lg': size == 'lg'}">
                 <div class="modal-content" modal-transclude>
                     <div class="modal-header" v-if="showHeader">
@@ -102,6 +102,5 @@
 <style>
     .modal{
         display: block;
-        /*background-color: rgba(58, 63, 81, 0.8)*/
     }
 </style>
