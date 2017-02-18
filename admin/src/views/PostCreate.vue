@@ -7,6 +7,7 @@
             </div>
             <div class="pull-right">
                 <ui-dropdown-button :items='buttons' @action="save"></ui-dropdown-button>
+                <a class="btn btn-default" href="javascript:void(0)" @click="isShow=true"><i class="fa fa-gear"></i></a>
             </div>
         </div>
         <div class="app-content-full h-full" style="top: 117px; bottom:50px;">
@@ -48,6 +49,7 @@
     import toastr from 'toastr'
     import editor from '../components/Editor.vue'
     import vSelect from '../components/vue-select'
+    import Aside from '../components/Aside.vue'
     import DropdownButton from '../components/DropdownButton.vue'
 
     export default{
@@ -125,7 +127,8 @@
         components: {
             vSelect,
             'ui-editor': editor,
-            'ui-dropdown-button': DropdownButton
+            'ui-dropdown-button': DropdownButton,
+            'ui-aside': Aside
         }
     }
 </script>
