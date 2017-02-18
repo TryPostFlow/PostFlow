@@ -88,3 +88,19 @@ def update(id):
     db.session.add(account_data)
     db.session.commit()
     return render_schema(account_data, AccountSchema)
+
+
+@account_api.route('/<id>', methods=['DELETE'])
+@auth.require(401)
+@account_destory_perm.require(403)
+def destory(id):
+    account = get_user(id)
+    db.session.delete(account)
+    db.session.commit()
+
+    message = {
+        'code': 10000,
+        'message': 'success'
+    }
+
+    return render_schema(message)
