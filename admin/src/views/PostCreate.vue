@@ -10,7 +10,18 @@
             </div>
         </div>
         <div class="app-content-full h-full" style="top: 117px; bottom:50px;">
-            <ui-editor v-model="post" ></ui-editor>
+            <ui-editor v-model="post"></ui-editor>
+            <ui-aside class="aside-right" title="Post Settings" :is-show="isShow" @close="isShow=false">
+                <form>
+                    <div class="form-group">
+                        <label>Post URL</label>
+                        <div class="input-group">
+                            <span class="input-group-addon"><i class="fa fa-link"></i></span>
+                            <input type="text" class="form-control" v-model="post.slug">
+                        </div>
+                    </div>
+                </form>
+            </ui-aside>
         </div>
     </div>
     <div class="app-footer wrapper b-t bg-light">
@@ -18,7 +29,14 @@
             <div class="form-group" style="margin-bottom: 0;">
                 <label for="tags" class="control-label col-lg-1">Tags</label>
                 <div class="col-lg-10">
-                    <ui-select multiple="multiple" :tags=true v-model="post.tags"></ui-select>
+                    <v-select
+                        v-model="tags"
+                        multiple
+                        :taggable="true"
+                        max-height='200px'
+                        :on-search="getOptions"
+                        :options="options">
+                    </v-select>
                 </div>
             </div>
         </div>
@@ -29,7 +47,7 @@
 <script>
     import toastr from 'toastr'
     import editor from '../components/Editor.vue'
-    import select from '../components/Select.vue'
+    import vSelect from '../components/vue-select'
     import DropdownButton from '../components/DropdownButton.vue'
 
     export default{
@@ -50,7 +68,11 @@
                         dataTarget: 'published',
                         text: 'Publish Now'
                     }
-                ]
+                ],
+                isShow: false,
+                isDeleteShow:false,
+                options:[],
+                tags:[]
             }
         },
         methods: {
@@ -68,10 +90,40 @@
                 }, (error) => {
                     console.error(error)
                 })
+            },
+            getOptions(search, loading) {
+                loading(true)
+                this.$store.dispatch(
+                'tag/FETCH_ITEMS',
+                {
+                    path: `tags`,
+                    params: {
+                        q: search,
+                        limit: 10
+                    },
+                    request: 'search'
+                }).then(()=>{
+                    this.options = []
+                    this.$store.getters['tag/GET_ITEMS']('search').data.forEach(
+                        item =>{
+                            this.options.push({label:item.name, value:item.id})
+                        }
+                    )
+                     loading(false)
+                })
+              }
+        },
+        watch:{
+            'tags': function(){
+                let tags = []
+                this.tags.forEach(item =>{
+                    tags.push({name:item.label, id: item.value})
+                })
+                this.post.tags = tags
             }
         },
         components: {
-            'ui-select': select,
+            vSelect,
             'ui-editor': editor,
             'ui-dropdown-button': DropdownButton
         }

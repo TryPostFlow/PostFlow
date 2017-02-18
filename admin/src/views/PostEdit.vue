@@ -53,7 +53,6 @@
     import 'toastr/build/toastr.css'
     import Modal from '../components/Modal.vue'
     import editor from '../components/Editor.vue'
-    import select from '../components/Select.vue'
     import vSelect from '../components/vue-select'
     import DropdownButton from '../components/DropdownButton.vue'
     import Aside from '../components/Aside.vue'
@@ -172,6 +171,15 @@
                 })
               }
         },
+        watch:{
+            'tags': function(){
+                let tags = []
+                this.tags.forEach(item =>{
+                    tags.push({name:item.label, id: item.value})
+                })
+                this.post.tags = tags
+            }
+        },
         beforeMount(){
             fetchPost(this.$store).then(()=>{
                 this.post.tags.forEach(item =>{
@@ -182,7 +190,6 @@
         components: {
             vSelect,
             Modal,
-            // 'ui-select': select,
             'ui-editor': editor,
             'ui-dropdown-button': DropdownButton,
             'ui-aside': Aside
