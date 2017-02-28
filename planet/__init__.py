@@ -11,7 +11,7 @@ from flask_principal import identity_loaded, Identity
 from flask_themes2 import Themes, load_themes_from
 
 from .account.models import User
-from .auth.models import Token
+from .oauth.models import Token
 from .setting.models import Setting
 from .helpers.template import render_template
 import extensions
