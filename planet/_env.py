@@ -5,13 +5,13 @@ if sys.getdefaultencoding() != 'utf-8':
     sys.setdefaultencoding('utf-8')
 
 
-import simplejson
-import json
+# import simplejson
+# import json
 
-json.dump = simplejson.dump
-json.dumps = simplejson.dumps
-json.loads = simplejson.loads
-json.load = simplejson.load
+# json.dump = simplejson.dump
+# json.dumps = simplejson.dumps
+# json.loads = simplejson.loads
+# json.load = simplejson.load
 
 
 # check the mimetype of request is json or not.
