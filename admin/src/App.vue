@@ -15,7 +15,7 @@
             </div>
             <ul class="nav navbar-nav navbar-right">
               <li>
-                    <router-link :to="{name: 'SignOut'}">Sign Out</a>
+                    <router-link :to="{name: 'SignOut'}">Sign Out</router-link>
                   </li>
             </ul>
         </div>
@@ -65,8 +65,7 @@
         </div>
     </div>
 
-    <router-view keep-alive transition-mode="out-in">
-    </router-view>
+    <router-view></router-view>
 
   </div>
 </template>
