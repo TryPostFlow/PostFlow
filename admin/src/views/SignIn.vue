@@ -11,7 +11,7 @@
       </div>
       <div class="list-group list-group-sm">
         <div class="list-group-item">
-          <input type="email" placeholder="Email" class="form-control no-border" v-model="user.username" required>
+          <input type="email" placeholder="Email" class="form-control no-border" v-model="user.email" required>
         </div>
         <div class="list-group-item">
            <input type="password" placeholder="Password" class="form-control no-border" v-model="user.password" required>
@@ -39,9 +39,9 @@ export default{
     return {
       app: this.$parent.app,
       user: {
-        grant_type: 'password',
-        client_id: 'J1SuWr9nNV618NgJ4kZPM4DvYVY68AjtxDRsokZI',
-        client_secret: 'bM17VfEkCAmmcMTm81g0VExTsPPDSVzTDbCZZKoEDQZdZqTm05'
+//        grant_type: 'password',
+//        client_id: 'J1SuWr9nNV618NgJ4kZPM4DvYVY68AjtxDRsokZI',
+//        client_secret: 'bM17VfEkCAmmcMTm81g0VExTsPPDSVzTDbCZZKoEDQZdZqTm05'
       },
       authError: null
     }
@@ -50,18 +50,15 @@ export default{
     signin(){
       var vm = this
       axios.post(
-        'auth/token',
-        qs.stringify(this.user),
-        {
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'}
-        })
+        'login',
+        this.user)
       .then(function (response) {
         localStorage.setItem('auth', JSON.stringify(response.data))
         vm.$router.push({name: 'PostList'})
       })
       .catch(function(error){
         if (error.response) {
-          vm.authError = error.response.data.error_description
+          vm.authError = error.response.data.error
           console.log(error.response.data);
           console.log(error.response.status);
           console.log(error.response.headers);
