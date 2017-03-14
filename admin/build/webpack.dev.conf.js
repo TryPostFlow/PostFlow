@@ -24,7 +24,8 @@ module.exports = merge(baseWebpackConfig, {
   plugins: [
     new webpack.DefinePlugin({
       'process.env': config.dev.env,
-      base: config.dev.base
+      'base': JSON.stringify(config.dev.base),
+      'apiBaseURL': JSON.stringify(config.dev.apiBaseURL)
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     // new webpack.HotModuleReplacementPlugin(),

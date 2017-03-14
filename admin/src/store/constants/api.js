@@ -1,16 +1,8 @@
 import Axios from 'axios'
 
-let axios
-
-if (process.env.NODE_ENV === 'production') {
-  axios = Axios.create({
-    baseURL: '/api',
+const axios = Axios.create({
+    baseURL: apiBaseURL
   })
-}else{
-  axios = Axios.create({
-    baseURL: 'http://127.0.0.1:5000/api',
-  })
-}
 
 if (localStorage.getItem('auth')) {
   var auth = JSON.parse(localStorage.getItem('auth'))
