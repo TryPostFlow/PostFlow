@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import os
-from flask import send_from_directory, current_app
+from flask import send_from_directory
+from planet.extensions import storage
+from planet.images import image_view
 
-from . import image_view
+rule = os.path.join('/', storage.base_dir, '<path:path>')
 
-
-@image_view.route('/content/images/<path:path>')
+@image_view.route(rule, methods=['GET'])
 def show(path):
     return send_from_directory(
-        os.path.join(
-            current_app.instance_path,
-            current_app.config['IMAGE_PATHS']), path)
+        os.path.join(storage.base_path, storage.base_dir), path)

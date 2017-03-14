@@ -3,26 +3,28 @@
 
 import os
 import datetime
-from flask import request, current_app, jsonify, url_for
+from flask import request, current_app, jsonify
 from werkzeug.utils import secure_filename
-from ..helpers.text import uniquify
+from planet.helpers.text import uniquify
+from planet.extensions import storage
 
-from . import image_api
+from planet.images import image_api
 
 
-@image_api.route('/upload', methods=["POST"])
+@image_api.route('', methods=["POST"])
 def upload():
-    image = request.files['image']
-    filename = secure_filename(image.filename)
-    now = datetime.datetime.now()
-    folder = now.strftime('%Y/%m')
-    full_folder = os.path.join(current_app.config['IMAGE_PATHS'], folder)
-    if not os.path.exists(full_folder):
-        os.makedirs(full_folder)
-    full_path = uniquify(os.path.join(full_folder, filename), '-')
-    image.save(full_path)
+    image_data = request.files.get('image')
+
+    filename = secure_filename(image_data.filename)
+
+    folder = datetime.datetime.now().strftime('%Y/%m')
+    filename = os.path.join(folder, filename)
+    base_path = os.path.join(storage.base_path, storage.base_dir)
+    full_path = os.path.join(base_path, filename)
+    full_path = uniquify(full_path, '-')
+    filename = full_path.split(base_path)[-1]
+    filename = storage.save(image_data, filename=filename)
+    url = storage.url(filename)
     return jsonify(
-        path=url_for(
-            'image_view.show',
-            path=os.path.join(folder, os.path.basename(full_path)),
-            _external=True))
+        filename=filename,
+        url=url)
