@@ -43,4 +43,5 @@ def uniquify(path, sep=''):
         fd, filename = tempfile.mkstemp(
             dir=dirname, prefix=filename, suffix=ext)
         tempfile._name_sequence = orig
+    os.unlink(filename)
     return filename
