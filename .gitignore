@@ -82,3 +82,4 @@ venv/
 wiki/
 .vagrant
 .bundle
+content/
