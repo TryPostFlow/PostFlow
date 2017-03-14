@@ -14,9 +14,9 @@ ifeq (server,$(firstword $(MAKECMDGOALS)))
   $(eval $(RUN_ARGS):;@:)
 endif
 
-export FLASK_ENV=dev
-export FLASK_APP=planet/commands.py
-export FLASK_DEBUG=1
+server:export FLASK_ENV=dev
+server:export FLASK_APP=planet/commands.py
+server:export FLASK_DEBUG=1
 server: 
 	flask $(RUN_ARGS)
 
