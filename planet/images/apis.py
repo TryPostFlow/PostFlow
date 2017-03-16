@@ -3,6 +3,7 @@
 
 import os
 import datetime
+import time
 from flask import request, current_app, jsonify
 from werkzeug.utils import secure_filename
 from planet.helpers.text import uniquify
@@ -19,10 +20,9 @@ def upload():
 
     folder = datetime.datetime.now().strftime('%Y/%m')
     filename = os.path.join(folder, filename)
-    base_path = os.path.join(storage.base_path, storage.base_dir)
-    full_path = os.path.join(base_path, filename)
-    full_path = uniquify(full_path, '-')
-    filename = full_path.split(base_path)[-1]
+    unique_key = str(int(time.time() * 1000))[-10:]
+    basename, ext = os.path.splitext(filename)
+    filename = '{}-{}{}'.format(basename, unique_key, ext)
     filename = storage.save(image_data, filename=filename)
     url = storage.url(filename)
     return jsonify(
