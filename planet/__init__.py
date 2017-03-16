@@ -10,15 +10,16 @@ from flask import Flask, request, Blueprint, g, Response, abort
 from flask_principal import identity_loaded, Identity
 from flask_themes2 import Themes, load_themes_from
 
-from .account.models import User
-from .oauth.models import Token
-from .setting.models import Setting
-from .helpers.template import render_template
-import extensions
-from extensions import principals
+from planet.account.models import User
+from planet.oauth.models import Token
+from planet.setting.models import Setting
+from planet.helpers.template import render_template
+from planet import extensions
+from planet.extensions import principals
+from planet.packages import PACKAGES
 
 
-def create_app(config=None, packages=None):
+def create_app(config=None, packages=PACKAGES):
     app = Flask(
         __name__.split('.')[0],
         instance_path=os.getcwd(),
@@ -26,15 +27,15 @@ def create_app(config=None, packages=None):
 
     if config is not None:
         app.config.from_pyfile(config)
-    elif os.getenv('FLASK_ENV') == 'dev':
-        app.config.from_pyfile('config/development.conf')
-        app.logger.info("Config: Development")
+    elif os.getenv('FLASK_ENV') == 'production':
+        app.config.from_pyfile('config/production.conf')
+        app.logger.info("Config: Production")
     elif os.getenv('FLASK_ENV') == 'test':
         app.config.from_pyfile('config/test.conf')
         app.logger.info("Config: Test")
     else:
-        app.config.from_pyfile('config/production.conf')
-        app.logger.info("Config: Production")
+        app.config.from_pyfile('config/development.conf')
+        app.logger.info("Config: Development")
 
     configure_extensions(app)
     configure_errorhandlers(app)
