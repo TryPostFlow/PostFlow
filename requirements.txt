@@ -17,4 +17,5 @@ python-dateutil==2.6.0
 simplejson==3.10.0
 Unidecode==0.4.20
 raven==6.0.0
+SQLAlchemy-Utils==0.32.12
 -e git://github.com/fengluo/flask-storage.git#egg=flask-storage
