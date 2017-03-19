@@ -4,12 +4,10 @@
 import os
 import datetime
 import time
-from flask import request, current_app, jsonify
+from flask import request, jsonify
 from werkzeug.utils import secure_filename
-from planet.helpers.text import uniquify
 from planet.extensions import storage
-
-from planet.images import image_api
+from planet.image import image_api
 
 
 @image_api.route('', methods=["POST"])

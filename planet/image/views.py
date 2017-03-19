@@ -3,7 +3,7 @@
 import os
 from flask import send_from_directory
 from planet.extensions import storage
-from planet.images import image_view
+from planet.image import image_view
 
 rule = os.path.join('/', storage.base_dir, '<path:path>')
 

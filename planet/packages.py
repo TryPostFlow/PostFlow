@@ -5,6 +5,6 @@ PACKAGES = [
     'post',
     'tag',
     'setting',
-    'images',
+    'image',
     'admin'
 ]
