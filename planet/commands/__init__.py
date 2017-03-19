@@ -21,7 +21,7 @@ import feedparser
 from planet.post.models import Post
 from planet.tag.models import Tag
 
-from planet.commands.utils import (FlaskCLIError, create_permissions, EmailType)
+from planet.commands.utils import (FlaskCLIError, create_permissions, EmailType, prompt_save_user)
 
 
 def make_app(script_info):
@@ -137,6 +137,9 @@ def install(force, username, email, password):
     click.secho("[+] Creating default settings...", fg="cyan")
     create_permissions()
     init_settings()
+
+    click.secho("[+] Creating admin user...", fg="cyan")
+    prompt_save_user(username, email, password, role)
 
 
 @planet.command()

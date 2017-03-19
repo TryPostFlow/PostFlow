@@ -5,7 +5,7 @@ import re
 import click
 from planet.extensions import db
 from planet.permissions import Need
-from planet.account.models import create_user, Permission, Role
+from planet.account.models import (create_user, update_user, Permission, Role)
 
 
 _email_regex = r"[^@]+@[^@]+\.[^@]+"
@@ -64,3 +64,29 @@ def create_permissions():
     db.session.add(admin)
     db.session.commit()
 
+
+def prompt_save_user(username, email, password, role, only_update=False):
+    if not username:
+        username = click.prompt(
+            click.style("Username", fg="magenta"), type=str,
+            default=os.environ.get("USER", "")
+        )
+    if not email:
+        email = click.prompt(
+            click.style("Email address", fg="magenta"), type=EmailType()
+        )
+    if not password:
+        password = click.prompt(
+            click.style("Password", fg="magenta"), hide_input=True,
+            confirmation_prompt=True
+        )
+    if not role:
+        role = click.prompt(
+            click.style("Role", fg="magenta"),
+            type=click.Choice(["admin", "super_mod", "mod", "member"]),
+            default="admin"
+        )
+
+    if only_update:
+        return update_user(username, password, email, role)
+    return create_user(username, password, email, role)
