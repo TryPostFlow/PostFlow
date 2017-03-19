@@ -3,7 +3,7 @@
 
 import json
 from datetime import datetime
-from ..extensions import db
+from planet.extensions import db
 
 
 def init_settings():

@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import fields, post_load
-from .models import Setting, get_setting
-from ..helpers.text import slugify
-from ..schema import BaseSchema, update_object
+from planet.utils.schema import BaseSchema, update_object
+from planet.setting.models import Setting, get_setting
 
 
 class SettingSchema(BaseSchema):
