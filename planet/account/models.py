@@ -11,7 +11,7 @@ from flask_principal import RoleNeed, UserNeed
 
 from planet.extensions import db
 from planet.utils.database import CRUDMixin
-from planet.permissions import Need
+from planet.utils.permissions import Need
 from planet.post.models import Post
 from planet.setting.models import get_setting
 
@@ -33,7 +33,7 @@ def get_user(id_or_slug):
 
 def get_posts_by_user(id, page, limit=None):
     limit = limit if limit else int(get_setting('postsPerPage').value)
-    posts = Post.query.filter(Post.author_id == id).paginate(page, limit)
+    posts = Post.query.filter(Post.created_by == id).paginate(page, limit)
     return posts
 
 
