@@ -4,7 +4,7 @@ import os
 import re
 import click
 from planet.extensions import db
-from planet.permissions import Need
+from planet.utils.permissions import Need
 from planet.account.models import (create_user, update_user, Permission, Role)
 
 
