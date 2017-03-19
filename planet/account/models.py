@@ -3,21 +3,23 @@
 
 import hashlib
 from datetime import datetime
-from werkzeug import cached_property, security
+from werkzeug.utils import cached_property
+from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy.ext.hybrid import hybrid_property
 from flask_sqlalchemy import BaseQuery
 from flask_principal import RoleNeed, UserNeed
 
-from ..extensions import db
-from ..permissions import Need
-from ..post.models import Post
-from ..setting.models import get_setting
+from planet.extensions import db
+from planet.utils.database import CRUDMixin
+from planet.permissions import Need
+from planet.post.models import Post
+from planet.setting.models import get_setting
 
 
 def auth_user(email, password):
     user = User.query.filter(User.email == email).first()
-    # authenticated = user.check_password(password) if user else False
-    return user, True if user else False
+    authenticated = user.check_password(password) if user else False
+    return user, authenticated
 
 
 def get_all_users(page, limit=20):
@@ -35,11 +37,37 @@ def get_posts_by_user(id, page, limit=None):
     return posts
 
 
-def create_user(name, email, password):
-    user = User(name, email, password)
-    db.session.add(user)
-    db.session.commit()
+def create_user(name, email, password, role_name):
+    role = Role.query.filter(Role.slug == role_name).first()
+    if not role:
+        role = Role.query.filter(Role.slug == 'admin').first()
+    user = User.create(
+        name=name, email=email, password=password, primary_role=role)
     return user
+
+
+def update_user(name, password, email, role_name):
+    """Update an existing user.
+    Returns the updated user.
+
+    :param name: The name of the user.
+    :param password: The password of the user.
+    :param email: The email address of the user.
+    :param role_name: The name of the role to which the user
+                      should belong to.
+    """
+    user = User.query.filter_by(name=name).first()
+    if user is None:
+        return None
+
+    role = Role.query.filter(Role.slug == role_name).first()
+    if not role:
+        role = Role.query.filter(Role.slug == 'admin').first()
+
+    user.password = password
+    user.email = email
+    user.primary_role = role
+    return user.save()
 
 
 user_role = db.Table(
@@ -76,7 +104,7 @@ class UserQuery(BaseQuery):
         return user
 
 
-class User(db.Model):
+class User(db.Model, CRUDMixin):
     query_class = UserQuery
 
     id = db.Column(db.Integer, primary_key=True)
@@ -84,6 +112,7 @@ class User(db.Model):
     slug = db.Column(db.String(100), unique=True, index=True)
     _password = db.Column("password", db.String(60), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    primary_role_id = db.Column(db.Integer)
     status = db.Column(db.String(100), nullable=False, default='active')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
@@ -91,13 +120,22 @@ class User(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
 
-    roles = db.relationship(
+    primary_role = db.relationship(
         'Role',
-        backref='users',
+        lazy="joined",
+        backref="primary_users",
+        uselist=False,
+        primaryjoin='User.primary_role_id==Role.id',
+        foreign_keys=[primary_role_id])
+
+    secondary_roles = db.relationship(
+        'Role',
+        backref=db.backref('users', lazy='dynamic'),
         secondary=user_role,
         primaryjoin='User.id==user_role.c.user_id',
         secondaryjoin='user_role.c.role_id==Role.id',
-        foreign_keys=[user_role.c.user_id, user_role.c.role_id])
+        foreign_keys=[user_role.c.user_id, user_role.c.role_id],
+        lazy='dynamic')
 
     @hybrid_property
     def password(self):
@@ -105,10 +143,14 @@ class User(db.Model):
 
     @password.setter
     def password(self, password):
-        self._password = security.generate_password_hash(password)
+        self._password = generate_password_hash(password)
 
     def check_password(self, password):
-        return security.check_password_hash(self._password, password)
+        return check_password_hash(self._password, password)
+
+    @property
+    def roles(self):
+        return [self.primary_role] + list(self.secondary_roles)
 
     @cached_property
     def permissions(self):
