@@ -5,10 +5,10 @@ from flask_principal import RoleNeed, Permission
 
 
 class Need(tuple):
-    _needs = []
+    needs = []
 
     def __new__(self, method, value=None, object_id=None):
-        self._needs.append(tuple.__new__(Need, (method, value, object_id)))
+        self.needs.append(tuple.__new__(Need, (method, value, object_id)))
         return tuple.__new__(Need, (method, value, object_id))
 
     def __repr__(self):
