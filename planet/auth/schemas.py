@@ -3,7 +3,7 @@
 
 from marshmallow import (
     Schema, fields, validates_schema, ValidationError, post_load, validates)
-from ..account.models import User
+from planet.account.models import User
 
 
 class LoginSchema(Schema):

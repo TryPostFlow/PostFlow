@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import requests
 from flask import request, current_app, url_for
-from . import auth_api
-from .schemas import LoginSchema
 from planet.utils.schema import render_error
-from ..oauth.models import Client
+from planet.oauth.models import Client
+from planet.auth import auth_api
+from planet.auth.schemas import LoginSchema
 
 
 @auth_api.route('/login', methods=['POST'])
