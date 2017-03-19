@@ -14,7 +14,7 @@ from .permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)
 
-from ..schema import render_schema, render_error
+from planet.utils.schema import render_schema, render_error
 from ..extensions import db
 
 

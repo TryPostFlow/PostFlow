@@ -5,7 +5,7 @@ import requests
 from flask import request, current_app, url_for
 from . import auth_api
 from .schemas import LoginSchema
-from ..schema import render_error
+from planet.utils.schema import render_error
 from ..oauth.models import Client
 
 

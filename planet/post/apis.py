@@ -8,7 +8,7 @@ from planet.utils.permissions import auth
 
 from . import post_api
 from ..extensions import db
-from ..schema import render_schema, render_error
+from planet.utils.schema import render_schema, render_error
 from .schemas import PostSchema
 from .models import get_all_posts, get_post
 from .permissions import (

@@ -3,7 +3,7 @@
 
 from flask import request
 from . import setting
-from ..schema import render_schema, render_error
+from planet.utils.schema import render_schema, render_error
 from .schemas import SettingSchema
 from .models import get_setting, get_all_settings, save_setting
 

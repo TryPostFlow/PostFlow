@@ -5,7 +5,7 @@ from flask import request
 from planet.utils.permissions import auth
 from . import tag_api
 from ..extensions import db
-from ..schema import render_schema, render_error
+from planet.utils.schema import render_schema, render_error
 from .schemas import TagSchema
 from .models import Tag, get_tag
 from .permissions import (
