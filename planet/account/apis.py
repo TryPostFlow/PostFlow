@@ -1,21 +1,19 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# import jwt
-# import calendar
-# import datetime
 from flask import request, g
 
-from . import account_api
-from .schemas import AccountSchema, PasswordSchema
-from .models import get_user, get_all_users
+from planet.extensions import db
+from planet.utils.schema import render_schema, render_error
 from planet.utils.permissions import auth
-from .permissions import (
+from planet.account import account_api
+from planet.account.schemas import AccountSchema, PasswordSchema
+from planet.account.models import get_user, get_all_users
+from planet.account.permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)
 
-from planet.utils.schema import render_schema, render_error
-from ..extensions import db
+
 
 
 @account_api.route('/me', methods=['GET'])

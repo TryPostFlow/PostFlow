@@ -3,8 +3,8 @@
 
 from marshmallow import (
     Schema, fields, validates_schema, ValidationError, post_load, validates)
-from .models import User
-from ..schema import BaseSchema, update_object
+from planet.utils.schema import BaseSchema, update_object
+from planet.account.models import User
 
 
 class LoginSchema(Schema):
