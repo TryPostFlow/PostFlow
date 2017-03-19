@@ -9,7 +9,7 @@ from flask import request, g
 from . import account_api
 from .schemas import AccountSchema, PasswordSchema
 from .models import get_user, get_all_users
-from ..permissions import auth
+from planet.utils.permissions import auth
 from .permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)

@@ -4,12 +4,13 @@
 from datetime import datetime
 from flask import request, g
 
+from planet.utils.permissions import auth
+
 from . import post_api
 from ..extensions import db
 from ..schema import render_schema, render_error
 from .schemas import PostSchema
 from .models import get_all_posts, get_post
-from ..permissions import auth
 from .permissions import (
     post_list_perm, post_show_perm, post_create_perm,
     post_update_perm, post_destory_perm)
