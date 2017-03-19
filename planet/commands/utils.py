@@ -65,10 +65,10 @@ def create_permissions():
     db.session.commit()
 
 
-def prompt_save_user(username, email, password, role, only_update=False):
-    if not username:
-        username = click.prompt(
-            click.style("Username", fg="magenta"), type=str,
+def prompt_save_user(name, email, password, role, only_update=False):
+    if not name:
+        name = click.prompt(
+            click.style("Name", fg="magenta"), type=str,
             default=os.environ.get("USER", "")
         )
     if not email:
@@ -88,5 +88,6 @@ def prompt_save_user(username, email, password, role, only_update=False):
         )
 
     if only_update:
-        return update_user(username, password, email, role)
-    return create_user(username, password, email, role)
+        return update_user(name, password, email, role)
+    return create_user(name, password, email, role)
+
