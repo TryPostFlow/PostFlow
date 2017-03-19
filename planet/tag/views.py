@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from . import tag_view
-from .models import get_posts_by_tag, get_tag
-
-from ..helpers.template import render_template
+from planet.helpers.template import render_template
+from planet.tag import tag_view
+from planet.tag.models import get_posts_by_tag, get_tag
 
 
 @tag_view.route('/tag/<slug>', methods=['GET'])

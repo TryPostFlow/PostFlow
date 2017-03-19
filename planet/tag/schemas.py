@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from marshmallow import fields, post_load, pre_load
-from .models import Tag
-from ..helpers.text import slugify
-from ..schema import BaseSchema, update_object
+from marshmallow import fields, post_load
+from planet.utils.schema import BaseSchema, update_object
+from planet.tag.models import Tag
 
 
 class TagSchema(BaseSchema):

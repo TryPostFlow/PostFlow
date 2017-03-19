@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 
 from flask import request
+from planet.extensions import db
 from planet.utils.permissions import auth
-from . import tag_api
-from ..extensions import db
 from planet.utils.schema import render_schema, render_error
-from .schemas import TagSchema
-from .models import Tag, get_tag
-from .permissions import (
+from planet.tag import tag_api
+from planet.tag.schemas import TagSchema
+from planet.tag.models import Tag, get_tag
+from planet.tag.permissions import (
     tag_list_perm, tag_show_perm, tag_create_perm,
     tag_update_perm, tag_destory_perm)
 

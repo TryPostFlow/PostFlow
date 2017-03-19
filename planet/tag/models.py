@@ -4,10 +4,10 @@
 import itertools
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
-from ..extensions import db
-from ..post.models import Post
-from ..setting.models import get_setting
-from ..helpers.text import slugify
+from planet.extensions import db
+from planet.helpers.text import slugify
+from planet.post.models import Post
+from planet.setting.models import get_setting
 
 
 def get_tag(id_or_slug):
