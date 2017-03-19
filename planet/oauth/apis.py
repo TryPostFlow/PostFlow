@@ -2,13 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
-from werkzeug.security import gen_salt
 from flask import jsonify, g, request
-from ..extensions import oauth, db
-
-from . import oauth_api
-from .models import Token, Client, Grant
-from ..account.models import User
+from planet.extensions import oauth, db
+from planet.account.models import User
+from planet.oauth import oauth_api
+from planet.oauth.models import Token, Client, Grant
 
 
 @oauth.clientgetter

@@ -4,7 +4,6 @@
 from datetime import datetime, timedelta
 from werkzeug.security import gen_salt
 from planet.extensions import db
-from planet.account.models import User
 
 
 def create_client(name):
