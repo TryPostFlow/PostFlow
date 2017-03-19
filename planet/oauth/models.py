@@ -2,13 +2,32 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime, timedelta
-from ..extensions import db
-from ..account.models import User
+from werkzeug.security import gen_salt
+from planet.extensions import db
+from planet.account.models import User
+
+
+def create_client(name):
+    client = Client(
+        name=name,
+        client_id=gen_salt(40),
+        client_secret=gen_salt(50),
+        _redirect_uris=' '.join([
+            'http://localhost:8000/authorized',
+            'http://127.0.0.1:8000/authorized',
+            'http://127.0.1:8000/authorized',
+            'http://127.1:8000/authorized',
+            ]),
+        _default_scopes='email',
+    )
+    db.session.add(client)
+    db.session.commit()
+    return client
 
 
 class Client(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40))
+    name = db.Column(db.String(40), unique=True)
     client_id = db.Column(db.String(40), index=True)
     client_secret = db.Column(db.String(55), unique=True, index=True,
                               nullable=False)
@@ -20,10 +39,6 @@ class Client(db.Model):
         db.DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
-
-    @property
-    def user(self):
-        return User.query.get(1)
 
     @property
     def redirect_uris(self):
