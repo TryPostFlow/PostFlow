@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-import os
-from flask import send_from_directory, current_app
+from flask import send_from_directory
 
-from . import admin_view
+from planet.admin import admin_view
 
 
 @admin_view.route('/assets/<path:path>')
