@@ -2,27 +2,27 @@
 
 import click
 
-from planet.extensions import db
+from planet.extensions import db as sqlalchemy
 from planet.commands import planet
 
 
 @planet.group()
-def database():
+def db():
     """Create, update or delete users."""
     pass
 
 
-@database.command("create")
+@db.command("create")
 def createdb():
     """Initialize the database."""
     click.echo('creat the db')
-    db.create_all()
+    sqlalchemy.create_all()
     click.echo('over')
 
 
-@database.command("drop")
+@db.command("drop")
 def dropdb():
     """Initialize the database."""
     click.echo('drop the db')
-    db.drop_all()
+    sqlalchemy.drop_all()
     click.echo('over')
