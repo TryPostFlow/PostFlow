@@ -10,13 +10,13 @@ from flask import Flask, request, Blueprint, g, Response, abort
 from flask_principal import identity_loaded, Identity
 from flask_themes2 import Themes, load_themes_from
 
-from planet.account.models import User
-from planet.oauth.models import Token
-from planet.setting.models import Setting
-from planet.helpers.template import render_template
 from planet import extensions
 from planet.extensions import principals
 from planet.packages import PACKAGES
+from planet.helpers.template import render_template
+from planet.account.models import User
+from planet.oauth.models import Token
+from planet.setting.models import Setting
 
 
 def create_app(config=None, packages=PACKAGES):
