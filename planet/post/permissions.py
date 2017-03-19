@@ -3,7 +3,6 @@
 
 from functools import partial
 from flask_principal import Permission
-
 from planet.utils.permissions import Need
 
 PostNeed = partial(Need, 'post')

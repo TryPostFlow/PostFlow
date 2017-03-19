@@ -2,13 +2,13 @@
 
 from flask import g, request, url_for
 from werkzeug.contrib.atom import AtomFeed
-from . import post_view
-from .models import (
+from planet.utils.schema import render_schema
+from planet.helpers.template import render_template
+from planet.post import post_view
+from planet.post.models import (
     get_all_posts, get_post, get_next_post,
     get_prev_post, add_post_views, Post)
 
-from ..schema import render_schema
-from ..helpers.template import render_template
 
 
 @post_view.route('/', methods=['GET'])
