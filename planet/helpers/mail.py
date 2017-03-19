@@ -4,7 +4,7 @@
 import multiprocessing
 
 from flask_mail import Message
-from ..extensions import mail
+from planet.extensions import mail
 
 
 def processing_pool(f):
