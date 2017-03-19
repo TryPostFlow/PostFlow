@@ -7,12 +7,12 @@ import pkgutil
 import getpass
 import click
 from datetime import datetime
-from flask.cli import FlaskGroup, ScriptInfo, pass_script_info
+from flask import current_app
+from flask.cli import FlaskGroup, ScriptInfo, pass_script_info, with_appcontext
 from sqlalchemy_utils.functions import (database_exists, create_database,
                                         drop_database)
 
 from planet import create_app
-from planet.run import app
 from planet._compat import iteritems
 from planet.extensions import db, alembic
 from planet.setting.models import init_settings
@@ -128,8 +128,7 @@ def install(force, username, email, password, role):
     if database_exists(db.engine.url):
         if force or click.confirm(click.style(
             "Existing database found. Do you want to delete the old one and "
-            "create a new one?", fg="magenta")
-        ):
+            "create a new one?", fg="magenta")):
             drop_database(db.engine.url)
         else:
             sys.exit(0)
@@ -146,6 +145,43 @@ def install(force, username, email, password, role):
 
     click.secho("[+] FlaskBB has been successfully installed!",
                 fg="green", bold=True)
+
+
+@planet.command("shell", short_help="Runs a shell in the app context.")
+@with_appcontext
+def shell_command():
+    """Runs an interactive Python shell in the context of a given
+    Flask application.  The application will populate the default
+    namespace of this shell according to it"s configuration.
+    This is useful for executing small snippets of management code
+    without having to manually configuring the application.
+
+    This code snippet is taken from Flask"s cli module and modified to
+    run IPython and falls back to the normal shell if IPython is not
+    available.
+    """
+    import code
+    banner = "Python %s on %s\nInstance Path: %s" % (
+        sys.version,
+        sys.platform,
+        current_app.instance_path,
+    )
+    ctx = {"db": db}
+
+    # Support the regular Python interpreter startup script if someone
+    # is using it.
+    startup = os.environ.get("PYTHONSTARTUP")
+    if startup and os.path.isfile(startup):
+        with open(startup, "r") as f:
+            eval(compile(f.read(), startup, "exec"), ctx)
+
+    ctx.update(current_app.make_shell_context())
+
+    try:
+        import IPython
+        IPython.embed(banner1=banner, user_ns=ctx)
+    except ImportError:
+        code.interact(banner=banner, local=ctx)
 
 
 @planet.command()
