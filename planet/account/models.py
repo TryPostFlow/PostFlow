@@ -37,7 +37,7 @@ def get_posts_by_user(id, page, limit=None):
     return posts
 
 
-def create_user(name, email, password, role_name):
+def create_user(name, password, email, role_name):
     role = Role.query.filter(Role.slug == role_name).first()
     if not role:
         role = Role.query.filter(Role.slug == 'admin').first()
