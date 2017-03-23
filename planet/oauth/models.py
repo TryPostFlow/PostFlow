@@ -3,7 +3,9 @@
 
 from datetime import datetime, timedelta
 from werkzeug.security import gen_salt
+from sqlalchemy.ext.hybrid import hybrid_property
 from planet.extensions import db
+from planet.utils.database import CRUDMixin
 
 
 def create_client(name):
@@ -11,27 +13,26 @@ def create_client(name):
         name=name,
         client_id=gen_salt(40),
         client_secret=gen_salt(50),
-        _redirect_uris=' '.join([
+        redirect_uris=[
             'http://localhost:8000/authorized',
             'http://127.0.0.1:8000/authorized',
             'http://127.0.1:8000/authorized',
-            'http://127.1:8000/authorized',
-            ]),
-        _default_scopes='email',
+            'http://127.1:8000/authorized',],
+        default_scopes=['email', 'address',]
     )
     db.session.add(client)
     db.session.commit()
     return client
 
 
-class Client(db.Model):
+class Client(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True)
     client_id = db.Column(db.String(40), index=True)
     client_secret = db.Column(db.String(55), unique=True, index=True,
                               nullable=False)
-    _redirect_uris = db.Column(db.Text)
-    default_scope = db.Column(db.Text, default='email address')
+    _redirect_uris = db.Column('redirect_uris', db.Text)
+    _default_scopes = db.Column('default_scopes', db.Text, default='email address')
     disallow_grant_type = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
@@ -39,21 +40,29 @@ class Client(db.Model):
         default=datetime.utcnow,
         onupdate=datetime.utcnow)
 
-    @property
+    @hybrid_property
     def redirect_uris(self):
         if self._redirect_uris:
             return self._redirect_uris.split()
         return []
 
+    @redirect_uris.setter
+    def redirect_uris(self, redirect_uris):
+        self._redirect_uris = ' '.join(redirect_uris)
+
     @property
     def default_redirect_uri(self):
         return self.redirect_uris[0]
 
-    @property
+    @hybrid_property
     def default_scopes(self):
-        if self.default_scope:
-            return self.default_scope.split()
+        if self._default_scopes:
+            return self._default_scopes.split()
         return []
+
+    @default_scopes.setter
+    def default_scopes(self, default_scopes):
+        self._default_scope = ' '.join(default_scopes)
 
     @property
     def allowed_grant_types(self):
@@ -66,52 +75,59 @@ class Client(db.Model):
         return types
 
 
-class Grant(db.Model):
+class Grant(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')
-    )
-    user = db.relationship('User')
-
-    client_id = db.Column(
-        db.String(40), db.ForeignKey('client.client_id', ondelete='CASCADE'),
-        nullable=False,
-    )
-    client = db.relationship('Client')
+    user_id = db.Column(db.Integer)
+    user = db.relationship(
+        'User',
+        primaryjoin='User.id == Grant.user_id',
+        foreign_keys='Grant.user_id',
+        cascade="all, delete-orphan")
+    client_id = db.Column(db.String(40), nullable=False)
+    client = db.relationship(
+        'Client',
+        primaryjoin='Client.client_id == Grant.client_id',
+        foreign_keys='Grant.client_id',
+        cascade="all, delete-orphan")
     code = db.Column(db.String(255), index=True, nullable=False)
 
     redirect_uri = db.Column(db.String(255))
-    scope = db.Column(db.Text)
+    _scopes = db.Column('scopes', db.Text)
     expires = db.Column(db.DateTime)
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return self
 
     @property
     def scopes(self):
-        if self.scope:
-            return self.scope.split()
-        return None
+        if self._scopes:
+            return self._scopes.split()
+        return []
+
+    @scopes.setter
+    def scopes(self, scopes):
+        self._scopes = ' '.join(scopes)
 
 
-class Token(db.Model):
+class Token(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
-    client_id = db.Column(
-        db.String(40), db.ForeignKey('client.client_id', ondelete='CASCADE'),
-        nullable=False,
-    )
-    user_id = db.Column(
-        db.Integer, db.ForeignKey('user.id', ondelete='CASCADE')
-    )
+    client_id = db.Column(db.String(40), nullable=False)
+    client = db.relationship(
+        'Client',
+        primaryjoin='Client.client_id == Token.client_id',
+        foreign_keys='Token.client_id',
+        cascade="all, delete-orphan")
+    user_id = db.Column(db.Integer)
+    user = db.relationship(
+        'User',
+        primaryjoin='User.id == Token.user_id',
+        foreign_keys='Token.user_id',
+        cascade="all, delete-orphan")
     user = db.relationship('User')
     client = db.relationship('Client')
     token_type = db.Column(db.String(40))
     access_token = db.Column(db.String(255))
     refresh_token = db.Column(db.String(255))
     expires = db.Column(db.DateTime)
-    scope = db.Column(db.Text)
+    _scopes = db.Column('scopes', db.Text)
 
     def __init__(self, **kwargs):
         expires_in = kwargs.pop('expires_in')
@@ -121,14 +137,13 @@ class Token(db.Model):
 
     @property
     def scopes(self):
-        if self.scope:
-            return self.scope.split()
+        if self._scopes:
+            return self._scopes.split()
         return []
 
-    def delete(self):
-        db.session.delete(self)
-        db.session.commit()
-        return self
+    @scopes.setter
+    def scopes(self, scopes):
+        self._scopes = ' '.join(scopes)
 
     @property
     def is_expired(self):
