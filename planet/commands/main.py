@@ -4,9 +4,10 @@
 import os
 import sys
 import pkgutil
-import getpass
-import click
 from datetime import datetime
+
+import feedparser
+import click
 from jinja2 import Environment, FileSystemLoader
 from werkzeug.security import gen_salt
 from flask import current_app
@@ -17,8 +18,6 @@ from planet import create_app
 from planet._compat import iteritems
 from planet.extensions import db, alembic
 from planet.setting.models import init_settings
-
-import feedparser
 from planet.post.models import Post
 from planet.tag.models import Tag
 from planet.oauth.models import create_client
@@ -40,8 +39,7 @@ def set_config(ctx, param, value):
 @click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
 @click.option('--config', expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
-              help="Specify the config to use in dotted module notation "
-                   "e.g. flaskbb.configs.default.DefaultConfig")
+              help="Specify the config to use")
 @pass_script_info
 def planet(info, **params):
     os.environ["FLASK_DEBUG"] = str(info.load_app().config['DEBUG'])
@@ -50,17 +48,17 @@ def planet(info, **params):
 @planet.command()
 @click.option("--server", "-s", default="gunicorn",
               type=click.Choice(["gunicorn", "gevent"]),
-              help="The WSGI Server to run FlaskBB on.")
+              help="The WSGI Server to run Planet on.")
 @click.option("--host", "-h", default="127.0.0.1",
-              help="The interface to bind FlaskBB to.")
+              help="The interface to bind Planet to.")
 @click.option("--port", "-p", default="8000", type=int,
-              help="The port to bind FlaskBB to.")
+              help="The port to bind Planet to.")
 @click.option("--workers", "-w", default=4,
               help="The number of worker processes for handling requests.")
 @click.option("--daemon", "-d", default=False, is_flag=True,
               help="Starts gunicorn as daemon.")
 @click.option("--config", "-c",
-              help="The configuration file to use for FlaskBB.")
+              help="The configuration file to use for Planet.")
 def start(server, host, port, workers, config, daemon):
     """Starts a production ready wsgi server.
     TODO: Figure out a way how to forward additional args to gunicorn
@@ -146,7 +144,7 @@ def install(force, username, email, password, role):
     click.secho("[+] Creating admin user...", fg="cyan")
     prompt_save_user(username, email, password, role)
 
-    click.secho("[+] FlaskBB has been successfully installed!",
+    click.secho("[+] Planet has been successfully installed!",
                 fg="green", bold=True)
 
 
@@ -192,7 +190,7 @@ def shell_command():
               help="Creates a development config with DEBUG set to True.")
 @click.option("--output", "-o", required=False,
               help="The path where the config file will be saved at. "
-                   "Defaults to the flaskbb's root folder.")
+                   "Defaults to the Planet's root folder.")
 @click.option("--force", "-f", default=False, is_flag=True,
               help="Overwrite any existing config file if one exists.")
 def generate_config(development, output, force):
@@ -252,7 +250,7 @@ def generate_config(development, output, force):
 
 @planet.command()
 @click.option("--path", "-p",
-              help="The configuration file to use for FlaskBB.")
+              help="The configuration file to use for Planet.")
 def import_wordpress(path):
     feed = feedparser.parse(path)
     for entry in feed.entries:
