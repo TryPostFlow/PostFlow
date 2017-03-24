@@ -7,10 +7,11 @@ import pkgutil
 import getpass
 import click
 from datetime import datetime
+from jinja2 import Environment, FileSystemLoader
+from werkzeug.security import gen_salt
 from flask import current_app
 from flask.cli import FlaskGroup, ScriptInfo, pass_script_info, with_appcontext
-from sqlalchemy_utils.functions import (database_exists, create_database,
-                                        drop_database)
+from sqlalchemy_utils.functions import (database_exists, drop_database)
 
 from planet import create_app
 from planet._compat import iteritems
@@ -21,7 +22,9 @@ import feedparser
 from planet.post.models import Post
 from planet.tag.models import Tag
 from planet.oauth.models import create_client
-from planet.commands.utils import (FlaskCLIError, create_permissions, EmailType, prompt_save_user)
+from planet.commands.utils import (FlaskCLIError, create_permissions,
+                                   EmailType, prompt_save_user, prompt_config_path,
+                                   write_config)
 
 
 def make_app(script_info):
@@ -35,7 +38,7 @@ def set_config(ctx, param, value):
 
 
 @click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
-@click.option('--config', expose_value=False, callback=set_config,
+@click.option('--config', default="planet.conf", expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use in dotted module notation "
                    "e.g. flaskbb.configs.default.DefaultConfig")
@@ -134,7 +137,7 @@ def install(force, username, email, password, role):
             sys.exit(0)
     # create_database(db.engine.url)
     db.create_all()
-    # alembic.upgrade()
+    alembic.upgrade()
     click.secho("[+] Creating default settings...", fg="cyan")
     create_client('planet')
     create_permissions()
@@ -182,6 +185,69 @@ def shell_command():
         IPython.embed(banner1=banner, user_ns=ctx)
     except ImportError:
         code.interact(banner=banner, local=ctx)
+
+
+@planet.command("makeconfig")
+@click.option("--development", "-d", default=False, is_flag=True,
+              help="Creates a development config with DEBUG set to True.")
+@click.option("--output", "-o", required=False,
+              help="The path where the config file will be saved at. "
+                   "Defaults to the flaskbb's root folder.")
+@click.option("--force", "-f", default=False, is_flag=True,
+              help="Overwrite any existing config file if one exists.")
+def generate_config(development, output, force):
+    """Generates a Planet configuration file."""
+    config_env = Environment(
+        loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))
+    )
+    config_template = config_env.get_template('config.conf.tpl')
+
+    if output:
+        config_path = os.path.abspath(output)
+    else:
+        config_path = current_app.instance_path
+
+    if os.path.exists(config_path) and not os.path.isfile(config_path):
+        config_path = os.path.join(config_path, "planet.conf")
+
+    default_conf = {
+        "debug": True,
+        "server_name": "localhost:5000",
+        "secret_key": gen_salt(24),
+        "database_uri": "sqlite:///" + os.path.join(current_app.instance_path, "content/data/planet.db"),
+        "theme_paths": "content/themes",
+        "mail_server": "localhost",
+        "mail_port": 25,
+        "mail_use_tls": False,
+        "mail_use_ssl": False,
+        "mail_username": "",
+        "mail_password": "",
+        "mail_sender_name": "Planet Mailer",
+        "mail_sender_address": "noreply@yourdomain",
+        "mail_admin_address": "admin@yourdomain",
+        'storage_type': 'local',
+        'storage_base_url': 'localhost:5000',
+        'storage_base_path': current_app.instance_path,
+        'storage_base_dir': 'content/images/',
+    }
+
+    if not force:
+        config_path = prompt_config_path(config_path)
+
+    if force and os.path.exists(config_path):
+        click.secho("Overwriting existing config file: {}".format(config_path),
+                    fg="yellow")
+
+    # if development:
+    write_config(default_conf, config_template, config_path)
+
+    # Finished
+    click.secho("The configuration file has been saved to:\n{cfg}"
+                .format(cfg=config_path), fg="blue")
+    click.secho("Usage: planet --config {cfg} run\n"
+                "Feel free to adjust it as needed."
+                .format(cfg=config_path), fg="green")
+    sys.exit(0)
 
 
 @planet.command()
