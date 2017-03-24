@@ -38,7 +38,7 @@ def set_config(ctx, param, value):
 
 
 @click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
-@click.option('--config', default="planet.conf", expose_value=False, callback=set_config,
+@click.option('--config', expose_value=False, callback=set_config,
               required=False, is_flag=False, is_eager=True, metavar="CONFIG",
               help="Specify the config to use in dotted module notation "
                    "e.g. flaskbb.configs.default.DefaultConfig")
