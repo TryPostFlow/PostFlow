@@ -26,15 +26,8 @@ def create_app(config=None, packages=PACKAGES):
 
     if config is not None:
         app.config.from_pyfile(config)
-    elif os.getenv('FLASK_ENV') == 'production':
-        app.config.from_pyfile('config/production.conf')
-        app.logger.info("Config: Production")
-    elif os.getenv('FLASK_ENV') == 'test':
-        app.config.from_pyfile('config/test.conf')
-        app.logger.info("Config: Test")
     else:
-        app.config.from_pyfile('config/development.conf')
-        app.logger.info("Config: Development")
+        app.config.from_pyfile('planet.conf')
 
     configure_extensions(app)
     configure_errorhandlers(app)
