@@ -1,7 +1,7 @@
 import Axios from 'axios'
 
 const axios = Axios.create({
-    baseURL: apiBaseURL
+    baseURL: '/api'
   })
 
 if (localStorage.getItem('auth')) {

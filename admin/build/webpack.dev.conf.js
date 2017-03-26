@@ -19,13 +19,13 @@ module.exports = merge(baseWebpackConfig, {
   devtool: '#cheap-module-eval-source-map',
   devServer: {
     port: 9000,
-    historyApiFallback: true
+    historyApiFallback: true,
+    proxy: config.dev.proxyTable
   },
   plugins: [
     new webpack.DefinePlugin({
       'process.env': config.dev.env,
-      'base': JSON.stringify(config.dev.base),
-      'apiBaseURL': JSON.stringify(config.dev.apiBaseURL)
+      'base': JSON.stringify(config.dev.base)
     }),
     // https://github.com/glenjamin/webpack-hot-middleware#installation--usage
     // new webpack.HotModuleReplacementPlugin(),
