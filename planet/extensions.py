@@ -7,6 +7,7 @@ from flask_storage import Storage
 from flask_alembic import Alembic
 from flask_principal import Principal
 from flask_oauthlib.provider import OAuth2Provider
+from flask_themes2 import Themes
 from raven.contrib.flask import Sentry
 
 __all__ = ['mail', 'db', 'storage','alembic', 'principals', 'oauth', 'sentry']
@@ -18,3 +19,4 @@ oauth = OAuth2Provider()
 sentry = Sentry()
 alembic = Alembic()
 storage = Storage()
+themes = Themes()
