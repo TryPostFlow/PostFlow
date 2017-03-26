@@ -54,6 +54,7 @@ export default{
         this.user)
       .then(function (response) {
         localStorage.setItem('auth', JSON.stringify(response.data))
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
         vm.$router.push({name: 'PostList'})
       })
       .catch(function(error){
