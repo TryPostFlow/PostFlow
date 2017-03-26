@@ -1,1 +1,2 @@
 recursive-include planet/admin/static *
+recursive-include planet/config *
