@@ -4,45 +4,22 @@
 import os
 import sys
 import pkgutil
-from datetime import datetime
 
-import feedparser
 import click
-from jinja2 import Environment, FileSystemLoader
-from werkzeug.security import gen_salt
 from flask import current_app
-from flask.cli import FlaskGroup, ScriptInfo, pass_script_info, with_appcontext
-from sqlalchemy_utils.functions import (database_exists, drop_database)
+from flask.cli import with_appcontext
 
 from planet import create_app
 from planet._compat import iteritems
-from planet.extensions import db, alembic
-from planet.setting.models import init_settings
-from planet.post.models import Post
-from planet.tag.models import Tag
-from planet.oauth.models import create_client
+from planet.extensions import db
 from planet.commands.utils import (FlaskCLIError, create_permissions,
-                                   EmailType, prompt_save_user, prompt_config_path,
-                                   write_config)
-
-
-def make_app(script_info):
-    config_file = getattr(script_info, "config_file")
-    return create_app(config_file)
-
-
-def set_config(ctx, param, value):
-    """This will pass the config file to the create_app function."""
-    ctx.ensure_object(ScriptInfo).config_file = value
-
-
-@click.group(cls=FlaskGroup, create_app=make_app, add_version_option=False)
-@click.option('--config', expose_value=False, callback=set_config,
-              required=False, is_flag=False, is_eager=True, metavar="CONFIG",
-              help="Specify the config to use")
-@pass_script_info
-def planet(info, **params):
-    os.environ["FLASK_DEBUG"] = str(info.load_app().config['DEBUG'])
+                                   EmailType, prompt_save_user)
+from planet.commands.base import planet
+from planet.commands.database import init_db
+from planet.commands.theme import download_theme
+from planet.commands.config import generate_config
+from planet.setting.models import init_settings, save_setting
+from planet.oauth.models import Client
 
 
 @planet.command()
@@ -112,39 +89,88 @@ def start(server, host, port, workers, config, daemon):
                                 "Make sure it is installed.", fg="red")
 
 
+def prepare_folder(path):
+    # Todo: change permission
+    folder = os.path.join(current_app.instance_path, path)
+    if not os.path.isdir(folder):
+        os.makedirs(folder)
+    return folder
+
+
 @planet.command()
 @click.option("--force", "-f", default=False, is_flag=True,
               help="Doesn't ask for confirmation.")
-@click.option("--username", "-u", help="The username of the user.")
+@click.option("--name", "-u", help="The name of the user.")
 @click.option("--email", "-e", type=EmailType(),
               help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
-@click.option("--role", "-r", help="The role of the user.",
-              type=click.Choice(["admin", "super_mod", "mod", "member"]))
-def install(force, username, email, password, role):
+def init(force, name, email, password):
     """Installs planet. If no arguments are used, an interactive setup
     will be run.
     """
     click.secho("[+] Installing Planet...", fg="cyan")
-    if database_exists(db.engine.url):
-        if force or click.confirm(click.style(
-            "Existing database found. Do you want to delete the old one and "
-            "create a new one?", fg="magenta")):
-            drop_database(db.engine.url)
-        else:
-            sys.exit(0)
-    # create_database(db.engine.url)
-    db.create_all()
-    alembic.upgrade()
-    click.secho("[+] Creating default settings...", fg="cyan")
-    create_client('planet')
+    # Prepare Content folder
+    click.secho("[+] Prepareing content folder...", fg="cyan")
+    data_folder = prepare_folder('content/data/')
+    images_folder = prepare_folder('content/images/')
+    themes_folder = prepare_folder('content/themes/')
+    click.secho("[+] Content folder is ready.", fg="green")
+
+    # # Create admin user
+    click.secho("[+] Creating admin user...", fg="cyan")
+    if not name:
+        name = click.prompt(
+            click.style("Name", fg="magenta"), type=str,
+            default=os.environ.get("USER", "")
+        )
+    if not email:
+        email = click.prompt(
+            click.style("Email address", fg="magenta"), type=EmailType()
+        )
+    if not password:
+        password = click.prompt(
+            click.style("Password", fg="magenta"), hide_input=True,
+            confirmation_prompt=True
+        )
+
+    # Create Site
+    click.secho("[+] Creating site...", fg="cyan")
+    site_name = click.prompt(
+        click.style("Site name", fg="magenta"), type=str,
+        default="Planet")
+
+    # Select Theme
+    click.secho("[+] Seleting theme...", fg="cyan")
+    path = click.prompt(
+        click.style("Theme name (Github: user_name/repo_name)", fg="magenta"), type=str,
+        default="fengluo/casper")
+    # download theme
+    theme_name = download_theme(path)
+    click.secho("[+] Theme is ready.", fg="green")
+
+    # generate config
+    click.secho("[+] Generating config...", fg="cyan")
+    config_path = generate_config(theme=theme_name)
+    click.secho("The configuration file has been saved to:\n{cfg}"
+                .format(cfg=config_path), fg="blue")
+    current_app.config.from_pyfile(config_path)
+    click.secho("[+] Config is ready.", fg="green")
+
+    # init database
+    click.secho("[+] Initializing database...", fg="cyan")
+    init_db(force)
+    click.secho("[+] Database is ready.", fg="green")
+
+    # Insert data
+    click.secho("[+] Insert data...", fg="cyan")
+    Client.create(name='planet')
     create_permissions()
     init_settings()
+    save_setting('title', site_name)
+    prompt_save_user(name, email, password, 'admin')
+    click.secho("[+] Data is ready.", fg="green")
 
-    click.secho("[+] Creating admin user...", fg="cyan")
-    prompt_save_user(username, email, password, role)
-
-    click.secho("[+] Planet has been successfully installed!",
+    click.secho("[+] Planet has been successfully initialized!",
                 fg="green", bold=True)
 
 
@@ -183,96 +209,3 @@ def shell_command():
         IPython.embed(banner1=banner, user_ns=ctx)
     except ImportError:
         code.interact(banner=banner, local=ctx)
-
-
-@planet.command("makeconfig")
-@click.option("--development", "-d", default=False, is_flag=True,
-              help="Creates a development config with DEBUG set to True.")
-@click.option("--output", "-o", required=False,
-              help="The path where the config file will be saved at. "
-                   "Defaults to the Planet's root folder.")
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Overwrite any existing config file if one exists.")
-def generate_config(development, output, force):
-    """Generates a Planet configuration file."""
-    config_env = Environment(
-        loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))
-    )
-    config_template = config_env.get_template('config.conf.tpl')
-
-    if output:
-        config_path = os.path.abspath(output)
-    else:
-        config_path = current_app.instance_path
-
-    if os.path.exists(config_path) and not os.path.isfile(config_path):
-        config_path = os.path.join(config_path, "planet.conf")
-
-    default_conf = {
-        "debug": True,
-        "server_name": "localhost:5000",
-        "secret_key": gen_salt(24),
-        "database_uri": "sqlite:///" + os.path.join(current_app.instance_path, "content/data/planet.db"),
-        "theme_paths": "content/themes",
-        "mail_server": "localhost",
-        "mail_port": 25,
-        "mail_use_tls": False,
-        "mail_use_ssl": False,
-        "mail_username": "",
-        "mail_password": "",
-        "mail_sender_name": "Planet Mailer",
-        "mail_sender_address": "noreply@yourdomain",
-        "mail_admin_address": "admin@yourdomain",
-        'storage_type': 'local',
-        'storage_base_url': 'localhost:5000',
-        'storage_base_path': current_app.instance_path,
-        'storage_base_dir': 'content/images/',
-    }
-
-    if not force:
-        config_path = prompt_config_path(config_path)
-
-    if force and os.path.exists(config_path):
-        click.secho("Overwriting existing config file: {}".format(config_path),
-                    fg="yellow")
-
-    # if development:
-    write_config(default_conf, config_template, config_path)
-
-    # Finished
-    click.secho("The configuration file has been saved to:\n{cfg}"
-                .format(cfg=config_path), fg="blue")
-    click.secho("Usage: planet --config {cfg} run\n"
-                "Feel free to adjust it as needed."
-                .format(cfg=config_path), fg="green")
-    sys.exit(0)
-
-
-@planet.command()
-@click.option("--path", "-p",
-              help="The configuration file to use for Planet.")
-def import_wordpress(path):
-    feed = feedparser.parse(path)
-    for entry in feed.entries:
-        post = Post()
-        post.title = entry.title
-        post.content = entry.content[0]['value']
-        for tag_dict in entry.tags:
-            tag = Tag.query.filter_by(name=tag_dict['term']).first()
-            if not tag:
-                tag = Tag(name=tag_dict['term'])
-            post.tags.append(tag)
-
-        published = datetime.strptime(entry.wp_post_date, '%Y-%m-%d %H:%M:%S')
-        post.created_by = 1
-        post.updated_by = 1
-        post.published_by = 1
-        post.slug = published.strftime('%Y/%m/'+entry.wp_post_id)
-        post.created_at = published
-        post.updated_at = published
-        post.updated_at = published
-        db.session.add(post)
-        db.session.commit()
-        click.secho("[+] {} created.".format(post.title), fg="cyan")
-    click.secho("[+] The file has been successfully imported!",
-                fg="green", bold=True)
