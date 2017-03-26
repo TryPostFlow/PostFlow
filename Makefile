@@ -14,11 +14,11 @@ ifeq (server,$(firstword $(MAKECMDGOALS)))
   $(eval $(RUN_ARGS):;@:)
 endif
 
-server:export FLASK_ENV=dev
-server:export FLASK_APP=planet/commands.py
-server:export FLASK_DEBUG=1
 server: 
-	flask $(RUN_ARGS)
+	planet $(RUN_ARGS)
+
+serve:
+	@$(MAKE) server run
 
 admin-serve:
 	@npm run dev --prefix admin
@@ -27,4 +27,11 @@ admin-build:
 	@npm run build --prefix admin && rm -rf planet/admin/static/* && cp -r admin/dist/* planet/admin/static
 
 dev:
-	@$(MAKE) server admin-serve -j 2
+	@$(MAKE) serve admin-serve -j 2
+
+dependencies:requirements.txt
+	pip install -r requirements.txt
+
+install: dependencies
+	clear
+	planet init
