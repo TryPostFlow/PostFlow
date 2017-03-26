@@ -1,4 +1,3 @@
-DEBUG = {{debug}}
 TESTING = False
 
 # Security
@@ -11,7 +10,7 @@ SQLALCHEMY_ECHO = False
 
 # Theme
 THEME_PATHS = ('{{theme_paths}}', )
-THEME = 'default'
+THEME = '{{theme}}'
 
 # Storage
 STORAGE_TYPE='{{storage_type}}'

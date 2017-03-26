@@ -53,7 +53,7 @@ def write_config(config, config_template, config_path):
 
 def generate_config(output=None, force=None, theme=None):
     config_env = Environment(
-        loader=FileSystemLoader(os.path.join(current_app.root_path, "configs"))
+        loader=FileSystemLoader(os.path.join(current_app.root_path, "config"))
     )
     config_template = config_env.get_template('config.conf.tpl')
 
