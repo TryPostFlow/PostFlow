@@ -8,30 +8,18 @@ from planet.extensions import db
 from planet.utils.database import CRUDMixin
 
 
-def create_client(name):
-    client = Client(
-        name=name,
-        client_id=gen_salt(40),
-        client_secret=gen_salt(50),
-        redirect_uris=[
-            'http://localhost:8000/authorized',
-            'http://127.0.0.1:8000/authorized',
-            'http://127.0.1:8000/authorized',
-            'http://127.1:8000/authorized',],
-        default_scopes=['email', 'address',]
-    )
-    db.session.add(client)
-    db.session.commit()
-    return client
-
-
 class Client(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True)
-    client_id = db.Column(db.String(40), index=True)
+    client_id = db.Column(db.String(40), index=True, default=gen_salt(40))
     client_secret = db.Column(db.String(55), unique=True, index=True,
-                              nullable=False)
-    _redirect_uris = db.Column('redirect_uris', db.Text)
+                              nullable=False, default=gen_salt(40))
+    _redirect_uris = db.Column(
+        'redirect_uris', db.Text, default=" ".join([
+            'http://localhost:8000/authorized',
+            'http://127.0.0.1:8000/authorized',
+            'http://127.0.1:8000/authorized',
+            'http://127.1:8000/authorized',]))
     _default_scopes = db.Column('default_scopes', db.Text, default='email address')
     disallow_grant_type = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -82,13 +70,13 @@ class Grant(db.Model, CRUDMixin):
         'User',
         primaryjoin='User.id == Grant.user_id',
         foreign_keys='Grant.user_id',
-        cascade="all, delete-orphan")
+        cascade="all, delete")
     client_id = db.Column(db.String(40), nullable=False)
     client = db.relationship(
         'Client',
         primaryjoin='Client.client_id == Grant.client_id',
         foreign_keys='Grant.client_id',
-        cascade="all, delete-orphan")
+        cascade="all, delete")
     code = db.Column(db.String(255), index=True, nullable=False)
 
     redirect_uri = db.Column(db.String(255))
@@ -114,15 +102,13 @@ class Token(db.Model, CRUDMixin):
         'Client',
         primaryjoin='Client.client_id == Token.client_id',
         foreign_keys='Token.client_id',
-        cascade="all, delete-orphan")
+        cascade="all, delete")
     user_id = db.Column(db.Integer)
     user = db.relationship(
         'User',
         primaryjoin='User.id == Token.user_id',
         foreign_keys='Token.user_id',
-        cascade="all, delete-orphan")
-    user = db.relationship('User')
-    client = db.relationship('Client')
+        cascade="all, delete")
     token_type = db.Column(db.String(40))
     access_token = db.Column(db.String(255))
     refresh_token = db.Column(db.String(255))
