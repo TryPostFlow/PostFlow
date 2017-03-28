@@ -24,10 +24,16 @@ def create_app(config=None, packages=PACKAGES):
         instance_path=os.getcwd(),
         instance_relative_config=True)
 
-    if config is not None:
-        app.config.from_pyfile(config)
+    plant_conf = os.path.join(app.instance_path, 'planet.conf')
+    default_conf = os.path.join(app.root_path, 'config/default.conf')
+    if config:
+        config = config
+    elif os.path.exists(plant_conf):
+        config = plant_conf
     else:
-        app.config.from_pyfile('planet.conf')
+        config = default_conf
+
+    app.config.from_pyfile(config)
 
     configure_extensions(app)
     configure_errorhandlers(app)
