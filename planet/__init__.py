@@ -97,9 +97,9 @@ def configure_before_handlers(app):
 
     @app.before_request
     def check_post_data():
-        if request.is_json and\
-                request.method in ['POST', 'PUT'] and\
-                not request.get_json():
+        if request.method in ['POST', 'PUT'] and\
+                not request.get_data() and\
+                not request.files:
             abort(400)
 
     @app.before_request
@@ -138,30 +138,27 @@ def configure_errorhandlers(app):
 
     @app.errorhandler(400)
     def empty_body(error):
-        if request.is_json:
-            message = {
-                'code': 400,
-                'error': 'No input data provided'}
-            return Response(
-                response=json.dumps(message), status=400)
+        message = {
+            'code': 400,
+            'error': 'No input data provided'}
+        return Response(
+            response=json.dumps(message), status=400)
 
     @app.errorhandler(401)
     def unauthorized(error):
-        if request.is_json:
-            message = {
-                'code': 401,
-                'error': 'Login required'}
-            return Response(
-                response=json.dumps(message), status=401)
+        message = {
+            'code': 401,
+            'error': 'Login required'}
+        return Response(
+            response=json.dumps(message), status=401)
 
     @app.errorhandler(403)
     def forbidden(error):
-        if request.is_json:
-            message = {
-                'code': 403,
-                'error': 'Sorry, page not allowed'}
-            return Response(
-                response=json.dumps(message), status=403)
+        message = {
+            'code': 403,
+            'error': 'Sorry, page not allowed'}
+        return Response(
+            response=json.dumps(message), status=403)
 
     @app.errorhandler(404)
     def page_not_found(error):
