@@ -20,6 +20,7 @@ from planet.commands.theme import download_theme
 from planet.commands.config import generate_config
 from planet.setting.models import init_settings, save_setting
 from planet.oauth.models import Client
+from planet.post.models import insert_sample_post
 
 
 @planet.command()
@@ -168,6 +169,7 @@ def init(force, name, email, password):
     init_settings()
     save_setting('title', site_name)
     prompt_save_user(name, email, password, 'admin')
+    insert_sample_post()
     click.secho("[+] Data is ready.", fg="green")
 
     click.secho("[+] Planet has been successfully initialized!",
