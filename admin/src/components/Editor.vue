@@ -34,6 +34,11 @@
 
     export default{
         name: 'Editor',
+        data(){
+            return {
+                auth: JSON.parse(localStorage.getItem('auth'))
+            }
+        },
         props: {
             value: {
                 type: Object,
@@ -65,7 +70,6 @@
                     });
                     // console.log('length: '+imgPlaceholders.length)
                     Dropzone.autoDiscover = false;
-
                     imgPlaceholders.forEach(
                         function(element, index){
                             // console.log('element'+element)
@@ -76,10 +80,13 @@
 
                             element.setAttribute("class", "dropzone");
                             $($(element).find('img')[0]).remove()
-                            var url = process.env.NODE_ENV === 'production'?'/api/images/upload':'http://127.0.0.1:5000/api/images/upload'
+                            var url = '/api/images'
                             var dropzone = new Dropzone(element, {
                                 url: url,
                                 paramName: 'image',
+                                headers:{
+                                    'Authorization': 'Bearer ' + self.auth.access_token
+                                },
                                 success: function(file, response){
                                     var holderP = $(file.previewElement).closest("p")
 
@@ -93,13 +100,13 @@
                                         // console.log('whole: '+ whole)
                                         // console.log('a: '+ a)
                                         // console.log('b: '+ b)
-                                        return (nth === (elemindex+1)) ? (a + response.path +')') : a+b;
+                                        return (nth === (elemindex+1)) ? (a + response.url +')') : a+b;
                                     });
                                     self.value.markdown = newMarkdown
                                     // console.log(self.markdown)
 
                                     // Set image instead of placeholder
-                                    holderP.removeClass("dropzone").html('<img src="'+ response.path +'"/>');
+                                    holderP.removeClass("dropzone").html('<img src="'+ response.url +'"/>');
                                 }
                             });
                         }
