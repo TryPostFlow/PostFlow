@@ -140,12 +140,12 @@ def init(force, name, email, password):
         default="Planet")
 
     # Select Theme
-    click.secho("[+] Seleting theme...", fg="cyan")
-    path = click.prompt(
-        click.style("Theme name (Github: user_name/repo_name)", fg="magenta"), type=str,
-        default="fengluo/casper")
+    click.secho("[+] Installing theme...", fg="cyan")
+    # path = click.prompt(
+    #     click.style("Theme name (Github: user_name/repo_name)", fg="magenta"), type=str,
+    #     default="fengluo/casper")
     # download theme
-    theme_name = download_theme(path)
+    theme_name = download_theme("fengluo/casper")
     click.secho("[+] Theme is ready.", fg="green")
 
     # generate config
