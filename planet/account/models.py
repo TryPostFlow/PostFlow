@@ -12,6 +12,7 @@ from flask_principal import RoleNeed, UserNeed
 from planet.extensions import db
 from planet.utils.database import CRUDMixin
 from planet.utils.permissions import Need
+from planet.helpers.text import slugify
 from planet.post.models import Post
 from planet.setting.models import get_setting
 
@@ -108,8 +109,8 @@ class User(db.Model, CRUDMixin):
     query_class = UserQuery
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True, index=True)
-    slug = db.Column(db.String(100), unique=True, index=True)
+    _name = db.Column('name', db.String(100), unique=True, index=True)
+    _slug = db.Column('slug', db.String(100), unique=True, index=True)
     _password = db.Column("password", db.String(60), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     primary_role_id = db.Column(db.Integer)
@@ -136,6 +137,24 @@ class User(db.Model, CRUDMixin):
         secondaryjoin='user_role.c.role_id==Role.id',
         foreign_keys=[user_role.c.user_id, user_role.c.role_id],
         lazy='dynamic')
+    
+    @hybrid_property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name.strip()
+        if self.slug is None:
+            self.slug = slugify(name)[:255]
+
+    @hybrid_property
+    def slug(self):
+        return self._slug
+
+    @slug.setter
+    def slug(self, slug):
+        self._slug = slugify(slug) if slug else slugify(self.name)
 
     @hybrid_property
     def password(self):
