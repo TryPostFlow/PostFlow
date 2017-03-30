@@ -5,7 +5,7 @@
     export default {
         name: 'SignOut',
         created: function(){
-            localStorage.removeItem('auth')
+            this.$store.commit('auth/DELETE_ITEM')
             this.$router.push({name: 'SignIn'})
         }
     }

@@ -1,28 +1,29 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import createLogger from 'vuex/dist/logger'
-import { Post, Tag, Account, Setting } from './modules'
+import Vue from "vue";
+import Vuex from "vuex";
+import createLogger from "vuex/dist/logger";
+import { Post, Tag, Account, Setting, Auth } from "./modules";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 const store = new Vuex.Store({
-  plugins: process.env.NODE_ENV === 'production'?[]:[createLogger()],
+  plugins: process.env.NODE_ENV === "production" ? [] : [createLogger()],
   modules: {
     Account,
     Post,
     Tag,
-    Setting
+    Setting,
+    Auth
   }
-})
+});
 
 if (module.hot) {
-  module.hot.accept(['./modules'], () => {
-    const newMutations = require('./modules').default
+  module.hot.accept(["./modules"], () => {
+    const newMutations = require("./modules").default;
 
     store.hotUpdate({
       mutations: newMutations
-    })
-  })
+    });
+  });
 }
 
-export default store
+export default store;

@@ -32,29 +32,21 @@
 </div>
 </template>
 <script>
-import axios from '../store/constants/api'
-var qs = require('qs');
 export default{
   data() {
     return {
       app: this.$parent.app,
-      user: {
-//        grant_type: 'password',
-//        client_id: 'J1SuWr9nNV618NgJ4kZPM4DvYVY68AjtxDRsokZI',
-//        client_secret: 'bM17VfEkCAmmcMTm81g0VExTsPPDSVzTDbCZZKoEDQZdZqTm05'
-      },
+      user: {},
       authError: null
     }
   },
   methods: {
     signin(){
       var vm = this
-      axios.post(
-        'login',
-        this.user)
+      vm.$store.dispatch(
+        'auth/SIGNIN',
+        {params:vm.user})
       .then(function (response) {
-        localStorage.setItem('auth', JSON.stringify(response.data))
-        axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.access_token
         vm.$router.push({name: 'PostList'})
       })
       .catch(function(error){
@@ -71,11 +63,6 @@ export default{
       })
     }
   }
-  // beforeMount(){
-  //     if (this.$root.isLogin) {
-  //       this.$route.router.replace({name: 'PostList'})
-  //     };
-  // }
 }
 </script>
 <style>

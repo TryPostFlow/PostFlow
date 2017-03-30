@@ -1,47 +1,30 @@
-import 'font-awesome/css/font-awesome.css'
-import 'bootstrap/dist/css/bootstrap.css'
-import './css/app.css'
+import "font-awesome/css/font-awesome.css";
+import "bootstrap/dist/css/bootstrap.css";
+import "./css/app.css";
 
-import Vue from 'vue'
+import Vue from "vue";
+import { sync } from "vuex-router-sync";
 
-import Router from 'vue-router'
-import { sync } from 'vuex-router-sync'
+import App from "./App.vue";
+import store from "./store";
+import router from "./router";
+import axios from "./http";
 
-import App from './App.vue'
-import views from './views'
-import store from './store'
+Vue.prototype.$http = axios;
 
-Vue.use(Router)
-const router = new Router({
-  base: base,
-  mode: 'history',
-  scrollBehavior: () => ({ y: 0 }),
-  routes: views
-})
+sync(store, router);
 
-sync(store, router)
+// 页面刷新时，重新赋值token
+if (window.localStorage.getItem("auth")) {
+  var auth = JSON.parse(window.localStorage.getItem("auth"));
+  store.commit("auth/SET_ITEM", auth);
+}
 
-router.beforeEach((to, from, next) => {
-  if (to.matched.some(record => record.meta.auth)) {
-    var auth = localStorage.getItem('auth')? JSON.parse(localStorage.getItem('auth')): null
-    if (!auth) {
-      next({
-        name: 'SignIn',
-        query: {redirect: to.fullpath}
-      })
-    }else{
-      next()
-    }
-  }else{
-    next()
-  }
-})
-
-const app = new Vue(
-  Vue.util.extend({
-    router,
-    store
-  }, App) // Object spread copying everything from App.vue
-)
-require('es6-promise').polyfill()
-app.$mount('#app')
+const app = new Vue({
+  axios,
+  router,
+  store,
+  render: h => h(App)
+});
+require("es6-promise").polyfill();
+app.$mount("#app");
