@@ -75,6 +75,7 @@ config/development.conf
 config/production.conf
 public
 .idea
+.vscode
 tmp.*
 _static/
 _build/
