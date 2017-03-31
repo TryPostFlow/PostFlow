@@ -53,6 +53,13 @@
                     <span class="font-bold">General</span>
                   </router-link>
                 </li>
+                </li>
+                <li :class="{'active':$route.name == 'Navigation'}">
+                  <router-link :to="{ name: 'Navigation'}">
+                    <i class="fa fa-compass"></i>
+                    <span class="font-bold">Navigation</span>
+                  </router-link>
+                </li>
                 <li :class="{'active':$route.name == 'AccountList' || $route.name == 'AccountEdit'}">
                   <router-link :to="{ name: 'AccountList'}">
                     <i class="fa fa-users"></i>
