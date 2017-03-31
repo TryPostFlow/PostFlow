@@ -7,8 +7,8 @@ from planet.utils.permissions import auth
 from planet.setting import setting_api
 from planet.setting.schemas import SettingSchema
 from planet.setting.models import get_setting, get_all_settings, save_setting
-from planet.setting.permissions import (
-    setting_list_perm, setting_show_perm, setting_update_perm)
+from planet.setting.permissions import (setting_list_perm, setting_show_perm,
+                                        setting_update_perm)
 
 
 @setting_api.route('', methods=['GET'])
@@ -37,7 +37,6 @@ def update():
     settings = []
     for key in payload:
         item = payload[key]
-        print item
         if 'key' in item.keys():
             setting = save_setting(item['key'], item.get('value'))
             settings.append(setting)

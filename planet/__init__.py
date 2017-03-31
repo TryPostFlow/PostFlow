@@ -69,7 +69,6 @@ def configure_packages(app, packages):
 
 
 def configure_identity(app):
-
     @principals.identity_loader
     def load_identity_from_header():
         header = request.headers.get('Authorization')
@@ -78,8 +77,7 @@ def configure_identity(app):
         access_token = header.replace('Bearer ', '', 1)
         if not access_token:
             return
-        token = Token.query.filter(
-            Token.access_token == access_token).first()
+        token = Token.query.filter(Token.access_token == access_token).first()
 
         if not token:
             return
@@ -95,12 +93,12 @@ def configure_identity(app):
 
 def configure_before_handlers(app):
 
-    @app.before_request
-    def check_post_data():
-        if request.method in ['POST', 'PUT'] and\
-                not request.get_data() and\
-                not request.files:
-            abort(400)
+    # @app.before_request
+    # def check_post_data():
+    #     if request.method in ['POST', 'PUT'] and\
+    #             not request.get_data() and\
+    #             not request.files:
+    #         abort(400)
 
     @app.before_request
     def authenticate():
@@ -117,7 +115,6 @@ def configure_before_handlers(app):
 
 
 def configure_after_handlers(self):
-
     @self.after_request
     def headers(response):
         response.headers['Access-Control-Allow-Origin'] = '*'
@@ -135,54 +132,37 @@ def configure_after_handlers(self):
 
 
 def configure_errorhandlers(app):
-
     @app.errorhandler(400)
     def empty_body(error):
-        message = {
-            'code': 400,
-            'error': 'No input data provided'}
-        return Response(
-            response=json.dumps(message), status=400)
+        message = {'code': 400, 'error': 'No input data provided'}
+        return Response(response=json.dumps(message), status=400)
 
     @app.errorhandler(401)
     def unauthorized(error):
-        message = {
-            'code': 401,
-            'error': 'Login required'}
-        return Response(
-            response=json.dumps(message), status=401)
+        message = {'code': 401, 'error': 'Login required'}
+        return Response(response=json.dumps(message), status=401)
 
     @app.errorhandler(403)
     def forbidden(error):
-        message = {
-            'code': 403,
-            'error': 'Sorry, page not allowed'}
-        return Response(
-            response=json.dumps(message), status=403)
+        message = {'code': 403, 'error': 'Sorry, page not allowed'}
+        return Response(response=json.dumps(message), status=403)
 
     @app.errorhandler(404)
     def page_not_found(error):
         if request.is_json:
-            message = {
-                'code': 404,
-                'error': 'Not Found: ' + request.url}
-            return Response(
-                response=json.dumps(message), status=404)
+            message = {'code': 404, 'error': 'Not Found: ' + request.url}
+            return Response(response=json.dumps(message), status=404)
         return render_template('404.html', error=error)
 
     @app.errorhandler(500)
     def server_error(error):
         if request.is_json:
-            message = {
-                'code': 500,
-                'error': 'Sorry, an error has occurred'}
-            return Response(
-                response=json.dumps(message), status=500)
+            message = {'code': 500, 'error': 'Sorry, an error has occurred'}
+            return Response(response=json.dumps(message), status=500)
         return render_template('500.html', error=error)
 
 
 def configure_template_filters(app):
-
     @app.template_filter()
     def format_datetime(datetime, format):
         return datetime.strftime(format)
