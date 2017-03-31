@@ -6,7 +6,7 @@ from flask_themes2 import get_theme, render_theme_template
 
 
 def get_current_theme():
-    theme = g.site.activeTheme or current_app.config['THEME']
+    theme = current_app.config['THEME']
     return get_theme(theme)
 
 
