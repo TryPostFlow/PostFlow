@@ -13,17 +13,19 @@ def init_settings():
         'logo': '',
         'cover': '',
         'postsPerPage': 5,
-        'activeTheme': 'default',
+        # 'activeTheme': 'casper',
         'disqus_id': '',
         'ga_id': '',
-        'navigation': json.dumps([{"label": "Home", "url": "/"}])
+        'navigation': json.dumps([{
+            "label": "Home",
+            "url": "/"
+        }])
     }
     for setting_key in default_settings:
         setting = Setting.query.filter(Setting.key == setting_key).first()
         if not setting:
             setting = Setting(
-                key=setting_key,
-                value=default_settings[setting_key])
+                key=setting_key, value=default_settings[setting_key])
             db.session.add(setting)
     db.session.commit()
 
@@ -52,6 +54,4 @@ class Setting(db.Model):
     value = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
