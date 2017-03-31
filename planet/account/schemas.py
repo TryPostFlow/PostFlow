@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from marshmallow import (
-    Schema, fields, validates_schema, ValidationError, post_load, validates)
+from marshmallow import (Schema, fields, validates_schema, ValidationError,
+                         post_load, validates)
 from planet.utils.schema import BaseSchema, update_object
 from planet.account.models import User
 
@@ -23,8 +23,7 @@ class LoginSchema(Schema):
 
     @post_load
     def validate_login(self, data):
-        account = User.query.filter(
-            User.email == data.get('email')).first()
+        account = User.query.filter(User.email == data.get('email')).first()
         authenticated = account.check_password(data.get('password'))\
             if account else False
         if not authenticated:
@@ -32,8 +31,9 @@ class LoginSchema(Schema):
 
 
 class AccountSchema(BaseSchema):
-    name = fields.String()
-    email = fields.Email()
+    name = fields.String(required=True)
+    email = fields.Email(required=True)
+    password = fields.String(load_only=True, required=True)
     avatar = fields.String()
 
     @post_load
@@ -44,14 +44,22 @@ class AccountSchema(BaseSchema):
         return User(**data)
 
     @validates_schema
-    def validate_email(self, data):
-        account = User.query.filter(
-            User.email == data.get('email')).first()
+    def validate_name(self, data):
+        account = User.query.filter(User.name == data.get('name')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
-            raise ValidationError("This email has existed")
+            raise ValidationError("This name has existed", "name")
         if not data.get('id') and account:
-            raise ValidationError("This email has existed")
+            raise ValidationError("This name has existed", "name")
+
+    @validates_schema
+    def validate_email(self, data):
+        account = User.query.filter(User.email == data.get('email')).first()
+        if data.get('id') and account and\
+                str(data.get('id')) != str(account.id):
+            raise ValidationError("This email has existed", "email")
+        if not data.get('id') and account:
+            raise ValidationError("This email has existed", "email")
 
 
 class PasswordSchema(BaseSchema):
@@ -65,9 +73,16 @@ class PasswordSchema(BaseSchema):
         if not user:
             raise ValidationError("This account doesn't exist")
         if not user.check_password(data.get('old_password')):
-            raise ValidationError("The old password is wrong", field_names=['old_password', ])
+            raise ValidationError(
+                "The old password is wrong", field_names=[
+                    'old_password',
+                ])
 
     @validates_schema
     def validate_new_password(self, data):
         if data.get('new_password') != data.get('verify_password'):
-            raise ValidationError("Your new password do not match", field_names=['verify_password', ])
+            raise ValidationError(
+                "Your new password do not match",
+                field_names=[
+                    'verify_password',
+                ])

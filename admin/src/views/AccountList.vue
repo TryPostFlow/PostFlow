@@ -5,27 +5,33 @@
             <h1 class="m-n font-thin h3 pull-left">Accounts</h1>
             <a href="javascript:void(0)" class="btn btn-primary pull-right" @click="isAddModalShow=true">Add Account</a>
         </div>
-        <modal title="Add Account" ok-text="Save" :is-show="isAddModalShow" @close="isAddModalShow=false" :on-ok="addAccount" >
+        <modal title="Add Account" ok-text="Save" :is-show="isAddModalShow" :ok-loading="true" @close="isAddModalShow=false" :on-ok="addAccount" >
             <form class="form-horizontal" @submit.prevent="save">
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'name' in error}">
                     <label class="col-lg-2 control-label">Name</label>
                     <div class="col-lg-10">
                         <input type="text" class="form-control" v-model="account.name">
-                        <span class="help-block m-b-none">Use your real name so people can recognise you</span>
+                        <span class="help-block m-b-none">
+                            {{'name' in error?error['name'][0]:'Use your real name so people can recognise you'}}
+                        </span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'email' in error}">
                     <label class="col-lg-2 control-label">Email</label>
                     <div class="col-lg-10">
                         <input type="text" class="form-control" v-model="account.email">
-                        <span class="help-block m-b-none">Used for notifications</span>
+                        <span class="help-block m-b-none">
+                            {{'email' in error?error['email'][0]:'Used for notifications'}}
+                        </span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'password' in error}">
                     <label class="col-lg-2 control-label">Password</label>
                     <div class="col-lg-10">
                         <input type="password" class="form-control" v-model="account.password">
-                        <span class="help-block m-b-none">Used for signin</span>
+                        <span class="help-block m-b-none">
+                            {{'password' in error?error['password'][0]:'Used for signin'}}
+                        </span>
                     </div>
                 </div>
             </form>
@@ -65,7 +71,8 @@
         data(){
             return{
                 account: {},
-                isAddModalShow: false
+                isAddModalShow: false,
+                error:{}
             }
         },
         computed:{
@@ -86,8 +93,9 @@
                     fetchAccounts(this.$store)
                     toastr.options.positionClass = 'toast-bottom-right';
                     toastr.success('Add account successfully.', {timeOut: 3000})
+                    this.isAddModalShow = !this.isAddModalShow
                 }, (error) => {
-                    console.error(error)
+                    this.error = error.error
                 })
             }
         },
