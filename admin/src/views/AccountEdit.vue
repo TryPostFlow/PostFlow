@@ -6,48 +6,55 @@
         </div>
         <div class="wrapper-md">
             <form class="form-horizontal" @submit.prevent="save">
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'name' in accountError}">
                     <label class="col-lg-2 control-label">Name</label>
                     <div class="col-lg-10">
                         <input type="text" class="form-control" v-model="account.name">
-                        <span class="help-block m-b-none">Use your real name so people can recognise you</span>
+                        <span class="help-block m-b-none">
+                            {{'name' in accountError?accountError['name'][0]:'Use your real name so people can recognise you'}}
+                        </span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'email' in accountError}">
                     <label class="col-lg-2 control-label">Email</label>
                     <div class="col-lg-10">
                         <input type="text" class="form-control" v-model="account.email">
-                        <span class="help-block m-b-none">Used for notifications</span>
+                        <span class="help-block m-b-none">
+                            {{'email' in accountError?accountError['email'][0]:'Used for notifications'}}
+                        </span>
                     </div>
                 </div>
                 <div class="form-group">
                   <div class="col-lg-offset-2 col-lg-10">
                     <button type="submit" class="btn btn-primary text-u-c" @click.stop.prevent="save">Save</button>
-                    <button type="submit" class="btn btn-link text-danger text-u-c" @click.stop.prevent="remove"><i class="fa fa-trash"></i> Delete Account</button>
+                    <button type="submit" class="btn btn-link text-danger text-u-c" @click.stop.prevent="isRemoveModalShow=true"><i class="fa fa-trash"></i> Delete Account</button>
                   </div>
                 </div>
             </form>
+            <modal title="Delete Account" ok-text="Sure" :is-show="isRemoveModalShow" :ok-loading="true" @close="isRemoveModalShow=false" :on-ok="remove" >
+                <p>Are you sure?</p>
+            </modal>
             <div class="line line-dashed b-b line-lg pull-in"></div>
             <form class="form-horizontal" @submit.prevent="change_password">
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'old_password' in passwordError}">
                     <label class="col-lg-2 control-label">Old Password</label>
                     <div class="col-lg-10">
                         <input type="password" class="form-control" v-model="password.old_password">
-                        <span v-show="passwordError.old_password">{{passwordError.old_password[0]}}</span>
+                        <span class="help-block m-b-none" v-if="'old_password' in passwordError">{{passwordError.old_password[0]}}</span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'new_password' in passwordError}">
                     <label class="col-lg-2 control-label">New Password</label>
                     <div class="col-lg-10">
                         <input type="password" class="form-control" v-model="password.new_password">
-                        <span v-show="passwordError.new_password">{{passwordError.new_password[0]}}</span>
+                        <span class="help-block m-b-none" v-if="'new_password' in passwordError">{{passwordError.new_password[0]}}</span>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{'has-error':'verify_password' in passwordError}">
                     <label class="col-lg-2 control-label">Verify Password</label>
                     <div class="col-lg-10">
                         <input type="password" class="form-control" v-model="password.verify_password">
-                        <span v-show="passwordError.verify_password">{{passwordError.verify_password[0]}}</span>
+                        <span class="help-block m-b-none" v-if="'verify_password' in passwordError">{{passwordError.verify_password[0]}}</span>
                     </div>
                 </div>
                 <div class="form-group">
@@ -65,6 +72,7 @@
     import toastr from 'toastr'
     import 'toastr/build/toastr.css'
 
+    import Modal from '../components/Modal.vue'
     import axios from '../store/constants/api'
 
     function fetchAccount(store){
@@ -88,12 +96,9 @@
                     new_password: null,
                     verify_password: null
                 },
-                passwordError: {
-                    _schema: [],
-                    old_password:[],
-                    new_password:[],
-                    verify_password:[]
-                }
+                accountError: {},
+                passwordError: {},
+                isRemoveModalShow: false
             }
         },
         computed:{
@@ -117,7 +122,11 @@
                 .then(()=>{
                     toastr.options.positionClass = 'toast-bottom-right';
                     toastr.success('Save successfully.', {timeOut: 3000})
+                }, (error) => {
+                    this.accountError = {}
+                    this.accountError = error.error
                 })
+                
             },
             change_password(){
               var vm = this
@@ -130,16 +139,8 @@
                 toastr.success('Change Password successfully.', {timeOut: 3000})
               })
               .catch(function(error){
-                if (error.response) {
-                  vm.passwordError = error.response.data.error
-                  console.log(vm.authError);
-                  console.log(error.response.status);
-                  console.log(error.response.headers);
-                } else {
-                  // Something happened in setting up the request that triggered an Error
-                  console.log('Error', error.message);
-                }
-                console.log(error.config);
+                vm.passwordError = {}
+                vm.passwordError = error.response.data.error
               })
             },
             remove(){
@@ -153,9 +154,14 @@
                 }).then(()=>{
                     toastr.options.positionClass = 'toast-bottom-right';
                     toastr.success('Delete successfully.', {timeOut: 3000})
+                    this.isRemoveModalShow = false
                     this.$router.push({name:'AccountList'})
+
                 })
             }
+        },
+        components:{
+            Modal
         }
     }
 </script>
