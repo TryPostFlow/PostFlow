@@ -14,8 +14,6 @@ from planet.account.permissions import (
     account_update_perm, account_destory_perm)
 
 
-
-
 @account_api.route('/me', methods=['GET'])
 @auth.require(401)
 def me():
@@ -67,10 +65,7 @@ def update_password(id):
     user.password = password_data['new_password']
     db.session.add(user)
     db.session.commit()
-    message = {
-        'code': 10000,
-        'message': 'success'
-    }
+    message = {'code': 10000, 'message': 'success'}
     return render_schema(message)
 
 
@@ -79,7 +74,7 @@ def update_password(id):
 @account_update_perm.require(403)
 def update(id):
     payload = request.get_json()
-    account_schema = AccountSchema(only=('id', 'name', 'email', 'password'))
+    account_schema = AccountSchema(only=('id', 'name', 'email'))
     account_data, errors = account_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
@@ -96,9 +91,6 @@ def destory(id):
     db.session.delete(account)
     db.session.commit()
 
-    message = {
-        'code': 10000,
-        'message': 'success'
-    }
+    message = {'code': 10000, 'message': 'success'}
 
     return render_schema(message)

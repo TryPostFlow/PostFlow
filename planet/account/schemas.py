@@ -43,8 +43,10 @@ class AccountSchema(BaseSchema):
             return update_object(user, data)
         return User(**data)
 
-    @validates_schema
+    @validates_schema(skip_on_field_errors=True)
     def validate_name(self, data):
+        if not data.get('name'):
+            raise ValidationError("The name is needed", "name")
         account = User.query.filter(User.name == data.get('name')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
@@ -52,8 +54,10 @@ class AccountSchema(BaseSchema):
         if not data.get('id') and account:
             raise ValidationError("This name has existed", "name")
 
-    @validates_schema
+    @validates_schema(skip_on_field_errors=True)
     def validate_email(self, data):
+        if not data.get('email'):
+            raise ValidationError("The email is needed", "email")
         account = User.query.filter(User.email == data.get('email')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
@@ -63,26 +67,21 @@ class AccountSchema(BaseSchema):
 
 
 class PasswordSchema(BaseSchema):
-    old_password = fields.String(required=True)
-    new_password = fields.String(required=True)
-    verify_password = fields.String(required=True)
+    old_password = fields.String(load_only=True, required=True)
+    new_password = fields.String(load_only=True, required=True)
+    verify_password = fields.String(load_only=True, required=True)
 
     @validates_schema
     def validate_old_password(self, data):
         user = User.query.get(data.get('id'))
         if not user:
             raise ValidationError("This account doesn't exist")
-        if not user.check_password(data.get('old_password')):
-            raise ValidationError(
-                "The old password is wrong", field_names=[
-                    'old_password',
-                ])
+        if data.get('old_password'
+                    ) and not user.check_password(data.get('old_password')):
+            raise ValidationError("The old password is wrong", 'old_password')
 
     @validates_schema
     def validate_new_password(self, data):
         if data.get('new_password') != data.get('verify_password'):
-            raise ValidationError(
-                "Your new password do not match",
-                field_names=[
-                    'verify_password',
-                ])
+            raise ValidationError("Your new password do not match",
+                                  'verify_password')
