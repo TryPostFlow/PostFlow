@@ -4,7 +4,7 @@
 from marshmallow import (Schema, fields, validates_schema, ValidationError,
                          post_load, validates)
 from planet.utils.schema import BaseSchema, update_object
-from planet.account.models import User
+from planet.account.models import User, Role, Permission
 
 
 class LoginSchema(Schema):
@@ -30,11 +30,50 @@ class LoginSchema(Schema):
             raise ValidationError("account or password is wrong")
 
 
+class PermissionSchema(Schema):
+    id = fields.Integer()
+    name = fields.String()
+    object_type = fields.String()
+    action_type = fields.String()
+    object_id = fields.Integer()
+
+    @post_load
+    def make_object(self, data):
+        if data.get('id'):
+            permission = Permission.query.get(data.get('id'))
+            return permission
+        return Permission(**data)
+
+
+class GroupPermissionSchema(Schema):
+    group = fields.String()
+    permissions = fields.Nested(
+        PermissionSchema, many=True, only=('id', 'object_type', 'action_type'))
+
+
+class RoleSchema(BaseSchema):
+    name = fields.String()
+    description = fields.String()
+    permissions = fields.Nested(
+        PermissionSchema, many=True, only=('id', 'object_type', 'action_type'))
+
+    @post_load
+    def make_object(self, data):
+        if data.get('id'):
+            role = Role.query.get(data.get('id'))
+            if len(data.keys()) == 1:
+                return role
+            return update_object(role, data)
+        return Role(**data)
+
+
 class AccountSchema(BaseSchema):
     name = fields.String(required=True)
     email = fields.Email(required=True)
     password = fields.String(load_only=True, required=True)
     avatar = fields.String()
+    primary_role = fields.Nested(RoleSchema, only=('id', 'name'))
+    status = fields.String()
 
     @post_load
     def make_object(self, data):

@@ -13,3 +13,11 @@ account_show_perm = Permission(AccountNeed('show'))
 account_create_perm = Permission(AccountNeed('create'))
 account_update_perm = Permission(AccountNeed('update'))
 account_destory_perm = Permission(AccountNeed('destory'))
+
+RoleNeed = partial(Need, 'role')
+
+role_list_perm = Permission(RoleNeed('list'))
+role_show_perm = Permission(RoleNeed('show'))
+role_create_perm = Permission(RoleNeed('create'))
+role_update_perm = Permission(RoleNeed('update'))
+role_destory_perm = Permission(RoleNeed('destory'))

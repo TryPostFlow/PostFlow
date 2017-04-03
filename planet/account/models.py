@@ -71,19 +71,16 @@ def update_user(name, password, email, role_name):
     return user.save()
 
 
-user_role = db.Table(
-    'user_role',
-    db.Column('user_id', db.Integer, index=True),
-    db.Column('role_id', db.Integer, index=True))
+user_role = db.Table('user_role',
+                     db.Column('user_id', db.Integer, index=True),
+                     db.Column('role_id', db.Integer, index=True))
 
-role_permission = db.Table(
-    'role_permission',
-    db.Column('role_id', db.Integer, index=True),
-    db.Column('permission_id', db.Integer, index=True))
+role_permission = db.Table('role_permission',
+                           db.Column('role_id', db.Integer, index=True),
+                           db.Column('permission_id', db.Integer, index=True))
 
 
 class UserQuery(BaseQuery):
-
     def from_identity(self, identity):
         """
         Loads user from flaskext.principal.Identity instance and
@@ -108,18 +105,19 @@ class UserQuery(BaseQuery):
 class User(db.Model, CRUDMixin):
     query_class = UserQuery
 
+    STATUS_ACTIVE = 'active'
+    STATUS_FORBIDDEN = 'forbidden'
+
     id = db.Column(db.Integer, primary_key=True)
     _name = db.Column('name', db.String(100), unique=True, index=True)
     _slug = db.Column('slug', db.String(100), unique=True, index=True)
     _password = db.Column("password", db.String(60), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     primary_role_id = db.Column(db.Integer)
-    status = db.Column(db.String(100), nullable=False, default='active')
+    status = db.Column(db.String(100), nullable=False, default=STATUS_ACTIVE)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     primary_role = db.relationship(
         'Role',
@@ -137,7 +135,7 @@ class User(db.Model, CRUDMixin):
         secondaryjoin='user_role.c.role_id==Role.id',
         foreign_keys=[user_role.c.user_id, user_role.c.role_id],
         lazy='dynamic')
-    
+
     @hybrid_property
     def name(self):
         return self._name
@@ -180,12 +178,12 @@ class User(db.Model, CRUDMixin):
 
     @cached_property
     def provides(self):
-        needs = [RoleNeed('authenticated'),
-                 UserNeed(self.id)]
+        needs = [RoleNeed('authenticated'), UserNeed(self.id)]
 
         needs.extend([
             Need(perm.object_type, perm.action_type, perm.object_id)
-            for perm in self.permissions])
+            for perm in self.permissions
+        ])
 
         return needs
 
@@ -195,16 +193,23 @@ class User(db.Model, CRUDMixin):
         return gravatar_url + hashlib.md5(self.email.lower()).hexdigest()
 
 
-class Role(db.Model):
+def get_all_roles(page, limit=20):
+    return Role.query.order_by(Role.created_at.desc()).paginate(page, limit)
+
+
+def get_role(id_or_slug):
+    return Role.query.filter(
+        db.or_(Role.id == id_or_slug, Role.slug == id_or_slug)).first()
+
+
+class Role(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     slug = db.Column(db.String(100))
     description = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     permissions = db.relationship(
         'Permission',
         backref='roles',
@@ -212,8 +217,8 @@ class Role(db.Model):
         primaryjoin='Role.id==role_permission.c.role_id',
         secondaryjoin='role_permission.c.permission_id==Permission.id',
         foreign_keys=[
-            role_permission.c.role_id,
-            role_permission.c.permission_id])
+            role_permission.c.role_id, role_permission.c.permission_id
+        ])
 
 
 class Permission(db.Model):
@@ -224,6 +229,4 @@ class Permission(db.Model):
     object_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

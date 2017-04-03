@@ -7,20 +7,20 @@ from planet.extensions import db
 from planet.utils.schema import render_schema, render_error
 from planet.utils.permissions import auth
 from planet.account import account_api
-from planet.account.schemas import AccountSchema, PasswordSchema
-from planet.account.models import get_user, get_all_users
+from planet.account.schemas import AccountSchema, PasswordSchema, RoleSchema
+from planet.account.models import (User, get_user, get_all_users, get_role)
 from planet.account.permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)
 
 
-@account_api.route('/me', methods=['GET'])
+@account_api.route('/accounts/me', methods=['GET'])
 @auth.require(401)
 def me():
     return render_schema(g.user, AccountSchema)
 
 
-@account_api.route('/<int:id>', methods=['GET'])
+@account_api.route('/accounts/<int:id>', methods=['GET'])
 @auth.require(401)
 @account_show_perm.require(403)
 def view(id):
@@ -28,17 +28,27 @@ def view(id):
     return render_schema(user, AccountSchema)
 
 
-@account_api.route('', methods=['GET'])
+@account_api.route('/accounts', methods=['GET'])
 @auth.require(401)
 @account_list_perm.require(403)
-def list():
-    page = int(request.values.get('p', 1))
-    limit = int(request.values.get('limit', 20))
-    users = get_all_users(page, limit)
+def index():
+    page = int(request.args.get('page', 1))
+    limit = int(request.args.get('limit', 20))
+    role_id = request.args.get('role')
+    users_query = User.query
+    if role_id:
+        role = get_role(role_id)
+        if role:
+            users_query = users_query.filter(
+                db.or_(
+                    User.primary_role == role,
+                    User.secondary_roles.any(id=role.id)))
+    users = users_query.order_by(User.created_at.desc()).paginate(page, limit)
+
     return render_schema(users, AccountSchema)
 
 
-@account_api.route('', methods=['POST'])
+@account_api.route('/accounts', methods=['POST'])
 @auth.require(401)
 @account_create_perm.require(403)
 def create():
@@ -52,7 +62,7 @@ def create():
     return render_schema(account_data, AccountSchema)
 
 
-@account_api.route('/<int:id>/password', methods=['PUT'])
+@account_api.route('/accounts/<int:id>/password', methods=['PUT'])
 @auth.require(401)
 @account_update_perm.require(403)
 def update_password(id):
@@ -69,12 +79,13 @@ def update_password(id):
     return render_schema(message)
 
 
-@account_api.route('/<int:id>', methods=['PUT'])
+@account_api.route('/accounts/<int:id>', methods=['PUT'])
 @auth.require(401)
 @account_update_perm.require(403)
 def update(id):
     payload = request.get_json()
-    account_schema = AccountSchema(only=('id', 'name', 'email'))
+    account_schema = AccountSchema(only=('id', 'name', 'email', 'primary_role',
+                                         'status'))
     account_data, errors = account_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
@@ -83,7 +94,7 @@ def update(id):
     return render_schema(account_data, AccountSchema)
 
 
-@account_api.route('/<id>', methods=['DELETE'])
+@account_api.route('/accounts/<id>', methods=['DELETE'])
 @auth.require(401)
 @account_destory_perm.require(403)
 def destory(id):
