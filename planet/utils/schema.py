@@ -30,11 +30,8 @@ def render_schema(model, schema=None):
 
 
 def render_error(code, error, status=400):
-    message = {
-        'code': code,
-        'error': error}
-    return Response(
-        response=json.dumps(message), status=status)
+    message = {'code': code, 'error': error}
+    return Response(response=json.dumps(message), status=status)
 
 
 def update_object(obj, data):
