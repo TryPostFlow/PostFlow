@@ -8,7 +8,7 @@ from datetime import datetime
 import mistune
 from jinja2.utils import Markup
 from sqlalchemy.ext.hybrid import hybrid_property
-from planet.extensions import db
+from planet.extensions import db, storage
 from planet.helpers.text import slugify
 from planet.setting.models import get_setting
 from planet.utils.database import CRUDMixin
@@ -120,10 +120,9 @@ That should be enough to get you started. Have fun - and let us know what you th
     return post
 
 
-post_tag = db.Table(
-    'post_tag',
-    db.Column('post_id', db.Integer(), index=True),
-    db.Column('tag_id', db.Integer(), index=True))
+post_tag = db.Table('post_tag',
+                    db.Column('post_id', db.Integer(), index=True),
+                    db.Column('tag_id', db.Integer(), index=True))
 
 
 class Post(db.Model, CRUDMixin):
@@ -138,14 +137,13 @@ class Post(db.Model, CRUDMixin):
     _markdown = db.Column('markdown', db.Text)
     content = db.Column(db.Text)
     excerpt = db.Column(db.Text)
+    _image = db.Column('image', db.String(255))
     views = db.Column(db.Integer, default=0)
     status = db.Column(db.String(150), default=STATUS_DRAFT)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     created_by = db.Column(db.Integer, index=True)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     updated_by = db.Column(db.Integer, index=True)
     published_at = db.Column(db.DateTime)
     published_by = db.Column(db.Integer, index=True)
@@ -207,3 +205,7 @@ class Post(db.Model, CRUDMixin):
                 self._slug = "{}-{}".format(slugify_slug, x)
             return
         self._slug = slugify_slug
+
+    @hybrid_property
+    def image(self):
+        return storage.url(self._image) if self._image else None

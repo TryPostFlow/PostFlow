@@ -10,9 +10,9 @@ from planet.utils.schema import render_schema, render_error
 from planet.post import post_api
 from planet.post.schemas import PostSchema
 from planet.post.models import get_all_posts, get_post
-from planet.post.permissions import (
-    post_list_perm, post_show_perm, post_create_perm,
-    post_update_perm, post_destory_perm)
+from planet.post.permissions import (post_list_perm, post_show_perm,
+                                     post_create_perm, post_update_perm,
+                                     post_destory_perm)
 
 
 @post_api.route('', methods=['GET'])
@@ -62,7 +62,8 @@ def update(id):
     playload = request.get_json()
     if not playload:
         return render_error(20001, 'No input data provided')
-    post_schema = PostSchema(exclude=('created_at', 'updated_at', 'author'))
+    post_schema = PostSchema(exclude=('image', 'created_at', 'updated_at',
+                                      'author'))
     post_data, errors = post_schema.load(playload)
     if errors:
         return render_error(20001, errors, 422)
@@ -83,9 +84,6 @@ def destory(id):
     db.session.delete(post)
     db.session.commit()
 
-    message = {
-        'code': 10000,
-        'message': 'success'
-    }
+    message = {'code': 10000, 'message': 'success'}
 
     return render_schema(message)

@@ -15,6 +15,8 @@ class PostSchema(BaseSchema):
     author = fields.Nested(AccountSchema, exclude=('password', ))
     markdown = fields.String()
     content = fields.String()
+    image = fields.String(dump_only=True, allow_none=True)
+    _image = fields.String(allow_none=True)
     tags = fields.Nested(TagSchema, many=True, partial=True)
     status = fields.String()
     views = fields.Integer()
