@@ -24,6 +24,29 @@
                         </span>
                     </div>
                 </div>
+                <div class="form-group" :class="{'has-error':'primary_role' in accountError}">
+                    <label class="col-lg-2 control-label">Primary Role</label>
+                    <div class="col-lg-10">
+                        <select v-model="account.primary_role.id" class="form-control">
+                            <option :value="role.id" v-for="role in roles">{{role.name}}</option>
+                        </select>
+                        <span class="help-block m-b-none">
+                            {{'primary_role' in accountError?accountError['primary_role'][0]:'Thr primary role for the account'}}
+                        </span>
+                    </div>
+                </div>
+                <div class="form-group" :class="{'has-error':'primary_role' in accountError}">
+                    <label class="col-lg-2 control-label">Status</label>
+                    <div class="col-lg-10">
+                        <select v-model="account.status" class="form-control">
+                            <option value="active">Active</option>
+                            <option value="forbidden">Forbidden</option>
+                        </select>
+                        <span class="help-block m-b-none">
+                            {{'primary_role' in accountError?accountError['primary_role'][0]:'Thr primary role for the account'}}
+                        </span>
+                    </div>
+                </div>
                 <div class="form-group">
                   <div class="col-lg-offset-2 col-lg-10">
                     <button type="submit" class="btn btn-primary text-u-c" @click.stop.prevent="save">Save</button>
@@ -86,6 +109,10 @@
             })
     }
 
+    function fetchRoles(store){
+        return store.dispatch('role/FETCH_ITEMS', {path: 'roles'})
+    }
+
     export default{
         name: 'AccountEdit',
         data(){
@@ -103,12 +130,22 @@
         },
         computed:{
             account(){
-                return this.$store.getters['account/GET_ITEM'](this.$store.state.route.params.account_id) || {}
-            }
+                const account = this.$store.getters['account/GET_ITEM'](this.$store.state.route.params.account_id) || {}
+                if(!account.primary_role){
+                    account.primary_role = {}
+                }
+                return account
+            },
+            roles(){return this.$store.getters['role/GET_ITEMS']().data}
         },
         beforeMount(){
-            fetchAccount(this.$store).then(()=>{
-                this.password.id = this.account.id
+            // fetchAccount(this.$store).then(()=>{
+            //     this.password.id = this.account.id
+            // })
+            fetchRoles(this.$store).then(()=>{
+                fetchAccount(this.$store).then(()=>{
+                    this.password.id = this.account.id
+                })
             })
         },
         methods:{

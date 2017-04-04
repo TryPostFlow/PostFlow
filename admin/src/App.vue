@@ -60,7 +60,7 @@
                     <span class="font-bold">Navigation</span>
                   </router-link>
                 </li>
-                <li :class="{'active':$route.name == 'AccountList' || $route.name == 'AccountEdit'}">
+                <li :class="{'active':['AccountList','AccountEdit', 'RoleEdit'].indexOf($route.name) >= 0}">
                   <router-link :to="{ name: 'AccountList'}">
                     <i class="fa fa-users"></i>
                     <span class="font-bold">Accounts</span>

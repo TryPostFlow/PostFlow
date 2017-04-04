@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import createLogger from "vuex/dist/logger";
-import { Post, Tag, Account, Setting, Auth } from "./modules";
+import { Post, Tag, Account, Setting, Auth, Role, Permission } from "./modules";
 
 Vue.use(Vuex);
 
@@ -12,7 +12,9 @@ const store = new Vuex.Store({
     Post,
     Tag,
     Setting,
-    Auth
+    Auth,
+    Role,
+    Permission
   }
 });
 
