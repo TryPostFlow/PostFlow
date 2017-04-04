@@ -83,7 +83,7 @@
                             var url = '/api/images'
                             var dropzone = new Dropzone(element, {
                                 url: url,
-                                paramName: 'image',
+                                paramName: 'file',
                                 headers:{
                                     'Authorization': 'Bearer ' + self.auth.access_token
                                 },

@@ -24,7 +24,7 @@
         },
         mounted(){
           let self = this
-          const url = "/images"
+          const url = "/api/images"
           var Dropzone = require("dropzone");
           Dropzone.autoDiscover = false;
           var element = this.$el.querySelector('div.dropzone')
