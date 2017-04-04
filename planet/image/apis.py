@@ -16,7 +16,7 @@ from planet.image.permissions import image_upload_perm
 @auth.require(401)
 @image_upload_perm.require(403)
 def upload():
-    image_data = request.files.get('image')
+    image_data = request.files.get('file')
 
     filename = secure_filename(image_data.filename)
 
@@ -27,6 +27,4 @@ def upload():
     filename = '{}-{}{}'.format(basename, unique_key, ext)
     filename = storage.save(image_data, filename=filename)
     url = storage.url(filename)
-    return jsonify(
-        filename=filename,
-        url=url)
+    return jsonify(filename=filename, url=url)
