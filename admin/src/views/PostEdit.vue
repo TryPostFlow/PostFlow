@@ -18,6 +18,9 @@
             <ui-aside class="aside-right" title="Post Settings" :is-show="isShow" @close="isShow=false">
                 <form>
                     <div class="form-group">
+                        <dropzone :image_url="post.image" @success="successhandler" @remove="removehandler"></dropzone>
+                    </div>
+                    <div class="form-group">
                         <label>Post URL</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-link"></i></span>
@@ -56,6 +59,7 @@
     import vSelect from '../components/vue-select'
     import DropdownButton from '../components/DropdownButton.vue'
     import Aside from '../components/Aside.vue'
+    import Dropzone from '../components/Dropzone.vue'
     import '../css/yue.css'
     
 
@@ -124,6 +128,7 @@
                 }
                 else{
                     this.post.status = status
+                    // this.post.tags = this.tags
                     this.$store.dispatch(
                     'post/UPDATE_ITEM',
                     {
@@ -169,14 +174,28 @@
                     )
                      loading(false)
                 })
-              }
+              },
+                successhandler(file, response){
+                    this.post.image = response.url
+                    this.post._image = response.filename
+                },
+                removehandler(path){
+                    this.post.image = null
+                    this.post._image = null
+                }
         },
         watch:{
             'tags': function(){
                 let tags = []
                 this.tags.forEach(item =>{
-                    tags.push({name:item.label, id: item.value})
+                    if (typeof(item) == 'object'){
+                        tags.push({name:item.label, id: item.value})
+                    }
+                    else{
+                        tags.push({name:item})
+                    }
                 })
+                console.log(tags)
                 this.post.tags = tags
             }
         },
@@ -192,7 +211,8 @@
             Modal,
             'ui-editor': editor,
             'ui-dropdown-button': DropdownButton,
-            'ui-aside': Aside
+            'ui-aside': Aside,
+            Dropzone
         }
     }
 </script>
