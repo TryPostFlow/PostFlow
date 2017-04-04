@@ -8,9 +8,9 @@ from planet.utils.schema import render_schema, render_error
 from planet.tag import tag_api
 from planet.tag.schemas import TagSchema
 from planet.tag.models import Tag, get_tag
-from planet.tag.permissions import (
-    tag_list_perm, tag_show_perm, tag_create_perm,
-    tag_update_perm, tag_destory_perm)
+from planet.tag.permissions import (tag_list_perm, tag_show_perm,
+                                    tag_create_perm, tag_update_perm,
+                                    tag_destory_perm)
 
 
 @tag_api.route('', methods=['GET'])
@@ -59,7 +59,8 @@ def update(id):
     if not payload:
         return render_error(20001, 'No input data provided')
     tag = get_tag(id)
-    tag_schema = TagSchema(exclude=('created_at', 'updated_at'))
+    tag_schema = TagSchema(exclude=('image', 'num_posts', 'created_at',
+                                    'updated_at'))
     tag, errors = tag_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
@@ -76,9 +77,6 @@ def destory(id):
     db.session.delete(tag)
     db.session.commit()
 
-    message = {
-        'code': 10000,
-        'message': 'success'
-    }
+    message = {'code': 10000, 'message': 'success'}
 
     return render_schema(message)

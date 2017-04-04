@@ -4,7 +4,7 @@
 import itertools
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
-from planet.extensions import db
+from planet.extensions import db, storage
 from planet.helpers.text import slugify
 from planet.post.models import Post
 from planet.setting.models import get_setting
@@ -38,11 +38,10 @@ class Tag(db.Model):
     _name = db.Column('name', db.String(150))
     _slug = db.Column('slug', db.String(150), unique=True)
     description = db.Column(db.Text)
+    _image = db.Column('image', db.String(255))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(
-        db.DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow)
+        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     __mapper_args__ = {'order_by': id.desc()}
 
@@ -74,6 +73,14 @@ class Tag(db.Model):
             return
         self._slug = slugify_slug
 
-    @property
+    @hybrid_property
     def num_posts(self):
         return len(self.posts)
+
+    @hybrid_property
+    def image(self):
+        return storage.url(self._image) if self._image else None
+
+    # @image.setter
+    # def image(self, image):
+    #     self._image = image

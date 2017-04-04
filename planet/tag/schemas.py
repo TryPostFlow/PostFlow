@@ -8,17 +8,14 @@ from planet.tag.models import Tag
 
 class TagSchema(BaseSchema):
     id = fields.Integer(allow_none=True)
-    name = fields.String(required=True)
+    name = fields.String()
     slug = fields.String(allow_none=True)
     description = fields.String(allow_none=True)
-    num_posts = fields.Integer(allow_none=True)
+    image = fields.String(dump_only=True, allow_none=True)
+    _image = fields.String(allow_none=True)
+    num_posts = fields.Integer(allow_none=True, dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
     created_at = fields.DateTime(dump_only=True)
-
-    # @pre_load
-    # def slugify_name(self, in_data):
-    #     in_data['slug'] = slugify(in_data['slug'])\
-    #         if 'slug' in in_data.keys() else slugify(in_data['name'])
 
     @post_load
     def make_object(self, data):
