@@ -10,6 +10,8 @@ import TagEdit from "./TagEdit.vue";
 import Settings from "./Settings.vue";
 import AccountList from "./AccountList.vue";
 import AccountEdit from "./AccountEdit.vue";
+import RoleCreate from "./RoleCreate.vue";
+import RoleEdit from "./RoleEdit.vue";
 import Navigation from "./Navigation.vue";
 
 export default [
@@ -125,6 +127,22 @@ export default [
     path: "/accounts/:account_id/edit",
     name: "AccountEdit",
     component: AccountEdit,
+    meta: {
+      auth: true
+    }
+  },
+  {
+    path: "/roles/new",
+    name: "RoleCreate",
+    component: RoleCreate,
+    meta: {
+      auth: true
+    }
+  },
+  {
+    path: "/roles/:role_id/edit",
+    name: "RoleEdit",
+    component: RoleEdit,
     meta: {
       auth: true
     }
