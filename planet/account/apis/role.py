@@ -37,7 +37,7 @@ def show(id_or_slug):
 @role_create_perm.require(403)
 def create():
     payload = request.get_json()
-    role_schema = RoleSchema(only=('name', 'description'))
+    role_schema = RoleSchema(only=('name', 'description', 'permissions'))
     role_data, errors = role_schema.load(payload)
     if errors:
         return render_error(20001, errors, 422)
