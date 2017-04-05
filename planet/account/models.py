@@ -181,8 +181,8 @@ class User(db.Model, CRUDMixin):
         needs = [RoleNeed('authenticated'), UserNeed(self.id)]
 
         needs.extend([
-            Need(perm.object_type, perm.action_type, perm.object_id)
-            for perm in self.permissions
+            Need(perm.object_type, perm.action_type, perm.object_id, perm.name,
+                 perm.action_name) for perm in self.permissions
         ])
 
         return needs
@@ -225,6 +225,7 @@ class Permission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(150))
     object_type = db.Column(db.String(150))
+    action_name = db.Column(db.String(150))
     action_type = db.Column(db.String(150))
     object_id = db.Column(db.Integer)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)

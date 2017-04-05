@@ -35,6 +35,7 @@ class PermissionSchema(Schema):
     name = fields.String()
     object_type = fields.String()
     action_type = fields.String()
+    action_name = fields.String()
     object_id = fields.Integer()
 
     @post_load
@@ -46,16 +47,21 @@ class PermissionSchema(Schema):
 
 
 class GroupPermissionSchema(Schema):
-    group = fields.String()
+    name = fields.String()
+    object_type = fields.String()
     permissions = fields.Nested(
-        PermissionSchema, many=True, only=('id', 'object_type', 'action_type'))
+        PermissionSchema,
+        many=True,
+        only=('id', 'object_type', 'action_type', 'action_name'))
 
 
 class RoleSchema(BaseSchema):
     name = fields.String()
     description = fields.String()
     permissions = fields.Nested(
-        PermissionSchema, many=True, only=('id', 'object_type', 'action_type'))
+        PermissionSchema,
+        many=True,
+        only=('id', 'object_type', 'action_type', 'action_name'))
 
     @post_load
     def make_object(self, data):

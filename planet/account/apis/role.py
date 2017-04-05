@@ -85,7 +85,8 @@ def permissions_index():
             perms = Permission.query.filter(
                 Permission.object_type == group.object_type).all()
             group_permissions.append({
-                'group': group.object_type,
+                'name': group.name,
+                'object_type': group.object_type,
                 'permissions': perms
             })
         return render_schema(group_permissions, GroupPermissionSchema)

@@ -26,6 +26,8 @@ def init_permissions():
             permission = Permission(
                 object_type=need.method, action_type=need.value)
             db.session.add(permission)
+        permission.name = need.method_name
+        permission.action_name = need.value_name
         admin.permissions.append(permission)
     db.session.add(admin)
     db.session.commit()
