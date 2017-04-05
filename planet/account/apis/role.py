@@ -15,13 +15,12 @@ from planet.account.permissions import (role_list_perm, role_show_perm,
 
 
 @role_api.route('/roles', methods=['GET'])
-@auth.require(401)
-@role_list_perm.require(403)
 def index():
     page = int(request.values.get('page', 1))
     limit = int(request.values.get('limit', 20))
     roles = get_all_roles(page, limit)
-    return render_schema(roles, RoleSchema)
+    return render_schema(
+        roles, RoleSchema(exclude=('description', 'permissions')))
 
 
 @role_api.route('/roles/<id_or_slug>', methods=['GET'])
@@ -29,7 +28,7 @@ def index():
 @role_show_perm.require(403)
 def show(id_or_slug):
     role = get_role(id_or_slug)
-    return render_schema(role, RoleSchema)
+    return render_schema(role, RoleSchema())
 
 
 @role_api.route('/roles', methods=['POST'])
@@ -43,7 +42,7 @@ def create():
         return render_error(20001, errors, 422)
     db.session.add(role_data)
     db.session.commit()
-    return render_schema(role_data, RoleSchema)
+    return render_schema(role_data, RoleSchema())
 
 
 @role_api.route('/roles/<id>', methods=['PUT'])
@@ -57,7 +56,7 @@ def update(id):
         return render_error(20001, errors, 422)
     db.session.add(role_data)
     db.session.commit()
-    return render_schema(role_data, RoleSchema)
+    return render_schema(role_data, RoleSchema())
 
 
 @role_api.route('/roles/<id>', methods=['DELETE'])
@@ -89,7 +88,7 @@ def permissions_index():
                 'object_type': group.object_type,
                 'permissions': perms
             })
-        return render_schema(group_permissions, GroupPermissionSchema)
+        return render_schema(group_permissions, GroupPermissionSchema())
     permissions = Permission.query.order_by(
         Permission.created_at.desc()).paginate(page, limit)
-    return render_schema(permissions, PermissionSchema)
+    return render_schema(permissions, PermissionSchema())

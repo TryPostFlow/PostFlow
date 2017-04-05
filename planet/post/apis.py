@@ -22,7 +22,7 @@ def index():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
     posts = get_all_posts(page=page, limit=limit)
-    return render_schema(posts, PostSchema)
+    return render_schema(posts, PostSchema())
 
 
 @post_api.route('/<id_or_slug>', methods=['GET'])
@@ -30,7 +30,7 @@ def index():
 @post_show_perm.require(403)
 def show(id_or_slug):
     post = get_post(id_or_slug)
-    return render_schema(post, PostSchema)
+    return render_schema(post, PostSchema())
 
 
 @post_api.route('', methods=['POST'])
@@ -51,7 +51,7 @@ def create():
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
-    return render_schema(post_data, PostSchema)
+    return render_schema(post_data, PostSchema())
 
 
 @post_api.route('/<id>', methods=['PUT'])
@@ -73,7 +73,7 @@ def update(id):
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
-    return render_schema(post_data, PostSchema)
+    return render_schema(post_data, PostSchema())
 
 
 @post_api.route('/<id>', methods=['DELETE'])

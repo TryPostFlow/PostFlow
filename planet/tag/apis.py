@@ -24,7 +24,7 @@ def list():
     if q:
         tags_query = tags_query.filter(Tag.name.like('%' + q + '%'))
     tags = tags_query.paginate(page, limit)
-    return render_schema(tags, TagSchema)
+    return render_schema(tags, TagSchema())
 
 
 @tag_api.route('/<id_or_slug>', methods=['GET'])
@@ -32,7 +32,7 @@ def list():
 @tag_show_perm.require(403)
 def show(id_or_slug):
     tag = get_tag(id_or_slug)
-    return render_schema(tag, TagSchema)
+    return render_schema(tag, TagSchema())
 
 
 @tag_api.route('', methods=['POST'])
@@ -48,7 +48,7 @@ def create():
         return render_error(20001, errors, 422)
     db.session.add(tag_data)
     db.session.commit()
-    return render_schema(tag_data, TagSchema)
+    return render_schema(tag_data, TagSchema())
 
 
 @tag_api.route('/<id>', methods=['PUT'])
@@ -66,7 +66,7 @@ def update(id):
         return render_error(20001, errors, 422)
     db.session.add(tag)
     db.session.commit()
-    return render_schema(tag, TagSchema)
+    return render_schema(tag, TagSchema())
 
 
 @tag_api.route('/<id>', methods=['DELETE'])

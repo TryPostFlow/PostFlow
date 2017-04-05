@@ -17,7 +17,7 @@ from planet.account.permissions import (
 @account_api.route('/accounts/me', methods=['GET'])
 @auth.require(401)
 def me():
-    return render_schema(g.user, AccountSchema)
+    return render_schema(g.user, AccountSchema())
 
 
 @account_api.route('/accounts/<int:id>', methods=['GET'])
@@ -25,7 +25,7 @@ def me():
 @account_show_perm.require(403)
 def view(id):
     user = get_user(id)
-    return render_schema(user, AccountSchema)
+    return render_schema(user, AccountSchema())
 
 
 @account_api.route('/accounts', methods=['GET'])
@@ -45,7 +45,7 @@ def index():
                     User.secondary_roles.any(id=role.id)))
     users = users_query.order_by(User.created_at.desc()).paginate(page, limit)
 
-    return render_schema(users, AccountSchema)
+    return render_schema(users, AccountSchema())
 
 
 @account_api.route('/accounts', methods=['POST'])
@@ -59,7 +59,7 @@ def create():
         return render_error(20001, errors, 422)
     db.session.add(account_data)
     db.session.commit()
-    return render_schema(account_data, AccountSchema)
+    return render_schema(account_data, AccountSchema())
 
 
 @account_api.route('/accounts/<int:id>/password', methods=['PUT'])
@@ -91,7 +91,7 @@ def update(id):
         return render_error(20001, errors, 422)
     db.session.add(account_data)
     db.session.commit()
-    return render_schema(account_data, AccountSchema)
+    return render_schema(account_data, AccountSchema())
 
 
 @account_api.route('/accounts/<id>', methods=['DELETE'])

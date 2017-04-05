@@ -16,7 +16,7 @@ from planet.setting.permissions import (setting_list_perm, setting_show_perm,
 @setting_list_perm.require(403)
 def index():
     settings = get_all_settings()
-    return render_schema(settings, SettingSchema)
+    return render_schema(settings, SettingSchema())
 
 
 @setting_api.route('/<id_or_key>', methods=['GET'])
@@ -24,7 +24,7 @@ def index():
 @setting_show_perm.require(403)
 def show(id_or_key):
     setting = get_setting(id_or_key)
-    return render_schema(setting, SettingSchema)
+    return render_schema(setting, SettingSchema())
 
 
 @setting_api.route('', methods=['PUT'])
@@ -40,4 +40,4 @@ def update():
         if 'key' in item.keys():
             setting = save_setting(item['key'], item.get('value'))
             settings.append(setting)
-    return render_schema(settings, SettingSchema)
+    return render_schema(settings, SettingSchema())

@@ -18,13 +18,15 @@ def render_schema(model, schema=None):
     if schema is None:
         resp = json.dumps(model)
     elif isinstance(model, flask_sqlalchemy.Pagination):
-        resp = schema(many=True).dumps(model.items).data
+        schema.many = True
+        resp = schema.dumps(model.items).data
         headers['X-Total'] = model.total
         headers['X-Page'] = model.page
     elif isinstance(model, list):
-        resp = schema(many=True).dumps(model).data
+        schema.many = True
+        resp = schema.dumps(model).data
     else:
-        resp = schema().dumps(model).data
+        resp = schema.dumps(model).data
 
     return Response(response=resp, headers=headers)
 
