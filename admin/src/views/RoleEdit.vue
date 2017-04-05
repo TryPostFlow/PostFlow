@@ -31,13 +31,13 @@
                     <label class="col-lg-2 control-label">Permissions</label>
                     <div class="col-lg-10">
                         <div v-for="group_permission in permissions">
-                            {{group_permission.group}}
+                            {{group_permission.name}}
                             <div class="row">
                                 <div class="checkbox col-md-4" v-for="permission in group_permission.permissions">
                                     <label class="i-checks i-checks-sm">
                                         <input type="checkbox" :value="permission" v-model="role.permissions">
                                         <i></i>
-                                        {{permission.object_type}} {{permission.action_type}}
+                                        {{permission.action_name}}
                                     </label>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
     }
 
     function fetchPermissions(store){
-        return store.dispatch('permission/FETCH_ITEMS', {path: 'permissions?format=group', index:'group'})
+        return store.dispatch('permission/FETCH_ITEMS', {path: 'permissions?format=group', index:'object_type'})
     }
 
     export default{
