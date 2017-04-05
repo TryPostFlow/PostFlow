@@ -27,8 +27,8 @@
                 <div class="form-group" :class="{'has-error':'primary_role' in accountError}">
                     <label class="col-lg-2 control-label">Primary Role</label>
                     <div class="col-lg-10">
-                        <select v-model="account.primary_role.id" class="form-control">
-                            <option :value="role.id" v-for="role in roles">{{role.name}}</option>
+                        <select v-model="account.primary_role" class="form-control">
+                            <option :value="role" v-for="role in roles">{{role.name}}</option>
                         </select>
                         <span class="help-block m-b-none">
                             {{'primary_role' in accountError?accountError['primary_role'][0]:'Thr primary role for the account'}}

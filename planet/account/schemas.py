@@ -78,7 +78,10 @@ class AccountSchema(BaseSchema):
     email = fields.Email(required=True)
     password = fields.String(load_only=True, required=True)
     avatar = fields.String()
-    primary_role = fields.Nested(RoleSchema, only=('id', 'name'))
+    primary_role = fields.Nested(
+        RoleSchema,
+        exclude=('permissions', 'description'),
+        dump_only=('created_at', 'updated_at'))
     status = fields.String()
 
     @post_load
