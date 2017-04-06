@@ -17,26 +17,43 @@ from planet.commands.utils import (FlaskCLIError, create_permissions,
 from planet.commands.base import planet
 from planet.commands.database import init_db
 from planet.commands.theme import download_theme
-from planet.commands.config import generate_config
+from planet.config.commands import generate_config
 from planet.setting.models import init_settings, save_setting
 from planet.oauth.models import Client
 from planet.post.models import insert_sample_post
 
 
 @planet.command()
-@click.option("--server", "-s", default="gunicorn",
-              type=click.Choice(["gunicorn", "gevent"]),
-              help="The WSGI Server to run Planet on.")
-@click.option("--host", "-h", default="127.0.0.1",
-              help="The interface to bind Planet to.")
-@click.option("--port", "-p", default="8000", type=int,
-              help="The port to bind Planet to.")
-@click.option("--workers", "-w", default=4,
-              help="The number of worker processes for handling requests.")
-@click.option("--daemon", "-d", default=False, is_flag=True,
-              help="Starts gunicorn as daemon.")
-@click.option("--config", "-c",
-              help="The configuration file to use for Planet.")
+@click.option(
+    "--server",
+    "-s",
+    default="gunicorn",
+    type=click.Choice(["gunicorn", "gevent"]),
+    help="The WSGI Server to run Planet on.")
+@click.option(
+    "--host",
+    "-h",
+    default="127.0.0.1",
+    help="The interface to bind Planet to.")
+@click.option(
+    "--port",
+    "-p",
+    default="8000",
+    type=int,
+    help="The port to bind Planet to.")
+@click.option(
+    "--workers",
+    "-w",
+    default=4,
+    help="The number of worker processes for handling requests.")
+@click.option(
+    "--daemon",
+    "-d",
+    default=False,
+    is_flag=True,
+    help="Starts gunicorn as daemon.")
+@click.option(
+    "--config", "-c", help="The configuration file to use for Planet.")
 def start(server, host, port, workers, config, daemon):
     """Starts a production ready wsgi server.
     TODO: Figure out a way how to forward additional args to gunicorn
@@ -53,10 +70,10 @@ def start(server, host, port, workers, config, daemon):
                     super(FlaskApplication, self).__init__()
 
                 def load_config(self):
-                    config = dict([
-                        (key, value) for key, value in iteritems(self.options)
-                        if key in self.cfg.settings and value is not None
-                    ])
+                    config = dict(
+                        [(key, value)
+                         for key, value in iteritems(self.options)
+                         if key in self.cfg.settings and value is not None])
                     for key, value in iteritems(config):
                         self.cfg.set(key.lower(), value)
 
@@ -75,8 +92,10 @@ def start(server, host, port, workers, config, daemon):
             }
             FlaskApplication(create_app(config=config), options).run()
         except ImportError:
-            raise FlaskCLIError("Cannot import gunicorn. "
-                                "Make sure it is installed.", fg="red")
+            raise FlaskCLIError(
+                "Cannot import gunicorn. "
+                "Make sure it is installed.",
+                fg="red")
     elif server == "gevent":
         try:
             from gevent import __version__
@@ -86,8 +105,10 @@ def start(server, host, port, workers, config, daemon):
             http_server = WSGIServer((host, port), create_app(config=config))
             http_server.serve_forever()
         except ImportError:
-            raise FlaskCLIError("Cannot import gevent. "
-                                "Make sure it is installed.", fg="red")
+            raise FlaskCLIError(
+                "Cannot import gevent. "
+                "Make sure it is installed.",
+                fg="red")
 
 
 def prepare_folder(path):
@@ -99,11 +120,15 @@ def prepare_folder(path):
 
 
 @planet.command()
-@click.option("--force", "-f", default=False, is_flag=True,
-              help="Doesn't ask for confirmation.")
+@click.option(
+    "--force",
+    "-f",
+    default=False,
+    is_flag=True,
+    help="Doesn't ask for confirmation.")
 @click.option("--name", "-u", help="The name of the user.")
-@click.option("--email", "-e", type=EmailType(),
-              help="The email address of the user.")
+@click.option(
+    "--email", "-e", type=EmailType(), help="The email address of the user.")
 @click.option("--password", "-p", help="The password of the user.")
 def init(force, name, email, password):
     """Installs planet. If no arguments are used, an interactive setup
@@ -121,24 +146,22 @@ def init(force, name, email, password):
     click.secho("[+] Creating admin user...", fg="cyan")
     if not name:
         name = click.prompt(
-            click.style("Name", fg="magenta"), type=str,
-            default=os.environ.get("USER", "")
-        )
+            click.style("Name", fg="magenta"),
+            type=str,
+            default=os.environ.get("USER", ""))
     if not email:
         email = click.prompt(
-            click.style("Email address", fg="magenta"), type=EmailType()
-        )
+            click.style("Email address", fg="magenta"), type=EmailType())
     if not password:
         password = click.prompt(
-            click.style("Password", fg="magenta"), hide_input=True,
-            confirmation_prompt=True
-        )
+            click.style("Password", fg="magenta"),
+            hide_input=True,
+            confirmation_prompt=True)
 
     # Create Site
     click.secho("[+] Creating site...", fg="cyan")
     site_name = click.prompt(
-        click.style("Site name", fg="magenta"), type=str,
-        default="Planet")
+        click.style("Site name", fg="magenta"), type=str, default="Planet")
 
     # Select Theme
     click.secho("[+] Installing theme...", fg="cyan")
@@ -152,8 +175,10 @@ def init(force, name, email, password):
     # generate config
     click.secho("[+] Generating config...", fg="cyan")
     config_path = generate_config(theme=theme_name)
-    click.secho("The configuration file has been saved to:\n{cfg}"
-                .format(cfg=config_path), fg="blue")
+    click.secho(
+        "The configuration file has been saved to:\n{cfg}".format(
+            cfg=config_path),
+        fg="blue")
     current_app.config.from_pyfile(config_path)
     click.secho("[+] Config is ready.", fg="green")
 
@@ -172,8 +197,8 @@ def init(force, name, email, password):
     insert_sample_post()
     click.secho("[+] Data is ready.", fg="green")
 
-    click.secho("[+] Planet has been successfully initialized!",
-                fg="green", bold=True)
+    click.secho(
+        "[+] Planet has been successfully initialized!", fg="green", bold=True)
 
 
 @planet.command("shell", short_help="Runs a shell in the app context.")
@@ -191,10 +216,7 @@ def shell_command():
     """
     import code
     banner = "Python %s on %s\nInstance Path: %s" % (
-        sys.version,
-        sys.platform,
-        current_app.instance_path,
-    )
+        sys.version, sys.platform, current_app.instance_path, )
     ctx = {"db": db}
 
     # Support the regular Python interpreter startup script if someone
