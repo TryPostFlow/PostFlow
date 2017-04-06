@@ -181,8 +181,8 @@ class User(db.Model, CRUDMixin):
         needs = [RoleNeed('authenticated'), UserNeed(self.id)]
 
         needs.extend([
-            Need(perm.object_type, perm.action_type, perm.object_id, perm.name,
-                 perm.action_name) for perm in self.permissions
+            Need(perm.object_type, perm.action_type, perm.object_id)
+            for perm in self.permissions
         ])
 
         return needs

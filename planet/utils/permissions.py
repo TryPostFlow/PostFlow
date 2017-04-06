@@ -20,7 +20,15 @@ class Need(tuple):
                                     value_name))
 
     def __repr__(self):
-        return 'Need(method=%r, value=%r, object_id=%r, method_name=%r, value_name=%r)' % self
+        return 'Need(method={}, value={}, object_id={})'.format(
+            self.method, self.value, self.object_id)
+
+    def __eq__(self, other):
+        return self.method == other.method and self.value == other.value\
+            and self.object_id == other.object_id
+
+    def __hash__(self):
+        return hash((self.method, self.value, self.object_id))
 
     method = property(operator.itemgetter(0))
     value = property(operator.itemgetter(1))
