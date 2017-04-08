@@ -46,16 +46,6 @@ class Tag(db.Model):
     __mapper_args__ = {'order_by': id.desc()}
 
     @hybrid_property
-    def name(self):
-        return self._name
-
-    @name.setter
-    def name(self, name):
-        self._name = name.strip()
-        if self.slug is None:
-            self.slug = slugify(name)[:255]
-
-    @hybrid_property
     def slug(self):
         return self._slug
 
@@ -74,13 +64,27 @@ class Tag(db.Model):
         self._slug = slugify_slug
 
     @hybrid_property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name.strip()
+        if self.slug is None:
+            self.slug = slugify(name)[:255]
+
+    @hybrid_property
     def num_posts(self):
         return len(self.posts)
 
     @hybrid_property
     def image(self):
-        return storage.url(self._image) if self._image else None
+        if self._image:
+            return dict(url=storage.url(self._image), filename=self._image)
+        return {}
 
-    # @image.setter
-    # def image(self, image):
-    #     self._image = image
+    @image.setter
+    def image(self, image=None):
+        if image is None:
+            image = {}
+        self._image = image.get('filename')
