@@ -11,8 +11,6 @@ from planet.auth.schemas import LoginSchema
 @auth_api.route('/login', methods=['POST'])
 def login():
     payload = request.get_json()
-    if not payload:
-        return render_error(20001, 'No input data provided')
     login_schema = LoginSchema()
     login_data, errors = login_schema.load(payload)
     if errors:
@@ -27,5 +25,6 @@ def login():
         'username': login_data.email,
         'password': payload.get('password')
     }
-    resp = current_app.test_client().post(url_for('oauth_api.token'), data=data)
+    resp = current_app.test_client().post(
+        url_for('oauth_api.token'), data=data)
     return resp
