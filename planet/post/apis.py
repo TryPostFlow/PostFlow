@@ -19,8 +19,8 @@ from planet.post.permissions import (post_list_perm, post_show_perm,
 @auth.require(401)
 @post_list_perm.require(403)
 def index():
-    page = int(request.values.get('p', 1))
-    limit = int(request.values.get('limit', 20))
+    page = int(request.args.get('p', 1))
+    limit = int(request.args.get('limit', 20))
     posts_data = get_all_posts(page=page, limit=limit)
     return PostSchema().jsonify(posts_data)
 
