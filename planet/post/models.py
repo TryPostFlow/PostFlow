@@ -24,7 +24,7 @@ def get_all_posts(status=None, page=1, limit=None):
 
 def get_post(id_or_slug):
     return Post.query.filter(
-        db.or_(Post.id == id_or_slug, Post.slug == id_or_slug)).first_or_404()
+        db.or_(Post.id == id_or_slug, Post.slug == id_or_slug)).first()
 
 
 def get_next_post(id):
@@ -208,4 +208,12 @@ class Post(db.Model, CRUDMixin):
 
     @hybrid_property
     def image(self):
-        return storage.url(self._image) if self._image else None
+        if self._image:
+            return dict(url=storage.url(self._image), filename=self._image)
+        return {}
+
+    @image.setter
+    def image(self, image=None):
+        if image is None:
+            image = {}
+        self._image = image.get('filename')

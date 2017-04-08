@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from flask import request, g
+from flask import request, g, jsonify, abort
 
 from planet.extensions import db
 from planet.utils.permissions import auth
@@ -21,16 +21,18 @@ from planet.post.permissions import (post_list_perm, post_show_perm,
 def index():
     page = int(request.values.get('p', 1))
     limit = int(request.values.get('limit', 20))
-    posts = get_all_posts(page=page, limit=limit)
-    return render_schema(posts, PostSchema())
+    posts_data = get_all_posts(page=page, limit=limit)
+    return PostSchema().jsonify(posts_data)
 
 
-@post_api.route('/<id_or_slug>', methods=['GET'])
+@post_api.route('/<post_id>', methods=['GET'])
 @auth.require(401)
 @post_show_perm.require(403)
-def show(id_or_slug):
-    post = get_post(id_or_slug)
-    return render_schema(post, PostSchema())
+def show(post_id):
+    post_data = get_post(post_id)
+    if not post_data:
+        abort(404)
+    return PostSchema().jsonify(post_data)
 
 
 @post_api.route('', methods=['POST'])
@@ -38,12 +40,9 @@ def show(id_or_slug):
 @post_create_perm.require(403)
 def create():
     payload = request.get_json()
-    if not payload:
-        return render_error(20001, 'No input data provided')
-    post_schema = PostSchema(exclude=('id', 'created_at', 'updated_at'))
-    post_data, errors = post_schema.load(payload)
+    post_data, errors = PostSchema().load(payload)
     if errors:
-        return render_error(20001, errors, 422)
+        return jsonify(code=20001, error=errors), 422
     post_data.author = g.user
     post_data.updated_by = g.user.id
     if post_data.status == 'published':
@@ -51,39 +50,37 @@ def create():
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
-    return render_schema(post_data, PostSchema())
+    return PostSchema().jsonify(post_data)
 
 
-@post_api.route('/<id>', methods=['PUT'])
+@post_api.route('/<post_id>', methods=['PUT'])
 @auth.require(401)
 @post_update_perm.require(403)
-def update(id):
-    post = get_post(id)
+def update(post_id):
+    post_data = get_post(post_id)
+    if not post_data:
+        abort(404)
     playload = request.get_json()
-    if not playload:
-        return render_error(20001, 'No input data provided')
-    post_schema = PostSchema(exclude=('image', 'created_at', 'updated_at',
-                                      'author'))
-    post_data, errors = post_schema.load(playload)
+    post_data, errors = PostSchema().load(playload)
     if errors:
-        return render_error(20001, errors, 422)
+        return jsonify(code=20001, error=errors), 422
     post_data.updated_by = g.user.id
-    if post.status != 'published' and post_data.status == 'published':
+    if post_data.status != 'published' and playload.get(
+            'status') == 'published':
         post_data.published_at = datetime.utcnow
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
-    return render_schema(post_data, PostSchema())
+    return PostSchema().jsonify(post_data)
 
 
-@post_api.route('/<id>', methods=['DELETE'])
+@post_api.route('/<post_id>', methods=['DELETE'])
 @auth.require(401)
 @post_destory_perm.require(403)
-def destory(id):
-    post = get_post(id)
-    db.session.delete(post)
+def destory(post_id):
+    post_data = get_post(post_id)
+    if not post_data:
+        abort(404)
+    db.session.delete(post_data)
     db.session.commit()
-
-    message = {'code': 10000, 'message': 'success'}
-
-    return render_schema(message)
+    return jsonify(code=10000, message='success')
