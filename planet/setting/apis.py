@@ -16,7 +16,7 @@ from planet.setting.permissions import (setting_list_perm, setting_show_perm,
 @setting_list_perm.require(403)
 def index():
     settings = get_all_settings()
-    return render_schema(settings, SettingSchema())
+    return SettingSchema().jsonify(settings)
 
 
 @setting_api.route('/<id_or_key>', methods=['GET'])
@@ -24,7 +24,7 @@ def index():
 @setting_show_perm.require(403)
 def show(id_or_key):
     setting = get_setting(id_or_key)
-    return render_schema(setting, SettingSchema())
+    return SettingSchema().jsonify(setting)
 
 
 @setting_api.route('', methods=['PUT'])
@@ -32,12 +32,10 @@ def show(id_or_key):
 @setting_update_perm.require(403)
 def update():
     payload = request.get_json()
-    if not payload:
-        return render_error(20001, 'No input data provided')
     settings = []
     for key in payload:
         item = payload[key]
         if 'key' in item.keys():
             setting = save_setting(item['key'], item.get('value'))
             settings.append(setting)
-    return render_schema(settings, SettingSchema())
+    return SettingSchema().jsonify(settings)
