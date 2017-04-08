@@ -18,7 +18,7 @@
             <ui-aside class="aside-right" title="Post Settings" :is-show="isShow" @close="isShow=false">
                 <form>
                     <div class="form-group">
-                        <dropzone :image_url="post.image" @success="successhandler" @remove="removehandler"></dropzone>
+                        <dropzone :image_url="post.image.url" @success="successhandler" @remove="removehandler"></dropzone>
                     </div>
                     <div class="form-group">
                         <label>Post URL</label>
@@ -135,6 +135,10 @@
                         path: `posts/${this.$store.state.route.params.post_id}`,
                         params: this.post
                     }).then(()=>{
+                        // this.tags = []
+                        // this.post.tags.forEach(item =>{
+                        //     this.tags.push({label:item.name, value: item.id})
+                        // })
                         toastr.options.positionClass = 'toast-bottom-right';
                         toastr.success('Save successfully.', {timeOut: 3000})
                     })
@@ -176,12 +180,10 @@
                 })
               },
                 successhandler(file, response){
-                    this.post.image = response.url
-                    this.post._image = response.filename
+                    this.$set(this.post, 'image', {url:response.url, filename: response.filename})
                 },
                 removehandler(path){
-                    this.post.image = null
-                    this.post._image = null
+                    this.post.image = {}
                 }
         },
         watch:{
@@ -195,7 +197,6 @@
                         tags.push({name:item})
                     }
                 })
-                console.log(tags)
                 this.post.tags = tags
             }
         },

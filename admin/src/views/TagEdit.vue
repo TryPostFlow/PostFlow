@@ -11,7 +11,7 @@
                         <div class="font-bold m-b">Tag Settings</div>
                         <form role="form" v-on:submit.prevent>
                             <div class="form-group">
-                                <dropzone :image_url="tag.image" @success="successhandler" @remove="removehandler"></dropzone>
+                                <dropzone :image_url="tag.image.url" @success="successhandler" @remove="removehandler"></dropzone>
                             </div>
                             <div class="form-group">
                                 <label>Name</label>
@@ -91,12 +91,10 @@ export default{
                 })
         },
         successhandler(file, response){
-            this.tag.image = response.url
-            this.tag._image = response.filename
+            this.$set(this.tag, 'image', {url:response.url, filename: response.filename})
         },
         removehandler(path){
-            this.tag.image = null
-            this.tag._image = null
+            this.tag.image = {}
         }
     },
     beforeMount(){
