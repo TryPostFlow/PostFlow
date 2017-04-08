@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request, g
+from flask import request, jsonify
 
 from planet.extensions import db
-from planet.utils.schema import render_schema, render_error
 from planet.utils.permissions import auth
 from planet.account import role_api
 from planet.account.schemas import RoleSchema, PermissionSchema, GroupPermissionSchema
@@ -15,12 +14,13 @@ from planet.account.permissions import (role_list_perm, role_show_perm,
 
 
 @role_api.route('/roles', methods=['GET'])
+@auth.require(401)
+@role_list_perm.require(403)
 def index():
     page = int(request.values.get('page', 1))
     limit = int(request.values.get('limit', 20))
     roles = get_all_roles(page, limit)
-    return render_schema(
-        roles, RoleSchema(exclude=('description', 'permissions')))
+    return RoleSchema(exclude=('permissions', )).jsonify(roles)
 
 
 @role_api.route('/roles/<id_or_slug>', methods=['GET'])
@@ -28,7 +28,7 @@ def index():
 @role_show_perm.require(403)
 def show(id_or_slug):
     role = get_role(id_or_slug)
-    return render_schema(role, RoleSchema())
+    return RoleSchema().jsonify(role)
 
 
 @role_api.route('/roles', methods=['POST'])
@@ -39,10 +39,10 @@ def create():
     role_schema = RoleSchema(only=('name', 'description', 'permissions'))
     role_data, errors = role_schema.load(payload)
     if errors:
-        return render_error(20001, errors, 422)
+        return jsonify(code=20001, error=errors), 422
     db.session.add(role_data)
     db.session.commit()
-    return render_schema(role_data, RoleSchema())
+    return RoleSchema().jsonify(role_data)
 
 
 @role_api.route('/roles/<id>', methods=['PUT'])
@@ -53,10 +53,10 @@ def update(id):
     role_schema = RoleSchema(only=('id', 'name', 'description', 'permissions'))
     role_data, errors = role_schema.load(payload)
     if errors:
-        return render_error(20001, errors, 422)
+        return jsonify(code=20001, error=errors), 422
     db.session.add(role_data)
     db.session.commit()
-    return render_schema(role_data, RoleSchema())
+    return RoleSchema().jsonify(role_data)
 
 
 @role_api.route('/roles/<id>', methods=['DELETE'])
@@ -67,9 +67,7 @@ def destory(id):
     db.session.delete(role)
     db.session.commit()
 
-    message = {'code': 10000, 'message': 'success'}
-
-    return render_schema(message)
+    return jsonify(code=10000, message='success')
 
 
 @role_api.route('/permissions', methods=['GET'])
@@ -88,7 +86,7 @@ def permissions_index():
                 'object_type': group.object_type,
                 'permissions': perms
             })
-        return render_schema(group_permissions, GroupPermissionSchema())
+        return GroupPermissionSchema().jsonify(group_permissions)
     permissions = Permission.query.order_by(
         Permission.created_at.desc()).paginate(page, limit)
-    return render_schema(permissions, PermissionSchema())
+    return PermissionSchema().jsonify(permissions)

@@ -1,14 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request, g
+from flask import request, g, jsonify, abort
 
 from planet.extensions import db
-from planet.utils.schema import render_schema, render_error
 from planet.utils.permissions import auth
 from planet.account import account_api
-from planet.account.schemas import AccountSchema, PasswordSchema, RoleSchema
-from planet.account.models import (User, get_user, get_all_users, get_role)
+from planet.account.schemas import AccountSchema, PasswordSchema
+from planet.account.models import (User, get_user, get_role)
 from planet.account.permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)
@@ -17,15 +16,17 @@ from planet.account.permissions import (
 @account_api.route('/accounts/me', methods=['GET'])
 @auth.require(401)
 def me():
-    return render_schema(g.user, AccountSchema())
+    return AccountSchema().jsonify(g.user)
 
 
-@account_api.route('/accounts/<int:id>', methods=['GET'])
+@account_api.route('/accounts/<account_id>', methods=['GET'])
 @auth.require(401)
 @account_show_perm.require(403)
-def view(id):
-    user = get_user(id)
-    return render_schema(user, AccountSchema())
+def show(account_id):
+    user_data = get_user(account_id)
+    if not user_data:
+        abort(404)
+    return AccountSchema().jsonify(user_data)
 
 
 @account_api.route('/accounts', methods=['GET'])
@@ -37,15 +38,13 @@ def index():
     role_id = request.args.get('role')
     users_query = User.query
     if role_id:
-        role = get_role(role_id)
-        if role:
-            users_query = users_query.filter(
-                db.or_(
-                    User.primary_role == role,
-                    User.secondary_roles.any(id=role.id)))
+        users_query = users_query.filter(
+            db.or_(
+                User.primary_role_id == role_id,
+                User.secondary_roles.any(id=role_id)))
     users = users_query.order_by(User.created_at.desc()).paginate(page, limit)
 
-    return render_schema(users, AccountSchema())
+    return AccountSchema().jsonify(users)
 
 
 @account_api.route('/accounts', methods=['POST'])
@@ -56,52 +55,54 @@ def create():
     account_schema = AccountSchema(only=('name', 'email', 'password'))
     account_data, errors = account_schema.load(payload)
     if errors:
-        return render_error(20001, errors, 422)
+        return jsonify(code=20001, error=errors), 422
     db.session.add(account_data)
     db.session.commit()
-    return render_schema(account_data, AccountSchema())
+    return AccountSchema().jsonify(account_data)
 
 
-@account_api.route('/accounts/<int:id>/password', methods=['PUT'])
+@account_api.route('/accounts/<account_id>/password', methods=['PUT'])
 @auth.require(401)
 @account_update_perm.require(403)
-def update_password(id):
+def update_password(account_id):
+    user_data = get_user(account_id)
+    if not user_data:
+        abort(404)
     payload = request.get_json()
-    password_schema = PasswordSchema()
-    password_data, errors = password_schema.load(payload)
+    password_data, errors = PasswordSchema().load(payload)
     if errors:
-        return render_error(20001, errors, 422)
-    user = get_user(id)
-    user.password = password_data['new_password']
-    db.session.add(user)
+        return jsonify(code=20001, error=errors), 422
+    user_data.password = password_data['new_password']
+    db.session.add(user_data)
     db.session.commit()
-    message = {'code': 10000, 'message': 'success'}
-    return render_schema(message)
+    return jsonify(code=10000, message='success')
 
 
-@account_api.route('/accounts/<int:id>', methods=['PUT'])
+@account_api.route('/accounts/<account_id>', methods=['PUT'])
 @auth.require(401)
 @account_update_perm.require(403)
-def update(id):
+def update(account_id):
+    user_data = get_user(account_id)
+    if not user_data:
+        abort(404)
     payload = request.get_json()
-    account_schema = AccountSchema(only=('id', 'name', 'email', 'primary_role',
-                                         'status'))
-    account_data, errors = account_schema.load(payload)
+    account_schema = AccountSchema()
+    user_data, errors = account_schema.load(payload)
     if errors:
-        return render_error(20001, errors, 422)
-    db.session.add(account_data)
+        return jsonify(code=20001, error=errors), 422
+    db.session.add(user_data)
     db.session.commit()
-    return render_schema(account_data, AccountSchema())
+    return AccountSchema().jsonify(user_data)
 
 
-@account_api.route('/accounts/<id>', methods=['DELETE'])
+@account_api.route('/accounts/<account_id>', methods=['DELETE'])
 @auth.require(401)
 @account_destory_perm.require(403)
-def destory(id):
-    account = get_user(id)
-    db.session.delete(account)
+def destory(account_id):
+    user_data = get_user(account_id)
+    if not user_data:
+        abort(404)
+    db.session.delete(user_data)
     db.session.commit()
 
-    message = {'code': 10000, 'message': 'success'}
-
-    return render_schema(message)
+    return jsonify(code=10000, message='success')
