@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request, jsonify
+from flask import request, jsonify, abort
 from planet.extensions import db
 from planet.utils.permissions import auth
 from planet.utils.schema import render_schema, render_error
@@ -23,16 +23,18 @@ def list():
     tags_query = Tag.query
     if query:
         tags_query = tags_query.filter(Tag.name.like('%{}%'.format(query)))
-    tags = tags_query.paginate(page, limit)
-    return TagSchema().jsonify(tags)
+    tags_data = tags_query.paginate(page, limit)
+    return TagSchema().jsonify(tags_data)
 
 
-@tag_api.route('/<tag_id_or_slug>', methods=['GET'])
+@tag_api.route('/<tag_id>', methods=['GET'])
 @auth.require(401)
 @tag_show_perm.require(403)
-def show(tag_id_or_slug):
-    tag = get_tag(tag_id_or_slug)
-    return TagSchema().jsonify(tag)
+def show(tag_id):
+    tag_data = get_tag(tag_id)
+    if not tag_data:
+        abort(404)
+    return TagSchema().jsonify(tag_data)
 
 
 @tag_api.route('', methods=['POST'])
@@ -45,15 +47,17 @@ def create():
         return jsonify(code=20001, error=errors), 422
     db.session.add(tag_data)
     db.session.commit()
-    return TagSchema(exclude=('id', )).jsonify(tag_data)
+    return TagSchema().jsonify(tag_data)
 
 
-@tag_api.route('/<tag_id_or_slug>', methods=['PUT'])
+@tag_api.route('/<tag_id>', methods=['PUT'])
 @auth.require(401)
 @tag_update_perm.require(403)
-def update(tag_id_or_slug):
+def update(tag_id):
     payload = request.get_json()
-    tag = get_tag(tag_id_or_slug)
+    tag_data = get_tag(tag_id)
+    if not tag_data:
+        abort(404)
     tag_data, errors = TagSchema().load(payload)
     if errors:
         return render_error(20001, errors, 422)
@@ -62,12 +66,14 @@ def update(tag_id_or_slug):
     return TagSchema().jsonify(tag_data)
 
 
-@tag_api.route('/<tag_id_or_slug>', methods=['DELETE'])
+@tag_api.route('/<tag_id>', methods=['DELETE'])
 @auth.require(401)
 @tag_destory_perm.require(403)
-def destory(tag_id_or_slug):
-    tag = get_tag(tag_id_or_slug)
-    db.session.delete(tag)
+def destory(tag_id):
+    tag_data = get_tag(tag_id)
+    if not tag_data:
+        abort(404)
+    db.session.delete(tag_data)
     db.session.commit()
 
     return jsonify(code=10000, message='success')
