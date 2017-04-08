@@ -2,35 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from marshmallow import (Schema, fields, validates_schema, ValidationError,
-                         post_load, validates)
-from planet.utils.schema import BaseSchema, update_object
+                         post_load, validates, pre_load)
+from planet.utils.schema import BaseSchema
 from planet.account.models import User, Role, Permission
 
 
-class LoginSchema(Schema):
-    email = fields.String(required=True)
-    password = fields.String(required=True)
-
-    @validates('email')
-    def validate_account(self, email):
-        account = User.query.filter_by(email=email).first()
-        if not account:
-            raise ValidationError("This account doesn't exist")
-
-    @post_load
-    def make_account(self, data):
-        return User.query.filter_by(email=data.get('email')).first()
-
-    @post_load
-    def validate_login(self, data):
-        account = User.query.filter(User.email == data.get('email')).first()
-        authenticated = account.check_password(data.get('password'))\
-            if account else False
-        if not authenticated:
-            raise ValidationError("account or password is wrong")
-
-
-class PermissionSchema(Schema):
+class PermissionSchema(BaseSchema):
     id = fields.Integer()
     name = fields.String()
     object_type = fields.String()
@@ -38,15 +15,11 @@ class PermissionSchema(Schema):
     action_name = fields.String()
     object_id = fields.Integer()
 
-    @post_load
-    def make_object(self, data):
-        if data.get('id'):
-            permission = Permission.query.get(data.get('id'))
-            return permission
-        return Permission(**data)
+    class Meta():
+        model = Permission
 
 
-class GroupPermissionSchema(Schema):
+class GroupPermissionSchema(BaseSchema):
     name = fields.String()
     object_type = fields.String()
     permissions = fields.Nested(
@@ -56,45 +29,39 @@ class GroupPermissionSchema(Schema):
 
 
 class RoleSchema(BaseSchema):
+    id = fields.Integer()
     name = fields.String()
     description = fields.String()
     permissions = fields.Nested(
         PermissionSchema,
         many=True,
         only=('id', 'object_type', 'action_type', 'action_name'))
+    updated_at = fields.DateTime(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
 
-    @post_load
-    def make_object(self, data):
-        if data.get('id'):
-            role = Role.query.get(data.get('id'))
-            if len(data.keys()) == 1:
-                return role
-            return update_object(role, data)
-        return Role(**data)
+    class Meta():
+        model = Role
 
 
 class AccountSchema(BaseSchema):
+    id = fields.Integer()
     name = fields.String(required=True)
     email = fields.Email(required=True)
     password = fields.String(load_only=True, required=True)
     avatar = fields.String()
     primary_role = fields.Nested(
-        RoleSchema,
-        exclude=('permissions', 'description'),
-        dump_only=('created_at', 'updated_at'))
+        RoleSchema, exclude=('permissions', ), required=True)
     status = fields.String()
+    updated_at = fields.DateTime(dump_only=True)
+    created_at = fields.DateTime(dump_only=True)
 
-    @post_load
-    def make_object(self, data):
-        if data.get('id'):
-            user = User.query.get(data.get('id'))
-            return update_object(user, data)
-        return User(**data)
+    class Meta():
+        model = User
 
     @validates_schema(skip_on_field_errors=True)
     def validate_name(self, data):
-        if not data.get('name'):
-            raise ValidationError("The name is needed", "name")
+        # if not data.get('name'):
+        #     raise ValidationError("The name is needed", "name")
         account = User.query.filter(User.name == data.get('name')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
@@ -104,8 +71,9 @@ class AccountSchema(BaseSchema):
 
     @validates_schema(skip_on_field_errors=True)
     def validate_email(self, data):
-        if not data.get('email'):
-            raise ValidationError("The email is needed", "email")
+        # if not data.get('email'):
+        #     raise ValidationError("The email is needed", "email")
+        print data
         account = User.query.filter(User.email == data.get('email')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
@@ -115,6 +83,7 @@ class AccountSchema(BaseSchema):
 
 
 class PasswordSchema(BaseSchema):
+    id = fields.Integer()
     old_password = fields.String(load_only=True, required=True)
     new_password = fields.String(load_only=True, required=True)
     verify_password = fields.String(load_only=True, required=True)
