@@ -46,7 +46,7 @@ def create():
     post_data.author = g.user
     post_data.updated_by = g.user.id
     if post_data.status == 'published':
-        post_data.published_at = datetime.utcnow
+        post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
@@ -67,7 +67,7 @@ def update(post_id):
     post_data.updated_by = g.user.id
     if post_data.status != 'published' and playload.get(
             'status') == 'published':
-        post_data.published_at = datetime.utcnow
+        post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
     db.session.add(post_data)
     db.session.commit()
