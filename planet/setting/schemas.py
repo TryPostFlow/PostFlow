@@ -13,3 +13,10 @@ class SettingSchema(BaseSchema):
 
     class Meta():
         model = Setting
+
+    def get_instance(self, data):
+        if data.get('id'):
+            return Setting.query.get(data['id'])
+        elif data.get('key'):
+            return Setting.query.filter_by(key=data.get('key')).first()
+        return None

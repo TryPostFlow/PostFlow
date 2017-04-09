@@ -18,7 +18,8 @@ from planet.commands.base import planet
 from planet.commands.database import init_db
 from planet.commands.theme import download_theme
 from planet.config.commands import generate_config
-from planet.setting.models import init_settings, save_setting
+from planet.setting.commands import init_settings
+from planet.setting.models import save_setting
 from planet.oauth.models import Client
 from planet.account.commands.utils import init_permissions
 from planet.post.commands import insert_sample_post
