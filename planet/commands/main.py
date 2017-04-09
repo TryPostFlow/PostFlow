@@ -20,7 +20,7 @@ from planet.commands.theme import download_theme
 from planet.config.commands import generate_config
 from planet.setting.models import init_settings, save_setting
 from planet.oauth.models import Client
-from planet.post.models import insert_sample_post
+from planet.post.commands import insert_sample_post
 
 
 @planet.command()
