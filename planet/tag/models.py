@@ -88,3 +88,5 @@ class Tag(db.Model):
         if image is None:
             image = {}
         self._image = image.get('filename')
+
+    image = db.synonym("_image", descriptor=image)

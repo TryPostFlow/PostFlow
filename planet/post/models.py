@@ -141,3 +141,5 @@ class Post(db.Model, CRUDMixin):
         if image is None:
             image = {}
         self._image = image.get('filename')
+
+    image = db.synonym("_image", descriptor=image)
