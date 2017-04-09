@@ -1,9 +1,0 @@
-{
-    "application": "planet",
-    "identifier": "default",
-    "name": "default",
-    "author": "fengluo",
-    "description": "A blog theme for Planet",
-    "license": "MIT/X11",
-    "doctype": "html5"
-}
