@@ -178,13 +178,13 @@
                     )
                      loading(false)
                 })
-              },
-                successhandler(file, response){
-                    this.$set(this.post, 'image', {url:response.url, filename: response.filename})
-                },
-                removehandler(path){
-                    this.post.image = {}
-                }
+            },
+            successhandler(file, response){
+                this.$set(this.post, 'image', {url:response.url, filename: response.filename})
+            },
+            removehandler(path){
+                this.post.image = {}
+            }
         },
         watch:{
             'tags': function(){

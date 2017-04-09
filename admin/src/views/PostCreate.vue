@@ -15,6 +15,9 @@
             <ui-aside class="aside-right" title="Post Settings" :is-show="isShow" @close="isShow=false">
                 <form>
                     <div class="form-group">
+                        <dropzone :image_url="post.image.url" @success="successhandler" @remove="removehandler"></dropzone>
+                    </div>
+                    <div class="form-group">
                         <label>Post URL</label>
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-link"></i></span>
@@ -51,6 +54,7 @@
     import vSelect from '../components/vue-select'
     import Aside from '../components/Aside.vue'
     import DropdownButton from '../components/DropdownButton.vue'
+    import Dropzone from '../components/Dropzone.vue'
 
     export default{
         name: 'PostsCreate',
@@ -59,7 +63,8 @@
                 post:{
                     markdown:'',
                     content:'',
-                    tags:[]
+                    tags:[],
+                    image:{}
                 },
                 buttons: [
                     {
@@ -113,13 +118,24 @@
                     )
                      loading(false)
                 })
-              }
+            },
+            successhandler(file, response){
+                this.$set(this.post, 'image', {url:response.url, filename: response.filename})
+            },
+            removehandler(path){
+                this.post.image = {}
+            }
         },
         watch:{
             'tags': function(){
                 let tags = []
                 this.tags.forEach(item =>{
-                    tags.push({name:item.label, id: item.value})
+                    if (typeof(item) == 'object'){
+                        tags.push({name:item.label, id: item.value})
+                    }
+                    else{
+                        tags.push({name:item})
+                    }
                 })
                 this.post.tags = tags
             }
@@ -128,7 +144,8 @@
             vSelect,
             'ui-editor': editor,
             'ui-dropdown-button': DropdownButton,
-            'ui-aside': Aside
+            'ui-aside': Aside,
+            Dropzone
         }
     }
 </script>
