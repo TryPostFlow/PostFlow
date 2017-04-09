@@ -18,6 +18,15 @@ class PermissionSchema(BaseSchema):
     class Meta():
         model = Permission
 
+    def get_instance(self, data):
+        if data.get('id'):
+            return Permission.query.get(data['id'])
+        elif data.get('object_type') and data.get('action_type'):
+            return Permission.query.filter(
+                Permission.object_type == data.get('object_type'),
+                Permission.action_type == data.get('action_type')).first()
+        return None
+
 
 class GroupPermissionSchema(BaseSchema):
     name = fields.String()
@@ -31,6 +40,7 @@ class GroupPermissionSchema(BaseSchema):
 class RoleSchema(BaseSchema):
     id = fields.Integer()
     name = fields.String()
+    slug = fields.String()
     description = fields.String()
     permissions = fields.Nested(
         PermissionSchema,

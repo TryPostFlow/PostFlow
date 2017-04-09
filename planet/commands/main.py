@@ -20,6 +20,7 @@ from planet.commands.theme import download_theme
 from planet.config.commands import generate_config
 from planet.setting.models import init_settings, save_setting
 from planet.oauth.models import Client
+from planet.account.commands.utils import init_permissions
 from planet.post.commands import insert_sample_post
 
 
@@ -190,10 +191,10 @@ def init(force, name, email, password):
     # Insert data
     click.secho("[+] Insert data...", fg="cyan")
     Client.create(name='planet')
-    create_permissions()
+    init_permissions()
     init_settings()
     save_setting('title', site_name)
-    prompt_save_user(name, email, password, 'admin')
+    prompt_save_user(name, email, password, 'owner')
     insert_sample_post()
     click.secho("[+] Data is ready.", fg="green")
 

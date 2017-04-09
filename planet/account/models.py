@@ -174,6 +174,9 @@ class User(db.Model, CRUDMixin):
         perms = []
         for role in self.roles:
             perms.extend(role.permissions)
+        role = Role.query.filter_by(slug='owner').first()
+        if role and self.primary_role == role:
+            perms.extend(Permission.query.all())
         return list(set(perms))
 
     @cached_property
