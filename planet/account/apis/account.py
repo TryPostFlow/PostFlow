@@ -86,8 +86,7 @@ def update(account_id):
     if not user_data:
         abort(404)
     payload = request.get_json()
-    account_schema = AccountSchema()
-    user_data, errors = account_schema.load(payload)
+    user_data, errors = AccountSchema().load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
     db.session.add(user_data)

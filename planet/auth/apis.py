@@ -11,8 +11,7 @@ from planet.auth.schemas import LoginSchema
 @auth_api.route('/login', methods=['POST'])
 def login():
     payload = request.get_json()
-    login_schema = LoginSchema()
-    login_data, errors = login_schema.load(payload)
+    login_data, errors = LoginSchema().load(payload)
     if errors:
         return render_error(20001, errors, 422)
     client = Client.query.filter(Client.name == 'planet').first()
