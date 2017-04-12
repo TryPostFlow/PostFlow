@@ -71,8 +71,7 @@ Backup[ ]of[ ]*.numbers/
 node_modules
 bower_components
 
-config/development.conf
-config/production.conf
+config/
 public
 .idea
 .vscode
@@ -84,4 +83,4 @@ wiki/
 .vagrant
 .bundle
 content/
-planet.conf
+postflow.conf

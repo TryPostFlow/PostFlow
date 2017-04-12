@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 setup(
-    name='get-planet',
+    name='postflow',
     version='0.1.0',
     author='Shawn Xie',
     author_email='fengluo17@gmail.com',
@@ -14,7 +14,7 @@ setup(
     include_package_data=True,
     entry_points='''
         [console_scripts]
-        planet=planet.commands:planet
+        postflow=postflow.commands:postflow
     ''',
     install_requires=[
         'feedparser==5.2.1', 'Flask==0.12', 'Flask-Mail==0.9.1',

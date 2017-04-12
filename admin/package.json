@@ -1,7 +1,7 @@
 {
-  "name": "planet",
+  "name": "postflow",
   "version": "0.0.1",
-  "description": "This is a admin panel for planet",
+  "description": "This is a admin panel for PostFlow",
   "author": "Shawn Xie",
   "main": "index.js",
   "scripts": {
