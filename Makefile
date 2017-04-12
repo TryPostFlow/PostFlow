@@ -15,7 +15,7 @@ ifeq (server,$(firstword $(MAKECMDGOALS)))
 endif
 
 server: 
-	planet $(RUN_ARGS)
+	postflow $(RUN_ARGS)
 
 serve:
 	@$(MAKE) server run
@@ -24,14 +24,14 @@ admin-serve:
 	@npm run dev --prefix admin
 
 admin-build:
-	@npm run build --prefix admin && rm -rf planet/admin/static/* && cp -r admin/dist/* planet/admin/static
+	@npm run build --prefix admin && rm -rf postflow/admin/static/* && cp -r admin/dist/* postflow/admin/static
 
 dev:
 	@$(MAKE) serve admin-serve -j 2
 
-dependencies:requirements.txt
+dependencies:
 	pip install -r requirements.txt
 
 install: dependencies
 	clear
-	planet init
+	postflow init

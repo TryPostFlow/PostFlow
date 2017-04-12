@@ -1,2 +1,2 @@
-recursive-include planet/admin/static *
-recursive-include planet/config *
+recursive-include postflow/admin/static *
+recursive-include postflow/config *
