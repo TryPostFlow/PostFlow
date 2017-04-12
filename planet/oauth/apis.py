@@ -37,8 +37,7 @@ def set_grant(client_id, code, request, *args, **kwargs):
         redirect_uri=request.redirect_uri,
         scope=' '.join(request.scopes),
         user_id=g.user.id,
-        expires=expires,
-    )
+        expires=expires, )
     db.session.add(grant)
     db.session.commit()
 
@@ -47,12 +46,17 @@ def set_grant(client_id, code, request, *args, **kwargs):
 def set_token(token, request, *args, **kwargs):
     # In real project, a token is unique bound to user and client.
     # Which means, you don't need to create a token every time.
+    Token.query.filter_by(
+        client_id=request.client.client_id, user_id=request.user.id).delete()
     tok = Token(**token)
     if request.response_type == 'token':
         tok.user_id = g.user.id
     else:
         tok.user_id = request.user.id
     tok.client_id = request.client.client_id
+    expires_in = token.get('expires_in')
+    expires = datetime.utcnow() + timedelta(seconds=expires_in)
+    tok.expires = expires
     db.session.add(tok)
     db.session.commit()
     return tok
@@ -63,8 +67,7 @@ def get_user(username, password, *args, **kwargs):
     # This is optional, if you don't need password credential
     # there is no need to implement this method
     user = User.query.filter(
-        db.or_(
-            User.name == username, User.email == username)).first()
+        db.or_(User.name == username, User.email == username)).first()
     if user and user.check_password(password):
         return user
     return None

@@ -81,9 +81,9 @@ def configure_identity(app):
 
         if not token:
             return
-        # if token.is_expired:
-        #     token.delete()
-        #     return
+        if token.is_expired:
+            token.delete()
+            return
         return Identity(token.user_id, 'Bearer')
 
     @identity_loaded.connect_via(app)
