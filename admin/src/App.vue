@@ -83,7 +83,7 @@
     data() {
       return {
         app: {
-          name: 'Planet',
+          name: 'PostFlow',
           version: '0.0.1',
           settings: {
             themeID: 1,
