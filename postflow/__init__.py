@@ -92,14 +92,6 @@ def configure_identity(app):
 
 
 def configure_before_handlers(app):
-
-    # @app.before_request
-    # def check_post_data():
-    #     if request.method in ['POST', 'PUT'] and\
-    #             not request.get_data() and\
-    #             not request.files:
-    #         abort(400)
-
     @app.before_request
     def authenticate():
         g.user = getattr(g.identity, 'user', None)
