@@ -14,6 +14,8 @@ export default {
       title: {},
       description: {},
       postsPerPage: {},
+      logo: {},
+      cover: {},
       ga_id: {},
       disqus_id: {},
       navigation: { value: null }

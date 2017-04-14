@@ -22,6 +22,18 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label class="col-lg-2 control-label">Blog Logo</label>
+                    <div class="col-lg-10">
+                        <dropzone :image_url="settings.logo.value" @success="successLogoHandler" @remove="removeLogoHandler"></dropzone>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">Blog Cover</label>
+                    <div class="col-lg-10">
+                        <dropzone :image_url="settings.cover.value" @success="successCoverHandler" @remove="removeCoverHandler"></dropzone>
+                    </div>
+                </div>
+                <div class="form-group">
                     <label class="col-lg-2 control-label">Posts per page</label>
                     <div class="col-lg-10">
                         <input type="text" class="form-control" v-model="settings.postsPerPage.value">
@@ -50,6 +62,8 @@
 <script>
 import toastr from 'toastr'
 import 'toastr/build/toastr.css'
+import Dropzone from '../components/Dropzone.vue'
+
 function fetchSettings(store){
     return store.dispatch('setting/FETCH_ITEMS', {path: 'settings', index:'key'})
 }
@@ -73,13 +87,31 @@ export default{
                 toastr.options.positionClass = 'toast-bottom-right';
                 toastr.success('Save successfully.', {timeOut: 3000})
             })
+        },
+        successLogoHandler(file, response){
+            this.$set(this.settings.logo, 'value', response.url)
+        },
+        removeLogoHandler(path){
+            this.settings.logo.value = ''
+        },
+        successCoverHandler(file, response){
+            this.$set(this.settings.cover, 'value', response.url)
+        },
+        removeCoverHandler(path){
+            this.settings.cover.value = ''
         }
     },
     beforeMount(){
         fetchSettings(this.$store)
+    },
+    components:{
+        Dropzone
     }
 }
 </script>
 <style>
-
+.image-container {
+    text-align: center;
+    display: table-cell;
+}
 </style>
