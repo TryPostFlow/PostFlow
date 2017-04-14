@@ -109,8 +109,7 @@ class Token(db.Model, CRUDMixin):
         'Client',
         backref=db.backref('tokens', cascade="all, delete"),
         primaryjoin='Client.client_id == Token.client_id',
-        foreign_keys='Token.client_id',
-        cascade="all, delete")
+        foreign_keys='Token.client_id')
     user_id = db.Column(db.Integer)
     user = db.relationship(
         'User',
