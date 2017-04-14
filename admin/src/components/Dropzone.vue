@@ -57,8 +57,8 @@
 }
 .image-container img{
   display: block;
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   min-height: 50px;
   vertical-align: middle;
 }

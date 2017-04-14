@@ -113,5 +113,6 @@ export default{
 .image-container {
     text-align: center;
     display: table-cell;
+    max-width: 500px;
 }
 </style>
