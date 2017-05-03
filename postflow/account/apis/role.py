@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from flask import request, jsonify, abort
+from flask import request, jsonify
 
-from postflow.extensions import db
 from postflow.utils.permissions import auth
 from postflow.account import role_api
-from postflow.account.schemas import RoleSchema, PermissionSchema, GroupPermissionSchema
-from postflow.account.models import (get_role, get_all_roles, Permission)
+from postflow.account.schemas import (RoleSchema, PermissionSchema,
+                                      GroupPermissionSchema)
+from postflow.account.models import (Role, Permission)
 from postflow.account.permissions import (role_list_perm, role_show_perm,
-                                        role_create_perm, role_update_perm,
-                                        role_destory_perm)
+                                          role_create_perm, role_update_perm,
+                                          role_destory_perm)
 
 
 @role_api.route('/roles', methods=['GET'])
@@ -19,7 +19,7 @@ from postflow.account.permissions import (role_list_perm, role_show_perm,
 def index():
     page = int(request.args.get('page', 1))
     limit = int(request.args.get('limit', 20))
-    roles = get_all_roles(page, limit)
+    roles = Role.query.order_by(Role.created_at.desc()).paginate(page, limit)
     return RoleSchema(exclude=('permissions', )).jsonify(roles)
 
 
@@ -27,9 +27,7 @@ def index():
 @auth.require(401)
 @role_show_perm.require(403)
 def show(role_id):
-    role_data = get_role(role_id)
-    if not role_data:
-        abort(404)
+    role_data = Role.query.get_or_404(role_id)
     return RoleSchema().jsonify(role_data)
 
 
@@ -42,8 +40,7 @@ def create():
     role_data, errors = role_schema.load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
-    db.session.add(role_data)
-    db.session.commit()
+    role_data.save()
     return RoleSchema().jsonify(role_data)
 
 
@@ -51,15 +48,12 @@ def create():
 @auth.require(401)
 @role_update_perm.require(403)
 def update(role_id):
-    role_data = get_role(role_id)
-    if not role_data:
-        abort(404)
+    role_data = Role.query.get_or_404(role_id)
     payload = request.get_json()
     role_data, errors = RoleSchema().load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
-    db.session.add(role_data)
-    db.session.commit()
+    role_data.save()
     return RoleSchema().jsonify(role_data)
 
 
@@ -67,11 +61,8 @@ def update(role_id):
 @auth.require(401)
 @role_destory_perm.require(403)
 def destory(role_id):
-    role_data = get_role(role_id)
-    if not role_data:
-        abort(404)
-    db.session.delete(role_data)
-    db.session.commit()
+    role_data = Role.query.get_or_404(role_id)
+    role_data.delete()
 
     return jsonify(code=10000, message='success')
 

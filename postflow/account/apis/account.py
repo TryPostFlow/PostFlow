@@ -7,7 +7,7 @@ from postflow.extensions import db
 from postflow.utils.permissions import auth
 from postflow.account import account_api
 from postflow.account.schemas import AccountSchema, PasswordSchema
-from postflow.account.models import (User, get_user, get_role)
+from postflow.account.models import User
 from postflow.account.permissions import (
     account_list_perm, account_show_perm, account_create_perm,
     account_update_perm, account_destory_perm)
@@ -23,9 +23,7 @@ def me():
 @auth.require(401)
 @account_show_perm.require(403)
 def show(account_id):
-    user_data = get_user(account_id)
-    if not user_data:
-        abort(404)
+    user_data = User.query.get_or_404(account_id)
     return AccountSchema().jsonify(user_data)
 
 
@@ -56,8 +54,7 @@ def create():
     account_data, errors = account_schema.load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
-    db.session.add(account_data)
-    db.session.commit()
+    account_data.save()
     return AccountSchema().jsonify(account_data)
 
 
@@ -65,16 +62,13 @@ def create():
 @auth.require(401)
 @account_update_perm.require(403)
 def update_password(account_id):
-    user_data = get_user(account_id)
-    if not user_data:
-        abort(404)
+    user_data = User.query.get_or_404(account_id)
     payload = request.get_json()
     password_data, errors = PasswordSchema().load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
     user_data.password = password_data['new_password']
-    db.session.add(user_data)
-    db.session.commit()
+    user_data.save()
     return jsonify(code=10000, message='success')
 
 
@@ -82,15 +76,12 @@ def update_password(account_id):
 @auth.require(401)
 @account_update_perm.require(403)
 def update(account_id):
-    user_data = get_user(account_id)
-    if not user_data:
-        abort(404)
+    user_data = User.query.get_or_404(account_id)
     payload = request.get_json()
     user_data, errors = AccountSchema().load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
-    db.session.add(user_data)
-    db.session.commit()
+    user_data.save()
     return AccountSchema().jsonify(user_data)
 
 
@@ -98,10 +89,7 @@ def update(account_id):
 @auth.require(401)
 @account_destory_perm.require(403)
 def destory(account_id):
-    user_data = get_user(account_id)
-    if not user_data:
-        abort(404)
-    db.session.delete(user_data)
-    db.session.commit()
+    user_data = User.query.get_or_404(account_id)
+    user_data.delete()
 
     return jsonify(code=10000, message='success')

@@ -83,7 +83,6 @@ class AccountSchema(BaseSchema):
     def validate_email(self, data):
         # if not data.get('email'):
         #     raise ValidationError("The email is needed", "email")
-        print data
         account = User.query.filter(User.email == data.get('email')).first()
         if data.get('id') and account and\
                 str(data.get('id')) != str(account.id):
