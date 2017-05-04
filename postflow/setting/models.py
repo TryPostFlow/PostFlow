@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import json
 from datetime import datetime
 from postflow.extensions import db
+from postflow.utils.database import CRUDMixin
 
 
 def get_setting(key):
@@ -19,12 +19,11 @@ def save_setting(key, value):
     setting = Setting.query.filter(Setting.key == key).first()
     setting = setting if setting else Setting(key=key)
     setting.value = value
-    db.session.add(setting)
-    db.session.commit()
+    setting.save()
     return setting
 
 
-class Setting(db.Model):
+class Setting(db.Model, CRUDMixin):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(150), nullable=False)
     value = db.Column(db.Text)

@@ -5,6 +5,7 @@ import itertools
 from datetime import datetime
 from sqlalchemy.ext.hybrid import hybrid_property
 from postflow.extensions import db, storage
+from postflow.utils.database import CRUDMixin
 from postflow.helpers.text import slugify
 from postflow.post.models import Post
 from postflow.setting.models import get_setting
@@ -22,7 +23,7 @@ def get_posts_by_tag(id, page, limit=None):
     return posts
 
 
-class Tag(db.Model):
+class Tag(db.Model, CRUDMixin):
 
     STATUS_DRAFT = 0
     STATUS_PUBLIC = 1
