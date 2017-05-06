@@ -4,13 +4,12 @@
 from flask import request, jsonify, abort
 from postflow.extensions import db
 from postflow.utils.permissions import auth
-from postflow.utils.schema import render_schema, render_error
 from postflow.tag import tag_api
 from postflow.tag.schemas import TagSchema
 from postflow.tag.models import Tag, get_tag
 from postflow.tag.permissions import (tag_list_perm, tag_show_perm,
-                                    tag_create_perm, tag_update_perm,
-                                    tag_destory_perm)
+                                      tag_create_perm, tag_update_perm,
+                                      tag_destory_perm)
 
 
 @tag_api.route('', methods=['GET'])
@@ -31,9 +30,8 @@ def list():
 @auth.require(401)
 @tag_show_perm.require(403)
 def show(tag_id):
-    tag_data = get_tag(tag_id)
-    if not tag_data:
-        abort(404)
+    tag_data = Tag.query.filter(
+        db.or_(Tag.id == tag_id, Tag.slug == tag_id)).first_or_404()
     return TagSchema().jsonify(tag_data)
 
 
@@ -45,8 +43,7 @@ def create():
     tag_data, errors = TagSchema(exclude=('id', )).load(payload)
     if errors:
         return jsonify(code=20001, error=errors), 422
-    db.session.add(tag_data)
-    db.session.commit()
+    tag_data.save()
     return TagSchema().jsonify(tag_data)
 
 
@@ -55,14 +52,12 @@ def create():
 @tag_update_perm.require(403)
 def update(tag_id):
     payload = request.get_json()
-    tag_data = get_tag(tag_id)
-    if not tag_data:
-        abort(404)
+    tag_data = Tag.query.filter(
+        db.or_(Tag.id == tag_id, Tag.slug == tag_id)).first_or_404()
     tag_data, errors = TagSchema().load(payload)
     if errors:
-        return render_error(20001, errors, 422)
-    db.session.add(tag_data)
-    db.session.commit()
+        return jsonify(code=20001, error=errors), 422
+    tag_data.save()
     return TagSchema().jsonify(tag_data)
 
 
@@ -70,10 +65,8 @@ def update(tag_id):
 @auth.require(401)
 @tag_destory_perm.require(403)
 def destory(tag_id):
-    tag_data = get_tag(tag_id)
-    if not tag_data:
-        abort(404)
-    db.session.delete(tag_data)
-    db.session.commit()
+    tag_data = Tag.query.filter(
+        db.or_(Tag.id == tag_id, Tag.slug == tag_id)).first_or_404()
+    tag_data.delete()
 
     return jsonify(code=10000, message='success')

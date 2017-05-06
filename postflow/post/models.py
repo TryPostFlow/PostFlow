@@ -22,26 +22,12 @@ def get_all_posts(status=None, page=1, limit=None):
     return query.paginate(page, limit)
 
 
-def get_post(id_or_slug):
-    return Post.query.filter(
-        db.or_(Post.id == id_or_slug, Post.slug == id_or_slug)).first()
-
-
 def get_next_post(id):
     return Post.query.order_by(Post.id.asc()).filter(Post.id > id).first()
 
 
 def get_prev_post(id):
     return Post.query.order_by(Post.id.desc()).filter(Post.id < id).first()
-
-
-def add_post_views(id, views=1):
-    post = Post.query.get(id)
-    if not post:
-        return
-    post.views = post.views + views
-    db.session.add(post)
-    db.session.commit()
 
 
 post_tag = db.Table('post_tag',

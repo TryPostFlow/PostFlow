@@ -20,6 +20,5 @@ def insert_sample_post():
     post_data.published_by = user_data.id
     post_data.created_by = user_data.id
     post_data.updated_by = user_data.id
-    db.session.add(post_data)
-    db.session.commit()
+    post_data.save()
     return post_data

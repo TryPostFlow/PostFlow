@@ -1,5 +1,6 @@
 feedparser==5.2.1
 Flask==0.12
+Flask-Storage==0.1.1
 Flask-Mail==0.9.1
 Flask-OAuthlib==0.9.3
 Flask-Principal==0.4.0
@@ -19,5 +20,4 @@ simplejson==3.10.0
 Unidecode==0.4.20
 raven==6.0.0
 SQLAlchemy-Utils==0.32.12
--e git+https://github.com/fengluo/flask-storage.git#egg=flask-storage
 -e .

@@ -27,15 +27,9 @@ def get_all_users(page, limit=20):
     return User.query.order_by(User.updated_at.desc()).paginate(page, limit)
 
 
-def get_user(id_or_slug):
-    return User.query.filter(
-        db.or_(User.id == id_or_slug, User.slug == id_or_slug)).first()
-
-
-def get_posts_by_user(id, page, limit=None):
+def get_posts_by_user(user_id, page, limit=None):
     limit = limit if limit else int(get_setting('postsPerPage').value)
-    posts = Post.query.filter(Post.created_by == id).paginate(page, limit)
-    return posts
+    return Post.query.filter(Post.created_by == user_id).paginate(page, limit)
 
 
 def create_user(name, password, email, role_name):

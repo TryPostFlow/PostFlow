@@ -2,13 +2,12 @@
 # -*- coding: utf-8 -*-
 
 from flask import request, abort
-from postflow.utils.schema import render_schema, render_error
 from postflow.utils.permissions import auth
 from postflow.setting import setting_api
 from postflow.setting.schemas import SettingSchema
 from postflow.setting.models import get_setting, get_all_settings, save_setting
 from postflow.setting.permissions import (setting_list_perm, setting_show_perm,
-                                        setting_update_perm)
+                                          setting_update_perm)
 
 
 @setting_api.route('', methods=['GET'])

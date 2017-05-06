@@ -38,8 +38,7 @@ def set_grant(client_id, code, request, *args, **kwargs):
         scope=' '.join(request.scopes),
         user_id=g.user.id,
         expires=expires, )
-    db.session.add(grant)
-    db.session.commit()
+    grant.save()
 
 
 @oauth.tokensetter
@@ -57,8 +56,7 @@ def set_token(token, request, *args, **kwargs):
     expires_in = token.get('expires_in')
     expires = datetime.utcnow() + timedelta(seconds=expires_in)
     tok.expires = expires
-    db.session.add(tok)
-    db.session.commit()
+    tok.save()
     return tok
 
 

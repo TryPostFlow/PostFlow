@@ -4,15 +4,14 @@
 from datetime import datetime
 from flask import request, g, jsonify, abort
 
-from postflow.extensions import db
 from postflow.utils.permissions import auth
-from postflow.utils.schema import render_schema, render_error
+from postflow.extensions import db
 from postflow.post import post_api
 from postflow.post.schemas import PostSchema
-from postflow.post.models import get_all_posts, get_post
+from postflow.post.models import Post, get_all_posts
 from postflow.post.permissions import (post_list_perm, post_show_perm,
-                                     post_create_perm, post_update_perm,
-                                     post_destory_perm)
+                                       post_create_perm, post_update_perm,
+                                       post_destory_perm)
 
 
 @post_api.route('', methods=['GET'])
@@ -29,9 +28,8 @@ def index():
 @auth.require(401)
 @post_show_perm.require(403)
 def show(post_id):
-    post_data = get_post(post_id)
-    if not post_data:
-        abort(404)
+    post_data = Post.query.filter(
+        db.or_(Post.id == post_id, Post.slug == post_id)).first_or_404()
     return PostSchema().jsonify(post_data)
 
 
@@ -48,8 +46,7 @@ def create():
     if post_data.status == 'published':
         post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
-    db.session.add(post_data)
-    db.session.commit()
+    post_data.save()
     return PostSchema().jsonify(post_data)
 
 
@@ -57,9 +54,8 @@ def create():
 @auth.require(401)
 @post_update_perm.require(403)
 def update(post_id):
-    post_data = get_post(post_id)
-    if not post_data:
-        abort(404)
+    post_data = Post.query.filter(
+        db.or_(Post.id == post_id, Post.slug == post_id)).first_or_404()
     playload = request.get_json()
     post_data, errors = PostSchema().load(playload)
     if errors:
@@ -69,8 +65,7 @@ def update(post_id):
             'status') == 'published':
         post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
-    db.session.add(post_data)
-    db.session.commit()
+    post_data.save()
     return PostSchema().jsonify(post_data)
 
 
@@ -78,9 +73,7 @@ def update(post_id):
 @auth.require(401)
 @post_destory_perm.require(403)
 def destory(post_id):
-    post_data = get_post(post_id)
-    if not post_data:
-        abort(404)
-    db.session.delete(post_data)
-    db.session.commit()
+    post_data = Post.query.filter(
+        db.or_(Post.id == post_id, Post.slug == post_id)).first_or_404()
+    post_data.delete()
     return jsonify(code=10000, message='success')
