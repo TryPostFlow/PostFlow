@@ -11,6 +11,15 @@ PostFlow is A simple, powerful publishing platform.
 
 ## Quickstart
 
+* Install
+    `pip install postflow`
+* Initialize PostFlow
+    * `postflow init`
+* Run PostFlow in the production mode. Default port is `8000`
+    * `postflow start`
+
+## Developer Install
+
 * Create a virtualenv
 * Install dependencies and PostFlow
     * `make install`
