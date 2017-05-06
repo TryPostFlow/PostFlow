@@ -7,7 +7,7 @@ setup(
     url="https://github.com/TryPostFlow/PostFlow",
     license="Apache Licence 2.0",
     long_description="""
-    This is blog system
+    A simple, powerful publishing platform
     """,
     packages=find_packages(exclude=['tests*']),
     zip_safe=False,
