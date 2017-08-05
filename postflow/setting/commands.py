@@ -1,8 +1,20 @@
-from postflow.setting.schemas import SettingSchema
-from postflow.setting.fixtures import DEFAULT_SETTINGS
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import click
+
+from postflow.commands import postflow
+from postflow.setting.fixtures import init_settings
 
 
-def init_settings():
-    for default_setting in DEFAULT_SETTINGS:
-        setting_data = SettingSchema().load(default_setting).data
-        setting_data.save()
+
+@postflow.group()
+def settings():
+    """Create, update or delete users."""
+    pass
+
+@settings.command("init")
+def init():
+    click.secho("[+] Initialize settings", fg="cyan")
+    init_settings()
+    click.secho("[+] Initialize settings successfully", fg="green")

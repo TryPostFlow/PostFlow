@@ -27,6 +27,9 @@
                             <input type="text" class="form-control" v-model="post.slug">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label>Sync Telegram Channel</label> <input type="checkbox" v-model="post.telegram">
+                    </div>
                 </form>
             </ui-aside>
         </div>

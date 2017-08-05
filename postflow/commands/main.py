@@ -18,7 +18,7 @@ from postflow.commands.base import postflow
 from postflow.commands.database import init_db
 from postflow.commands.theme import download_theme
 from postflow.config.commands import generate_config
-from postflow.setting.commands import init_settings
+from postflow.setting.fixtures import init_settings
 from postflow.setting.models import save_setting
 from postflow.oauth.models import Client
 from postflow.account.commands.utils import init_permissions

@@ -22,6 +22,7 @@ class PostSchema(BaseSchema):
     image = fields.Nested(ImageSchema)
     tags = fields.Nested(
         TagSchema, only=('id', 'name', 'slug'), many=True, partial=True)
+    telegram = fields.Integer(dump_only=True)
     status = fields.String()
     views = fields.Integer(dump_only=True)
     updated_at = fields.DateTime(dump_only=True)
