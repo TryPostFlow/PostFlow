@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
     name='postflow',
-    version='0.1.2',
+    version='0.1.3',
     author='Shawn Xie',
     author_email='fengluo17@gmail.com',
     url="https://github.com/TryPostFlow/PostFlow",

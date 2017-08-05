@@ -90,7 +90,7 @@ def start(server, host, port, workers, config, daemon):
                 "bind": "{}:{}".format(host, port),
                 "workers": workers,
                 "daemon": daemon,
-                "worker_class": worker_class
+                "worker_class": 'sync'
             }
             FlaskApplication(create_app(config=config), options).run()
         except ImportError:
