@@ -5,3 +5,4 @@ from postflow.commands.importer import importer
 from postflow.config.commands import config
 from postflow.account.commands.permission import permissions
 from postflow.account.commands.user import users
+from postflow.setting.commands import settings

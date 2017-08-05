@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
-from flask import request, g, jsonify, abort
+from flask import request, g, jsonify, abort, current_app, url_for
 
 from postflow.utils.permissions import auth
 from postflow.extensions import db
@@ -12,6 +12,8 @@ from postflow.post.models import Post, get_all_posts
 from postflow.post.permissions import (post_list_perm, post_show_perm,
                                        post_create_perm, post_update_perm,
                                        post_destory_perm)
+from postflow.post.tasks import send_telegram_channel
+from postflow.utils.async_func import taskman
 
 
 @post_api.route('', methods=['GET'])
@@ -47,6 +49,11 @@ def create():
         post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
     post_data.save()
+    if payload.get('telegram'):
+        message = "{}\n{}".format(
+            post_data.title,
+            url_for('post_view.show', slug=post_data.slug, _external=True))
+        taskman.add_task(send_telegram_channel, message)
     return PostSchema().jsonify(post_data)
 
 
@@ -66,6 +73,11 @@ def update(post_id):
         post_data.published_at = datetime.utcnow()
         post_data.published_by = g.user.id
     post_data.save()
+    if playload.get('telegram'):
+        message = "{}\n{}".format(
+            post_data.title,
+            url_for('post_view.show', slug=post_data.slug, _external=True))
+        taskman.add_task(send_telegram_channel, message)
     return PostSchema().jsonify(post_data)
 
 

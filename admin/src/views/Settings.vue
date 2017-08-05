@@ -54,6 +54,17 @@
                         <span class="help-block m-b-none">The shortname of your blog in the Disqus</span>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="col-lg-2 control-label">Telegram</label>
+                    <div class="col-lg-5">
+                        <input type="text" class="form-control" v-model="settings.telegram_token.value" placeholder="Telegram bot token">
+                        <span class="help-block m-b-none">The token of your telegram bot.</span>
+                    </div>
+                    <div class="col-lg-5">
+                        <input type="text" class="form-control" v-model="settings.telegram_channel.value" placeholder="Telegram channel username">
+                        <span class="help-block m-b-none">The token of your telegram bot.</span>
+                    </div>
+                </div>
             </form>
         </div>
     </div>

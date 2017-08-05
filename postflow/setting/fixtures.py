@@ -1,5 +1,7 @@
 import json
 
+from postflow.setting.schemas import SettingSchema
+
 DEFAULT_NAVIGATION = [
     {
         "label": "Home",
@@ -38,7 +40,21 @@ DEFAULT_SETTINGS = [
         'value': '',
     },
     {
+        'key': 'telegram_token',
+        'value': ''
+    },
+    {
+        'key': 'telegram_channel',
+        'value': ''
+    },
+    {
         'key': 'navigation',
         'value': json.dumps(DEFAULT_NAVIGATION)
     }
 ]
+
+
+def init_settings():
+    for default_setting in DEFAULT_SETTINGS:
+        setting_data = SettingSchema().load(default_setting).data
+        setting_data.save()
