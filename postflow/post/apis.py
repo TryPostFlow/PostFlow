@@ -13,7 +13,6 @@ from postflow.post.permissions import (post_list_perm, post_show_perm,
                                        post_create_perm, post_update_perm,
                                        post_destory_perm)
 from postflow.post.tasks import send_telegram_channel
-from postflow.utils.async_func import taskman
 
 
 @post_api.route('', methods=['GET'])
@@ -53,7 +52,7 @@ def create():
         message = "{}\n{}".format(
             post_data.title,
             url_for('post_view.show', slug=post_data.slug, _external=True))
-        taskman.add_task(send_telegram_channel, message)
+        send_telegram_channel(message)
     return PostSchema().jsonify(post_data)
 
 
@@ -77,7 +76,7 @@ def update(post_id):
         message = "{}\n{}".format(
             post_data.title,
             url_for('post_view.show', slug=post_data.slug, _external=True))
-        taskman.add_task(send_telegram_channel, message)
+        send_telegram_channel(message)
     return PostSchema().jsonify(post_data)
 
 

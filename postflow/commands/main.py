@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import gevent.monkey
+gevent.monkey.patch_all()
+# gevent.monkey.patch_all(thread=False, socket=False)
+
 import os
 import sys
 import pkgutil
@@ -90,7 +94,7 @@ def start(server, host, port, workers, config, daemon):
                 "bind": "{}:{}".format(host, port),
                 "workers": workers,
                 "daemon": daemon,
-                "worker_class": 'sync'
+                "worker_class": worker_class
             }
             FlaskApplication(create_app(config=config), options).run()
         except ImportError:

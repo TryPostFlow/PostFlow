@@ -1,65 +1,38 @@
-from multiprocessing import Process
+from flask import copy_current_request_context
 from threading import Thread
-from Queue import Queue
+from functools import wraps
 
+def run_async(func):
+	"""
+		run_async(func)
+			function decorator, intended to make "func" run in a separate
+			thread (asynchronously).
+			Returns the created Thread object
 
-class TaskException(Exception):
-    pass
+			E.g.:
+			@run_async
+			def task1():
+				do_something
 
+			@run_async
+			def task2():
+				do_something_too
 
-class Waiter(Thread):
-    """
-    Waiter thread
-    """
-    def __init__(self):
-        self.__q = Queue()
-        self.__stopped = False
+			t1 = task1()
+			t2 = task2()
+			...
+			t1.join()
+			t2.join()
+	"""
 
-    @property
-    def stopped(self):
-        return self.__stopped
+	@wraps(func)
+	def async_func(*args, **kwargs):
+		func_hl = Thread(
+            target = copy_current_request_context(func),
+            args = args,
+            kwargs = kwargs)
+		func_hl.start()
+		return func_hl
 
-    def run(self):
-        while True:
-            child = self.__q.get()
-            if child is None:
-                return
-            child.join()
+	return async_func
 
-    def waiton(self, process):
-        self.__q.put(process)
-
-    def stop(self):
-        self.__q.put(None)
-        self.__stopped = True
-
-
-class TaskManager():
-    """
-    Task Manager implementation. This class allows for any function to be fired
-    as their own process. Once fired the parent procsses can continue on doing
-    their business.
-    We do not guarentee execution of success of process.
-    """
-    def __init__(self):
-        self._waiter = Waiter()
-
-    def __del__(self):
-        self._waiter.stop()
-
-    def add_task(self, fn, *args):
-        """
-        If the kitchen is still accepting orders place task on waiter's docket.
-        Else, a TaskException is raised.
-        :Parameters:
-            `fn`: Target function to run as a seperate Process
-            `args`: The arguments to pass to the target function
-        """
-        if self._waiter.stopped:
-            raise TaskException('We are close for business. Go elsewhere!')
-        process = Process(target=fn, args=args)
-        process.start()
-        self._waiter.waiton(process)
-
-
-taskman = TaskManager()
