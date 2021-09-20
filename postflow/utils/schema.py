@@ -123,6 +123,5 @@ def render_error(code, error, status=400):
 
 def update_object(obj, data):
     for key, value in data.iteritems():
-        print key, value
         setattr(obj, key, value)
     return obj
