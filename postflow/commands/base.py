@@ -5,7 +5,7 @@ from flask.cli import FlaskGroup, ScriptInfo, pass_script_info
 
 from postflow import create_app
 
-def make_app(script_info):
+def make_app(script_info=None):
     config_file = getattr(script_info, "config_file")
     return create_app(config_file)
 

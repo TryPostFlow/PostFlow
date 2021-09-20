@@ -44,7 +44,7 @@ class Tag(db.Model, CRUDMixin):
     updated_at = db.Column(
         db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    __mapper_args__ = {'order_by': id.desc()}
+    # __mapper_args__ = {'order_by': id.desc()}
 
     @hybrid_property
     def slug(self):

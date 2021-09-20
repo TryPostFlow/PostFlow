@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from flask import g, request, url_for, jsonify
-from werkzeug.contrib.atom import AtomFeed
+from feedwerk.atom import AtomFeed
 from postflow.extensions import db
 from postflow.helpers.template import render_template
 from postflow.post import post_view

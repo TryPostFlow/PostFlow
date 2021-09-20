@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import _env
+import postflow._env
 import os
 import json
 from collections import namedtuple

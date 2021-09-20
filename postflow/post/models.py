@@ -58,7 +58,7 @@ class Post(db.Model, CRUDMixin):
     published_at = db.Column(db.DateTime)
     published_by = db.Column(db.Integer, index=True)
 
-    __mapper_args__ = {'order_by': id.desc()}
+    # __mapper_args__ = {'order_by': id.desc()}
 
     tags = db.relationship(
         'Tag',

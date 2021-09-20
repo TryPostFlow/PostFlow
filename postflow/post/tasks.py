@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
-from urllib import quote
+from urllib.parse import quote
 from flask import g
 
 
