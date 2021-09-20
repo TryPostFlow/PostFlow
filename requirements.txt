@@ -1,4 +1,4 @@
-feedparser==5.2.1
+feedparser==6.0.8
 Flask==2.0.1
 Flask-Storage==0.1.2
 Flask-Mail==0.9.1
