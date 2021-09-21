@@ -19,7 +19,7 @@ def get_all_posts(status=None, page=1, limit=None):
     query = Post.query
     if status:
         query = query.filter(Post.status == status)
-    return query.paginate(page, limit)
+    return query.order_by(Post.id.desc()).paginate(page, limit)
 
 
 def get_next_post(id):
