@@ -187,7 +187,7 @@ class User(db.Model, CRUDMixin):
     @cached_property
     def avatar(self):
         gravatar_url = "https://www.gravatar.com/avatar/"
-        return gravatar_url + hashlib.md5(self.email.lower()).hexdigest()
+        return gravatar_url + hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
 
 
 def get_all_roles(page, limit=20):

@@ -48,7 +48,7 @@ def write_config(config, config_template, config_path):
     """
     with open(config_path, 'w') as cfg_file:
         cfg_file.write(
-            config_template.render(**config).encode("utf-8")
+            config_template.render(**config)
         )
 
 def generate_config(output=None, force=None, theme=None):

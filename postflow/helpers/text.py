@@ -14,14 +14,15 @@ _lang_re = re.compile(r'l=[\'"]?(?P<lang>\w+)[\'"]?')
 def slugify(text, delim=u'-'):
     """Generates an ASCII-only slug. From http://flask.pocoo.org/snippets/5/"""
     split_text = []
-    text = text.decode() if isinstance(text, str) else text
+    # text = text.decode() if isinstance(text, str) else text
     for item in lazy_pinyin(text):
         result = []
         for word in _punct_re.split(unidecode(item.lower())):
-            word = word.decode() if isinstance(word, str) else word
+            # word = word.decode() if isinstance(word, str) else word
             result.extend(unidecode(word).split())
         split_text.extend(result)
-    return unicode(delim.join(split_text))
+    # return unicode(delim.join(split_text))
+    return delim.join(split_text)
 
 import tempfile
 import itertools as IT
