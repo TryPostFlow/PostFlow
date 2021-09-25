@@ -8,6 +8,7 @@ from datetime import datetime
 import mistune
 from jinja2.utils import Markup
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm.attributes import InstrumentedAttribute
 from postflow.extensions import db, storage
 from postflow.helpers.text import slugify
 from postflow.setting.models import get_setting
@@ -118,7 +119,10 @@ class Post(db.Model, CRUDMixin):
 
     @hybrid_property
     def image(self):
-        if self._image:
+        print('self._image')
+        print(self._image)
+        if self._image and not isinstance(self._image, InstrumentedAttribute):
+            print('get')
             return dict(url=storage.url(self._image), filename=self._image)
         return {}
 
