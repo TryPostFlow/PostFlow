@@ -1,5 +1,5 @@
 feedparser==6.0.8
-Flask==2.0.1
+Flask==2.3.2
 Flask-Storage==0.1.2
 Flask-Mail==0.9.1
 Flask-OAuthlib==0.9.6
