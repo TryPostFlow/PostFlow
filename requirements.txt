@@ -1,6 +1,8 @@
 feedparser==6.0.8
 Flask==2.0.1
-Flask-Storage==0.1.2
+Werkzeug==2.0.3
+SQLAlchemy==1.4.52
+Flask-Storage @ https://github.com/lepture/flask-storage/archive/b246c4a8b60bbb39fa6adbc76e7454429312c41b.tar.gz
 Flask-Mail==0.9.1
 Flask-OAuthlib==0.9.6
 Flask-Principal==0.4.0

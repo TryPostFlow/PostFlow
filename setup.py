@@ -17,10 +17,12 @@ setup(
         postflow=postflow.commands:postflow
     ''',
     install_requires=[
-        'feedparser==6.0.8', 'Flask==2.0.1', 'Flask-Storage==0.1.2',
+        'feedparser==6.0.8', 'Flask==2.0.1', 'Werkzeug==2.0.3',
+        'Flask-Storage @ https://github.com/lepture/flask-storage/archive/b246c4a8b60bbb39fa6adbc76e7454429312c41b.tar.gz',
         'Flask-Mail==0.9.1', 'Flask-OAuthlib==0.9.6', 'Flask-Principal==0.4.0',
         'Flask-Alembic==2.0.1', 'Flask-SQLAlchemy==2.5.1',
-        'Flask-Themes2==1.0.0', 'SQLAlchemy-Utils==0.37.8', 'gevent==21.8.0',
+        'Flask-Themes2==1.0.0', 'SQLAlchemy==1.4.52', 'SQLAlchemy-Utils==0.37.8',
+        'gevent==21.8.0',
         'gunicorn==20.1.0', 'jieba==0.38', 'Jinja2==3.0.1',
         'marshmallow==2.16.3', 'mistune==0.7.1', 'nose==1.3.7',
         'pypinyin==0.16.1', 'python-dateutil==2.6.0', 'simplejson==3.10.0',
