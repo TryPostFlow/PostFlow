@@ -16,7 +16,7 @@ RUN apt-get update && \
 
 COPY . /app
 
-RUN pip install --upgrade pip setuptools wheel && \
+RUN pip install --upgrade pip wheel "setuptools<81" && \
     pip install -r requirements.txt
 
 EXPOSE 8000
